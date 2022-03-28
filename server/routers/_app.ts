@@ -3,6 +3,7 @@
  */
 import { TRPCError } from '@trpc/server';
 import superjson from 'superjson';
+import { z } from 'zod';
 import { createRouter } from '../createRouter';
 import { spielRouter } from './spiele';
 import { spielerRouter } from './spieler';
@@ -39,6 +40,23 @@ export const appRouter = createRouter()
   .query('healthz', {
     async resolve() {
       return 'yay!';
+    },
+  })
+  .query('wait1000', {
+    async resolve() {
+      await new Promise((r) => setTimeout(r, 1000));
+      return { time: new Date() };
+    },
+  })
+  .query('jsonplaceholder', {
+    async resolve() {
+      return await fetch('https://jsonplaceholder.typicode.com/posts');
+    },
+  })
+  .query('input', {
+    input: z.object({ name: z.string() }),
+    async resolve({ ctx, input }) {
+      return { ctx, input };
     },
   })
   .merge('user.', userRouter)

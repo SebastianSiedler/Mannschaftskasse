@@ -43,6 +43,20 @@ export const appRouter = createRouter()
       return 'yay!';
     },
   })
+  .query('prisma_user', {
+    async resolve({ ctx }) {
+      return await ctx.prisma.user.findUnique({
+        where: {
+          id: ctx.session?.user.id,
+        },
+      });
+    },
+  })
+  .query('prisma_first_user', {
+    async resolve({ ctx }) {
+      return await ctx.prisma.user.findFirst();
+    },
+  })
   .query('wait1000', {
     async resolve() {
       await new Promise((r) => setTimeout(r, 1000));

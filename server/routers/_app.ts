@@ -2,6 +2,7 @@
  * This file contains the root router of your tRPC-backend
  */
 import { TRPCError } from '@trpc/server';
+import axios from 'axios';
 import superjson from 'superjson';
 import { z } from 'zod';
 import { createRouter } from '../createRouter';
@@ -50,7 +51,10 @@ export const appRouter = createRouter()
   })
   .query('jsonplaceholder', {
     async resolve() {
-      return await fetch('https://jsonplaceholder.typicode.com/posts');
+      const { data } = await axios.get(
+        'https://jsonplaceholder.typicode.com/posts',
+      );
+      return data;
     },
   })
   .query('input', {

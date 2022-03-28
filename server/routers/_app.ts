@@ -57,6 +57,23 @@ export const appRouter = createRouter()
       return await ctx.prisma.user.findFirst();
     },
   })
+  .query('prisma_first_user_5_parallel', {
+    async resolve({ ctx }) {
+      return await Promise.all(
+        [1, 2, 3, 4, 5].map(async () => await ctx.prisma.user.findFirst()),
+      );
+    },
+  })
+  .query('prisma_first_user_5_sequentiell', {
+    async resolve({ ctx }) {
+      const arr = [];
+      for (let i = 0; i < 5; i++) {
+        const u = await ctx.prisma.user.findFirst();
+        arr.push(u);
+      }
+      return arr;
+    },
+  })
   .query('wait1000', {
     async resolve() {
       await new Promise((r) => setTimeout(r, 1000));

@@ -1,0 +1,133 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["referentialIntegrity", "fullTextSearch", "fullTextIndex"]
+}
+
+datasource db {
+  provider = "postgres"
+  url      = env("DATABASE_URL")
+}
+
+generator erd {
+  provider = "prisma-erd-generator"
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model Account {
+  id                       String  @id @default(cuid())
+  userId                   String
+  type                     String
+  provider                 String
+  providerAccountId        String
+  refresh_token            String? @db.VarChar(2000)
+  refresh_token_expires_in Int?
+  access_token             String? @db.VarChar(2000)
+  expires_at               Int?
+  token_type               String?
+  scope                    String?
+  id_token                 String? @db.VarChar(2000)
+  session_state            String? @db.VarChar(2000)
+  oauth_token_secret       String? @db.VarChar(2000)
+  oauth_token              String? @db.VarChar(2000)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+
+  role Role @default(USER)
+}
+
+model Saison {
+  id            String  @id @default(cuid())
+  bfvCompoundID String // WettbewerbId - aktuelle Saison
+  name          String
+  spiel         Spiel[]
+  latest        Boolean @default(false) // Ob es die aktuelle Saison ist
+
+  @@unique([bfvCompoundID])
+}
+
+model Spiel {
+  id         String @id @default(cuid())
+  saisonId   String
+  saison     Saison @relation(fields: [saisonId], references: [id], onDelete: Cascade)
+  bfvMatchId String
+
+  kickoffDate DateTime
+  result      String
+
+  homeTeamId  String
+  homeTeam    Team   @relation("homeTeam", fields: [homeTeamId], references: [id], onDelete: Cascade)
+  guestTeamId String
+  guestTeam   Team   @relation("guestTeam", fields: [guestTeamId], references: [id], onDelete: Cascade)
+
+
+  spielereinsaetze Spielereinsatz[]
+
+  @@unique([bfvMatchId])
+}
+
+model Spieler {
+  id               String           @id @default(cuid())
+  name             String
+  active           Boolean
+  spielereinsaetze Spielereinsatz[]
+
+  @@unique([name])
+}
+
+model Spielereinsatz {
+  tore       Int
+  bezahlt    Boolean
+  gelbeKarte Int
+  roteKarte  Int
+
+  spielerId String
+  spieler   Spieler @relation(fields: [spielerId], references: [id], onDelete: Cascade)
+
+  spielId String
+  Spiel   Spiel  @relation(fields: [spielId], references: [id], onDelete: Cascade)
+
+  @@id([spielerId, spielId])
+}
+
+model Team {
+  id                 String @id @default(cuid())
+  bfvTeamPermanentId String
+  bfvClubId          String
+
+  logo        String?
+  name        String
+  homeSpiele  Spiel[] @relation("homeTeam")
+  guestSpiele Spiel[] @relation("guestTeam")
+
+  @@unique([bfvTeamPermanentId])
+}

@@ -52,7 +52,9 @@ export const appRouter = createRouter()
   .query('jsonplaceholder', {
     async resolve() {
       const { data } = await axios.get(
-        'https://jsonplaceholder.typicode.com/posts',
+        `https://jsonplaceholder.typicode.com/posts?id=${Math.floor(
+          Math.random() * 12,
+        )}`,
       );
       return data;
     },

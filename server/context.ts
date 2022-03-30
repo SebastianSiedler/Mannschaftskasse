@@ -13,13 +13,15 @@ export const createContext = async ({
     getServerSession({ req, res }, authOptions),
   );
 
+  console.log('session: ', session);
+
   return {
     req,
     res,
     prisma,
     session,
 
-    sessionDuration: duration,
+    sessionDuration: session == null ? null : duration,
   };
 };
 

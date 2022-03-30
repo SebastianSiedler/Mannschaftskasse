@@ -13,8 +13,6 @@ export const createContext = async ({
     getServerSession({ req, res }, authOptions),
   );
 
-  console.log('session: ', session);
-
   return {
     req,
     res,

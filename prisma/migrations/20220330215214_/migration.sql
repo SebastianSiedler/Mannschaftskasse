@@ -9,9 +9,9 @@ CREATE TABLE "Account" (
     "provider" TEXT NOT NULL,
     "providerAccountId" TEXT NOT NULL,
     "refresh_token" VARCHAR(2000),
-    "refresh_token_expires_in" INT4,
+    "refresh_token_expires_in" INTEGER,
     "access_token" VARCHAR(2000),
-    "expires_at" INT4,
+    "expires_at" INTEGER,
     "token_type" TEXT,
     "scope" TEXT,
     "id_token" VARCHAR(2000),
@@ -78,10 +78,10 @@ CREATE TABLE "Spieler" (
 
 -- CreateTable
 CREATE TABLE "Spielereinsatz" (
-    "tore" INT4 NOT NULL,
+    "tore" INTEGER NOT NULL,
     "bezahlt" BOOLEAN NOT NULL,
-    "gelbeKarte" INT4 NOT NULL,
-    "roteKarte" INT4 NOT NULL,
+    "gelbeKarte" INTEGER NOT NULL,
+    "roteKarte" INTEGER NOT NULL,
     "spielerId" TEXT NOT NULL,
     "spielId" TEXT NOT NULL,
 

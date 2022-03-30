@@ -18,7 +18,7 @@ export const testRouter = createRouter()
     },
   })
   /**
-   * /api/trpc/prisma_first_user_parallel?input={"json":{"range":15}}
+   * /api/trpc/test.prisma_first_user_parallel?input={"json":{"range":15}}
    */
   .query('prisma_first_user_parallel', {
     input: z.object({ range: z.number().default(5) }),

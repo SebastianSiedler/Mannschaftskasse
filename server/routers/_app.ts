@@ -38,8 +38,11 @@ export const appRouter = createRouter()
    * Add a health check endpoint to be called with `/api/trpc/healthz`
    */
   .query('healthz', {
-    async resolve() {
-      return 'yay!';
+    async resolve({ ctx }) {
+      return {
+        message: 'yay!',
+        time: ctx.sessionDuration,
+      };
     },
   })
   .merge('user.', userRouter)

@@ -32,8 +32,7 @@ export const spielRouter = createRouter()
           },
         },
         include: {
-          homeTeam: true,
-          guestTeam: true,
+          opponent: true,
         },
         orderBy: {
           kickoffDate: 'asc',
@@ -51,14 +50,10 @@ export const spielRouter = createRouter()
           id: input.spielId,
         },
         include: {
-          homeTeam: true,
-          guestTeam: true,
+          opponent: true,
         },
       });
 
-      return {
-        ...spiel,
-        title: `${spiel?.homeTeam.name} vs. ${spiel?.guestTeam.name} `,
-      };
+      return spiel;
     },
   });

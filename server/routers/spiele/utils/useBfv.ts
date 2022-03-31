@@ -7,6 +7,7 @@ import { prisma } from '@/lib/prisma';
 
 import fs from 'fs';
 import path from 'path';
+import { getOpponentTeam, parse_result } from '.';
 
 const { BFV_PERMANENT_TEAM_ID } = serverEnv;
 
@@ -75,38 +76,38 @@ export const updateMatches = async () => {
   );
 };
 
-const getTeamByBfvPermanentId = async (
-  permanentTeamId: string,
-  teamName: string,
-) => {
-  const team = await prisma.team.findUnique({
-    where: {
-      bfvTeamPermanentId: permanentTeamId,
-    },
-  });
+// const getTeamByBfvPermanentId = async (
+//   permanentTeamId: string,
+//   teamName: string,
+// ) => {
+//   const team = await prisma.team.findUnique({
+//     where: {
+//       bfvTeamPermanentId: permanentTeamId,
+//     },
+//   });
 
-  if (!team) {
-    const { data } = await getBfvClubInfo(permanentTeamId);
+//   if (!team) {
+//     const { data } = await getBfvClubInfo(permanentTeamId);
 
-    if (!data?.club) {
-      throw new TRPCError({
-        code: 'NOT_FOUND',
-        message: 'No corresponding bfv club to team found',
-      });
-    }
+//     if (!data?.club) {
+//       throw new TRPCError({
+//         code: 'NOT_FOUND',
+//         message: 'No corresponding bfv club to team found',
+//       });
+//     }
 
-    return await prisma.team.create({
-      data: {
-        bfvTeamPermanentId: permanentTeamId,
-        name: teamName,
-        bfvClubId: data.club.id,
-        logo: data.club.logoUrl,
-      },
-    });
-  }
+//     return await prisma.team.create({
+//       data: {
+//         bfvTeamPermanentId: permanentTeamId,
+//         name: teamName,
+//         bfvClubId: data.club.id,
+//         logo: data.club.logoUrl,
+//       },
+//     });
+//   }
 
-  return team;
-};
+//   return team;
+// };
 
 interface UpsertMatchopts {
   bfvMatch: BfvMatch;
@@ -115,45 +116,62 @@ interface UpsertMatchopts {
 
 const upsertMatch = async (opts: UpsertMatchopts) => {
   const { bfvMatch, saisonId } = opts;
+
+  const parsed_result = parse_result(bfvMatch);
+  const opponent_team = getOpponentTeam(bfvMatch);
+
+  console.log(opponent_team);
+
   const match = await prisma.spiel.findUnique({
     where: {
       bfvMatchId: bfvMatch.matchId,
     },
   });
 
+  /* Create new Game in DB */
   if (match === null) {
-    const [homeTeam, guestTeam] = await Promise.all([
-      await getTeamByBfvPermanentId(
-        bfvMatch.homeTeamPermanentId,
-        bfvMatch.homeTeamName,
-      ),
-      await getTeamByBfvPermanentId(
-        bfvMatch.guestTeamPermanentId,
-        bfvMatch.guestTeamName,
-      ),
-    ]);
+    const opponent = await prisma.team.upsert({
+      where: {
+        bfvTeamPermanentId: opponent_team.teamPermanentId,
+      },
+      update: {
+        bfvTeamPermanentId: opponent_team.teamPermanentId,
+        bfvClubId: opponent_team.clubId,
+        name: opponent_team.teamName,
+      },
+      create: {
+        bfvTeamPermanentId: opponent_team.teamPermanentId,
+        bfvClubId: opponent_team.clubId,
+        name: opponent_team.teamName,
+      },
+    });
 
     return await prisma.spiel.create({
       data: {
         saisonId: saisonId,
-        kickoffDate: getParsedDate(bfvMatch.kickoffDate, bfvMatch.kickoffTime),
-        result: bfvMatch.result,
-        homeTeamId: homeTeam.id,
-        guestTeamId: guestTeam.id,
         bfvMatchId: bfvMatch.matchId,
-      },
-    });
-  } else {
-    await prisma.spiel.update({
-      where: {
-        id: match.id,
-      },
-      data: {
+
         kickoffDate: getParsedDate(bfvMatch.kickoffDate, bfvMatch.kickoffTime),
-        result: bfvMatch.result,
+
+        result: parsed_result.result,
+        resultType: parsed_result.type,
+
+        opponentTeamId: opponent.id,
       },
     });
   }
+
+  /* Update existing Game */
+  return await prisma.spiel.update({
+    where: {
+      id: match.id,
+    },
+    data: {
+      kickoffDate: getParsedDate(bfvMatch.kickoffDate, bfvMatch.kickoffTime),
+      result: parsed_result.result,
+      resultType: parsed_result.type,
+    },
+  });
 };
 
 const getParsedDate = (date: string, time: string) => {

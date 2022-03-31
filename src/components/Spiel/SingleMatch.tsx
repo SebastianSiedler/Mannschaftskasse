@@ -46,7 +46,7 @@ const SingleMatch: React.FC<Props> = (props) => {
   return (
     <>
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>{matchQuery.data?.title}</DialogTitle>
+        <DialogTitle>{matchQuery.data?.opponent.name}</DialogTitle>
 
         <DialogContent>
           <div>Gespielte Spieler:</div>

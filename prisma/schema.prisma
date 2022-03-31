@@ -20,6 +20,15 @@ enum Role {
   ADMIN
 }
 
+enum Result {
+  NICHT_ANGETRETEN
+  GEWONNEN
+  VERLOREN
+  UNENTSCHIEDEN
+  AUSSTEHEND
+  NICHT_ANGETRETEN_GEGNER
+}
+
 model Account {
   id                       String  @id @default(cuid())
   userId                   String
@@ -67,41 +76,37 @@ model User {
 
 model Saison {
   id            String  @id @default(cuid())
-  bfvCompoundID String // WettbewerbId - aktuelle Saison
+  bfvCompoundID String  @unique // WettbewerbId - aktuelle Saison
   name          String
   spiel         Spiel[]
   latest        Boolean @default(false) // Ob es die aktuelle Saison ist
 
-  @@unique([bfvCompoundID])
 }
 
 model Spiel {
   id         String @id @default(cuid())
   saisonId   String
   saison     Saison @relation(fields: [saisonId], references: [id], onDelete: Cascade)
-  bfvMatchId String
+  bfvMatchId String @unique
 
   kickoffDate DateTime
-  result      String
+  result      String?
+  resultType  Result
 
-  homeTeamId  String
-  homeTeam    Team   @relation("homeTeam", fields: [homeTeamId], references: [id], onDelete: Cascade)
-  guestTeamId String
-  guestTeam   Team   @relation("guestTeam", fields: [guestTeamId], references: [id], onDelete: Cascade)
+  opponentTeamId String
+  opponent       Team   @relation(fields: [opponentTeamId], references: [id], onDelete: Cascade)
 
 
   spielereinsaetze Spielereinsatz[]
 
-  @@unique([bfvMatchId])
+
 }
 
 model Spieler {
   id               String           @id @default(cuid())
-  name             String
+  name             String           @unique
   active           Boolean
   spielereinsaetze Spielereinsatz[]
-
-  @@unique([name])
 }
 
 model Spielereinsatz {
@@ -121,13 +126,9 @@ model Spielereinsatz {
 
 model Team {
   id                 String @id @default(cuid())
-  bfvTeamPermanentId String
-  bfvClubId          String
+  bfvTeamPermanentId String @unique
+  bfvClubId          String // Wird für Logo Benötigt. Der Sportverein, dem das Team gehört
 
-  logo        String?
-  name        String
-  homeSpiele  Spiel[] @relation("homeTeam")
-  guestSpiele Spiel[] @relation("guestTeam")
-
-  @@unique([bfvTeamPermanentId])
+  name   String
+  spiele Spiel[] @relation()
 }

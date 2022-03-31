@@ -6,26 +6,26 @@ const isHomeTeam = (match: BfvMatch) => {
   return BFV_PERMANENT_TEAM_ID == match.homeTeamPermanentId;
 };
 
-enum Result {
-  'NICHT_ANGETRETEN',
-  'GEWONNEN',
-  'VERLOREN',
-  'UNENTSCHIEDEN',
-  'AUSSTEHEND',
-  'NICHT_ANGETRETEN_GEGNER',
+import { Result } from '@prisma/client';
+
+interface ParsedResult {
+  type: Result;
+  result: string | null;
 }
 
-export const parse_result = (match: BfvMatch) => {
+export const parse_result = (match: BfvMatch): ParsedResult => {
   const { result } = match;
   if (result === 'n.an.') {
     return {
       type: Result.NICHT_ANGETRETEN,
+      result: null,
     };
   }
 
   if (result === '') {
     return {
       type: Result.AUSSTEHEND,
+      result: null,
     };
   }
 
@@ -47,17 +47,41 @@ export const parse_result = (match: BfvMatch) => {
     };
   }
 
+  if (isHomeTeam(match) && heim_score > guest_score) {
+    return {
+      type: Result.GEWONNEN,
+      result,
+    };
+  } else if (!isHomeTeam(match) && heim_score < guest_score) {
+    return {
+      type: Result.GEWONNEN,
+      result,
+    };
+  } else {
+    return {
+      result,
+      type: Result.VERLOREN,
+    };
+  }
+};
+
+interface OpponentTeam {
+  teamPermanentId: string;
+  teamName: string;
+  clubId: string;
+}
+export const getOpponentTeam = (match: BfvMatch): OpponentTeam => {
   if (isHomeTeam(match)) {
-    if (heim_score > guest_score) {
-      return {
-        type: Result.GEWONNEN,
-        result,
-      };
-    } else {
-      return {
-        result,
-        type: Result.VERLOREN,
-      };
-    }
+    return {
+      teamPermanentId: match.guestTeamPermanentId,
+      teamName: match.guestTeamName,
+      clubId: match.guestClubId,
+    };
+  } else {
+    return {
+      teamPermanentId: match.homeTeamPermanentId,
+      teamName: match.homeTeamName,
+      clubId: match.homeClubId,
+    };
   }
 };

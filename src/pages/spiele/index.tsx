@@ -2,9 +2,7 @@ import { browserEnv } from '@/env/browser';
 import { trpc } from '@/lib/trpc';
 import type { NextPageWithAuthAndLayout } from '@/lib/types';
 import { DefaultLayout } from '@/src/components/DefaultLayout';
-import MatchListItem, {
-  NewMatchListItem,
-} from '@/src/components/Spiel/MatchListItem';
+import NewMatchListItem from '@/src/components/Spiel/MatchListItem';
 import SingleMatch from '@/src/components/Spiel/SingleMatch';
 import List from '@mui/material/List';
 import { useRouter } from 'next/router';
@@ -50,45 +48,15 @@ const ListSpiele: React.FC = () => {
       {spieleQuery.status === 'success' && (
         <List>
           {spieleQuery.data.map((item) => {
-            const isHomeTeam =
-              browserEnv.BFV_PERMANENT_TEAM_ID !==
-              item.homeTeam.bfvTeamPermanentId;
-
-            const scoreArr = item.result
-              .split(' ')[0]
-              .split(':')
-              .map((x) => Number(x));
-
-            let guestScore, homeScore;
-
-            if (isHomeTeam) {
-              [guestScore, homeScore] = scoreArr;
-            } else {
-              [homeScore, guestScore] = scoreArr;
-            }
-
-            const resultStatus: RESULT_SCORE =
-              homeScore > guestScore
-                ? 'GEWONNEN'
-                : homeScore < guestScore
-                ? 'VERLOREN'
-                : homeScore == guestScore
-                ? 'UNENTSCHIEDEN'
-                : 'NOT PLAYED';
-
             return (
               <NewMatchListItem
                 key={item.id}
                 spielId={item.id}
                 kickOffDate={item.kickoffDate}
-                clubId={
-                  isHomeTeam
-                    ? item.homeTeam.bfvClubId
-                    : item.guestTeam.bfvClubId
-                }
-                teamName={isHomeTeam ? item.homeTeam.name : item.guestTeam.name}
+                clubId={item.opponent.bfvClubId}
+                teamName={item.opponent.name}
                 result={item.result}
-                resultStatus={resultStatus}
+                resultStatus={item.resultType}
               />
             );
           })}

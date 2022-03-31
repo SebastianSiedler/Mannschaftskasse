@@ -4,6 +4,14 @@ import { z } from 'zod';
 import { isBfvDataChanged, updateMatches } from './utils/useBfv';
 
 export const spielRouter = createRouter()
+  /**
+   * Run only once on init if no data available
+   */
+  .query('update_matches', {
+    async resolve() {
+      return await updateMatches();
+    },
+  })
   .query('list', {
     async resolve({ ctx }) {
       try {

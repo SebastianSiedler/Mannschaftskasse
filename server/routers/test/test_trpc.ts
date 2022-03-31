@@ -24,38 +24,22 @@ export const testRouter = createRouter()
   .query('prisma_first_user_parallel', {
     input: z.object({ range: z.number().default(5) }),
     async resolve({ ctx, input }) {
-      const { data, duration } = await measureTime(async () => {
-        return await Promise.all(
-          Array(input.range)
-            .fill('#')
-            .map(async () => await ctx.prisma.user.findFirst()),
-        );
-      });
-
-      return {
-        data,
-        duration,
-        session: ctx.sessionDuration,
-      };
+      return await Promise.all(
+        Array(input.range)
+          .fill('#')
+          .map(async () => await ctx.prisma.user.findFirst()),
+      );
     },
   })
   .query('prisma_first_user_sequentiell', {
     input: z.object({ range: z.number().default(5) }),
     async resolve({ ctx, input }) {
-      const { data, duration } = await measureTime(async () => {
-        const arr = [];
-        for (const _ of Array(input.range).fill('#')) {
-          const u = await ctx.prisma.user.findFirst();
-          arr.push(u);
-        }
-        return arr;
-      });
-
-      return {
-        data,
-        duration,
-        session: ctx.sessionDuration,
-      };
+      const arr = [];
+      for (const _ of Array(input.range).fill('#')) {
+        const u = await ctx.prisma.user.findFirst();
+        arr.push(u);
+      }
+      return arr;
     },
   })
   .query('wait1000', {

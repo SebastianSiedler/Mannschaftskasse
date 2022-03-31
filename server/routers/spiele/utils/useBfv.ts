@@ -79,13 +79,13 @@ const getTeamByBfvPermanentId = async (
   permanentTeamId: string,
   teamName: string,
 ) => {
-  const teamId = await prisma.team.findUnique({
+  const team = await prisma.team.findUnique({
     where: {
       bfvTeamPermanentId: permanentTeamId,
     },
   });
 
-  if (!teamId) {
+  if (!team) {
     const { data } = await getBfvClubInfo(permanentTeamId);
 
     if (!data?.club) {
@@ -105,7 +105,7 @@ const getTeamByBfvPermanentId = async (
     });
   }
 
-  return teamId;
+  return team;
 };
 
 interface UpsertMatchopts {

@@ -18,12 +18,12 @@ import { userRouter } from './user';
  * @link https://trpc.io/docs/router
  */
 export const appRouter = createRouter()
-  // .middleware(({ ctx, next }) => { //TODO: middleware wieder reinkommentieren
-  //   if (!ctx.session?.user) {
-  //     throw new TRPCError({ code: 'UNAUTHORIZED' });
-  //   }
-  //   return next();
-  // })
+  .middleware(({ ctx, next }) => {
+    if (!ctx.session?.user) {
+      throw new TRPCError({ code: 'UNAUTHORIZED' });
+    }
+    return next();
+  })
   /**
    * Add data transformers
    * @link https://trpc.io/docs/data-transformers

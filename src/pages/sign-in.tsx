@@ -21,6 +21,7 @@ const SignIn = ({
 
       <Div100vh>
         <main className="flex flex-col justify-center basis-full">
+          <div>Sign In</div>
           <div className="w-full space-y-4 text-center bg-primary">
             {Object.values(providers ?? {}).map((provider) => (
               <div key={provider.name}>

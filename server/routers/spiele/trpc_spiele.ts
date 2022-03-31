@@ -1,15 +1,15 @@
 import { TRPCError } from '@trpc/server';
 import { createRouter } from 'server/createRouter';
 import { z } from 'zod';
-import { Context } from '@/server/context';
-import { updateMatches } from './utils/useBfv';
-import { getUserByCtx } from '@/server/utils';
+import { isBfvDataChanged, updateMatches } from './utils/useBfv';
 
 export const spielRouter = createRouter()
   .query('list', {
     async resolve({ ctx }) {
       try {
-        updateMatches(); //TODO: removed await
+        if (await isBfvDataChanged()) {
+          await updateMatches();
+        }
       } catch (e) {
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',

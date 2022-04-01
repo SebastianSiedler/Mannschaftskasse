@@ -3,7 +3,7 @@
 
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["referentialIntegrity", "fullTextSearch", "fullTextIndex", "cockroachdb"]
+  previewFeatures = ["referentialIntegrity", "fullTextSearch", "fullTextIndex", "cockroachdb", "extendedIndexes"]
 }
 
 datasource db {
@@ -96,10 +96,9 @@ model Spiel {
   opponentTeamId String
   opponent       Team   @relation(fields: [opponentTeamId], references: [id], onDelete: Cascade)
 
-
   spielereinsaetze Spielereinsatz[]
 
-
+  @@index([opponentTeamId])
 }
 
 model Spieler {
@@ -107,6 +106,8 @@ model Spieler {
   names            String[]
   active           Boolean
   spielereinsaetze Spielereinsatz[]
+
+  @@index([names, active])
 }
 
 model Spielereinsatz {
@@ -122,6 +123,7 @@ model Spielereinsatz {
   Spiel   Spiel  @relation(fields: [spielId], references: [id], onDelete: Cascade)
 
   @@id([spielerId, spielId])
+  @@index([tore, bezahlt, gelbeKarte, roteKarte, spielerId, spielId])
 }
 
 model Team {
@@ -131,4 +133,6 @@ model Team {
 
   name   String
   spiele Spiel[] @relation()
+
+  @@index([bfvClubId, bfvTeamPermanentId, name])
 }

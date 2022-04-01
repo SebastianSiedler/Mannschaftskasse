@@ -31,12 +31,24 @@ const SingleMatch: React.FC<Props> = (props) => {
 
   const router = useRouter();
 
-  const matchQuery = trpc.useQuery(['spiel.detail', { spielId }]);
-  const spielerQuery = trpc.useQuery(['einsatz.list', { spielId }]);
-  const availQuery = trpc.useQuery([
-    'einsatz.list.availablePlayers',
-    { spielId },
-  ]);
+  const matchQuery = trpc.useQuery(['spiel.detail', { spielId }], {
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
+  const spielerQuery = trpc.useQuery(['einsatz.list', { spielId }], {
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
+  const availQuery = trpc.useQuery(
+    ['einsatz.list.availablePlayers', { spielId }],
+    {
+      onError: (err) => {
+        toast.error(err.message);
+      },
+    },
+  );
 
   const addPlayerMutation = trpc.useMutation('einsatz.add', {
     onSuccess: () => {

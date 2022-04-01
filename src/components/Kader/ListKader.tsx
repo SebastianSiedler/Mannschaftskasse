@@ -7,9 +7,14 @@ import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
 import EditPlayer from './EditPlayer';
 import UserManagement from './UserManagement';
+import toast from 'react-hot-toast';
 
 const ListKader: React.FC = () => {
-  const kaderQuery = trpc.useQuery(['spieler.list']);
+  const kaderQuery = trpc.useQuery(['spieler.list'], {
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
 
   const [open, setOpen] = useState(false);
 

@@ -4,6 +4,7 @@ import { DefaultLayout } from '@/src/components/DefaultLayout';
 import MatchListItem from '@/src/components/Spiel/MatchListItem';
 import SingleMatch from '@/src/components/Spiel/SingleMatch';
 import { useRouter } from 'next/router';
+import toast from 'react-hot-toast';
 
 export type RESULT_SCORE =
   | 'GEWONNEN'
@@ -39,7 +40,11 @@ SpieleHome.getLayout = (page: React.ReactElement) => {
 export default SpieleHome;
 
 const ListSpiele: React.FC = () => {
-  const spieleQuery = trpc.useQuery(['spiel.list']);
+  const spieleQuery = trpc.useQuery(['spiel.list'], {
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
 
   return (
     <div>

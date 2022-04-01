@@ -339,7 +339,7 @@
             "teamType": "Herren",
             "kickoffDate": "20.03.2022",
             "kickoffTime": "13:00",
-            "homeTeamName": " ((SG) Stettbach II/Zeuzleben II)",
+            "homeTeamName": "(SG) Stettbach II/Zeuzleben II",
             "homeTeamPermanentId": "027B821L9S000000VS5489B2VVB7EFSC",
             "homeClubId": "00ES8GNL7O00000AVV0AG08LVUPGND5I",
             "homeLogoPrivate": false,
@@ -347,7 +347,7 @@
             "guestTeamPermanentId": "01ABT6GLBO000000VV0AG80NVVQOBMRO",
             "guestClubId": "00ES8GNLA800001GVV0AG08LVUPGND5I",
             "guestLogoPrivate": false,
-            "result": "n.an.",
+            "result": "0:2 U",
             "tickerMatchId": null,
             "prePublished": false
         },

@@ -7,7 +7,11 @@ import { signOut } from 'next-auth/react';
 const Home: NextPageWithAuthAndLayout = () => {
   const { data: session } = useSession();
 
-  const userQuery = trpc.useQuery(['user.profile', { id: session?.user.id! }]);
+  const userQuery = trpc.useQuery(['user.profile', { id: session?.user.id! }], {
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
 
   return (
     <>

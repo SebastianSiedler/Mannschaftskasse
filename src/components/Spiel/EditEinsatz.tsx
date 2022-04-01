@@ -26,7 +26,12 @@ const SingleMatch: React.FC<Props> = (props) => {
 
   const { refetch: refetchEinsatz } = trpc.useQuery(
     ['einsatz.detail', { spielId, spielerId }],
-    { enabled: false },
+    {
+      enabled: false,
+      onError: (err) => {
+        toast.error(err.message);
+      },
+    },
   );
 
   const form = useEinsatzForm();

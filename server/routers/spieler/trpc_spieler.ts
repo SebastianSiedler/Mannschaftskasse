@@ -1,8 +1,8 @@
-import { createRouter } from 'server/createRouter';
 import { z } from 'zod';
 import { TRPCError } from '@trpc/server';
+import { createAdminRouter } from '@/server/create-admin-router';
 
-export const spielerRouter = createRouter()
+export const spielerRouter = createAdminRouter()
   .query('list', {
     async resolve({ ctx }) {
       return await ctx.prisma.spieler.findMany();

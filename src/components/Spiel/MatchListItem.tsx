@@ -28,7 +28,7 @@ const NewMatchListItem: React.FC<NewProps> = (props) => {
       scroll={false}
     >
       <a
-        className={`flex justify-between items-center gap-2 transition duration-300 ease ${
+        className={`flex justify-between items-center gap-2 transition duration-500 ease rounded-xl px-2 py-2 ${
           spielId === router.query.spielId && 'bg-blue-100'
         }`}
       >

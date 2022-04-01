@@ -33,7 +33,7 @@ const StatsHome: NextPageWithAuthAndLayout = () => {
                 margin: '0.5rem 0 0.5rem 0',
               }}
             >
-              <div>{player.name}</div>
+              <div>{player.names[0]}</div>
 
               {/* Stats */}
               <div>
@@ -63,7 +63,7 @@ const StatsHome: NextPageWithAuthAndLayout = () => {
                   onClick={() => {
                     if (
                       window.confirm(
-                        `Schulden von ${player.name} wirklich begleichen?`,
+                        `Schulden von ${player.names[0]} wirklich begleichen?`,
                       )
                     ) {
                       schuldenBegleichen.mutate({ spielerId: player.id });

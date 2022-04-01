@@ -6,8 +6,6 @@ import { trpc } from '@/lib/trpc';
 
 const UserManagement: React.FC = () => {
   const { data } = useSession();
-  console.log(data?.user.role === 'ADMIN');
-
   const allUsersQuery = trpc.useQuery(['user.list']);
 
   const changeUserPermission = trpc.useMutation('user.changeRole', {

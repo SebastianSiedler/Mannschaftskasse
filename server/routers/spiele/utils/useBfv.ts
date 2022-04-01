@@ -120,8 +120,6 @@ const upsertMatch = async (opts: UpsertMatchopts) => {
   const parsed_result = parse_result(bfvMatch);
   const opponent_team = getOpponentTeam(bfvMatch);
 
-  console.log(opponent_team);
-
   const match = await prisma.spiel.findUnique({
     where: {
       bfvMatchId: bfvMatch.matchId,

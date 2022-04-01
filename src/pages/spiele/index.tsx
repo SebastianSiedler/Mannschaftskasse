@@ -44,7 +44,7 @@ const ListSpiele: React.FC = () => {
   return (
     <div>
       {spieleQuery.status === 'success' && (
-        <div className="mx-4 mt-2 gap-y-4 flex flex-col">
+        <div className="mx-2 mt-2 gap-y-4 flex flex-col">
           {spieleQuery.data.map((item) => {
             return (
               <MatchListItem

@@ -1,6 +1,5 @@
-import { trpc } from '@/lib/trpc';
+// MUI
 import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
@@ -9,11 +8,18 @@ import AddCircleOutline from '@mui/icons-material/AddCircleOutline';
 import HighlightOffOutlined from '@mui/icons-material/HighlightOffOutlined';
 import CheckCircleOutline from '@mui/icons-material/CheckCircleOutline';
 import ListItemIcon from '@mui/material/ListItemIcon';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
+import AppBar from '@mui/material/AppBar';
+import Typography from '@mui/material/Typography';
+import Toolbar from '@mui/material/Toolbar';
+
 import EditEinsatz from './EditEinsatz';
-import { useRouter } from 'next/router';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
+import { trpc } from '@/lib/trpc';
 
+import { useRouter } from 'next/router';
 interface Props {
   spielId: string;
   open: boolean;
@@ -45,8 +51,22 @@ const SingleMatch: React.FC<Props> = (props) => {
 
   return (
     <>
-      <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>{matchQuery.data?.opponent.name}</DialogTitle>
+      <Dialog open={open} onClose={handleClose} fullScreen>
+        <AppBar sx={{ position: 'relative' }}>
+          <Toolbar>
+            <IconButton
+              edge="start"
+              color="inherit"
+              onClick={handleClose}
+              aria-label="close"
+            >
+              <CloseIcon />
+            </IconButton>
+            <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
+              {matchQuery.data?.opponent.name}
+            </Typography>
+          </Toolbar>
+        </AppBar>
 
         <DialogContent>
           <div>Gespielte Spieler:</div>
@@ -63,7 +83,7 @@ const SingleMatch: React.FC<Props> = (props) => {
                     item.spielerId === router.query.spielerId
                   }
                 >
-                  <ListItemText>{item.spieler.name} </ListItemText>
+                  <ListItemText>{item.spieler.names[0]} </ListItemText>
                   <ListItemIcon>
                     {item.bezahlt ? (
                       <CheckCircleOutline color="success" />
@@ -88,7 +108,7 @@ const SingleMatch: React.FC<Props> = (props) => {
                   });
                 }}
               >
-                <ListItemText>{item.name}</ListItemText>
+                <ListItemText>{item.names[0]}</ListItemText>
                 <ListItemIcon>
                   <AddCircleOutline />
                 </ListItemIcon>

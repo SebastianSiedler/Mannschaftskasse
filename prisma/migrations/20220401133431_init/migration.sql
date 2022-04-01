@@ -1,6 +1,9 @@
 -- CreateEnum
 CREATE TYPE "Role" AS ENUM ('USER', 'ADMIN');
 
+-- CreateEnum
+CREATE TYPE "Result" AS ENUM ('NICHT_ANGETRETEN', 'GEWONNEN', 'VERLOREN', 'UNENTSCHIEDEN', 'AUSSTEHEND', 'NICHT_ANGETRETEN_GEGNER');
+
 -- CreateTable
 CREATE TABLE "Account" (
     "id" TEXT NOT NULL,
@@ -60,9 +63,9 @@ CREATE TABLE "Spiel" (
     "saisonId" TEXT NOT NULL,
     "bfvMatchId" TEXT NOT NULL,
     "kickoffDate" TIMESTAMP(3) NOT NULL,
-    "result" TEXT NOT NULL,
-    "homeTeamId" TEXT NOT NULL,
-    "guestTeamId" TEXT NOT NULL,
+    "result" TEXT,
+    "resultType" "Result" NOT NULL,
+    "opponentTeamId" TEXT NOT NULL,
 
     CONSTRAINT "Spiel_pkey" PRIMARY KEY ("id")
 );
@@ -70,7 +73,7 @@ CREATE TABLE "Spiel" (
 -- CreateTable
 CREATE TABLE "Spieler" (
     "id" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
+    "names" TEXT[],
     "active" BOOLEAN NOT NULL,
 
     CONSTRAINT "Spieler_pkey" PRIMARY KEY ("id")
@@ -93,7 +96,6 @@ CREATE TABLE "Team" (
     "id" TEXT NOT NULL,
     "bfvTeamPermanentId" TEXT NOT NULL,
     "bfvClubId" TEXT NOT NULL,
-    "logo" TEXT,
     "name" TEXT NOT NULL,
 
     CONSTRAINT "Team_pkey" PRIMARY KEY ("id")
@@ -121,9 +123,6 @@ CREATE UNIQUE INDEX "Saison_bfvCompoundID_key" ON "Saison"("bfvCompoundID");
 CREATE UNIQUE INDEX "Spiel_bfvMatchId_key" ON "Spiel"("bfvMatchId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Spieler_name_key" ON "Spieler"("name");
-
--- CreateIndex
 CREATE UNIQUE INDEX "Team_bfvTeamPermanentId_key" ON "Team"("bfvTeamPermanentId");
 
 -- AddForeignKey
@@ -136,10 +135,7 @@ ALTER TABLE "Session" ADD CONSTRAINT "Session_userId_fkey" FOREIGN KEY ("userId"
 ALTER TABLE "Spiel" ADD CONSTRAINT "Spiel_saisonId_fkey" FOREIGN KEY ("saisonId") REFERENCES "Saison"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Spiel" ADD CONSTRAINT "Spiel_homeTeamId_fkey" FOREIGN KEY ("homeTeamId") REFERENCES "Team"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Spiel" ADD CONSTRAINT "Spiel_guestTeamId_fkey" FOREIGN KEY ("guestTeamId") REFERENCES "Team"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "Spiel" ADD CONSTRAINT "Spiel_opponentTeamId_fkey" FOREIGN KEY ("opponentTeamId") REFERENCES "Team"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Spielereinsatz" ADD CONSTRAINT "Spielereinsatz_spielId_fkey" FOREIGN KEY ("spielId") REFERENCES "Spiel"("id") ON DELETE CASCADE ON UPDATE CASCADE;

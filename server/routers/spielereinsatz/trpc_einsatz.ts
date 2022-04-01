@@ -56,7 +56,6 @@ export const einsatzRouter = createRouter()
       bezahlt: z.boolean().default(false),
     }),
     async resolve({ input, ctx }) {
-      console.log(input);
       return await ctx.prisma.spielereinsatz.create({
         data: input,
       });

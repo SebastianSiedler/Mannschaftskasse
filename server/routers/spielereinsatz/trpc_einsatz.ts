@@ -15,11 +15,6 @@ export const einsatzRouter = createRouter()
         include: {
           spieler: true,
         },
-        orderBy: {
-          spieler: {
-            name: 'asc',
-          },
-        },
       });
     },
   })

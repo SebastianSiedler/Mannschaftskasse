@@ -11,27 +11,27 @@ const main = async () => {
   await prisma.spieler.createMany({
     data: [
       {
-        name: 'Sebastian',
+        names: ['Sebastian'],
         active: true,
       },
       {
-        name: 'Christopher',
+        names: ['Christopher'],
         active: true,
       },
       {
-        name: 'Daniel',
+        names: ['Daniel'],
         active: true,
       },
       {
-        name: 'René',
+        names: ['René'],
         active: true,
       },
       {
-        name: 'Johannes',
+        names: ['Johannes'],
         active: true,
       },
       {
-        name: 'Noah',
+        names: ['Noah'],
         active: true,
       },
     ],

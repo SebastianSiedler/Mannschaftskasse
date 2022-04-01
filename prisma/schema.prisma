@@ -104,7 +104,7 @@ model Spiel {
 
 model Spieler {
   id               String           @id @default(cuid())
-  name             String           @unique
+  names            String[]
   active           Boolean
   spielereinsaetze Spielereinsatz[]
 }

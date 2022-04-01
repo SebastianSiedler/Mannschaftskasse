@@ -1,8 +1,6 @@
-import { TRPCError } from '@trpc/server';
 import { createRouter } from 'server/createRouter';
 import { z } from 'zod';
-import { Context } from '@/server/context';
-import { getUserByCtx } from '@/server/utils';
+import { TRPCError } from '@trpc/server';
 
 export const spielerRouter = createRouter()
   .query('list', {
@@ -10,31 +8,50 @@ export const spielerRouter = createRouter()
       return await ctx.prisma.spieler.findMany();
     },
   })
-  .mutation('add', {
-    input: z.object({ name: z.string().min(2) }),
-    async resolve({ input, ctx }) {
-      return await ctx.prisma.spieler.create({
-        data: {
-          name: input.name,
-          active: true,
-        },
-      });
-    },
-  })
-  .mutation('update', {
+  .mutation('upsert', {
     input: z.object({
-      spielerId: z.string(),
-      active: z.boolean().optional(),
-      name: z.string().min(2).optional(),
+      names: z.string().min(2).array().min(1),
+      spielerId: z.string().optional(),
+      active: z.boolean(),
     }),
     async resolve({ input, ctx }) {
-      return await ctx.prisma.spieler.update({
+      /* Input array contais dublicates */
+      if (input.names.length !== new Set(input.names).size) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'Namen enthalten Dublikate!',
+        });
+      }
+      const spieler = await ctx.prisma.spieler.findMany({
+        where: {
+          id: {
+            not: input.spielerId,
+          },
+        },
+        select: { names: true },
+      });
+      const flat_spieler = spieler.map((s) => s.names).flat();
+
+      for (const name of input.names) {
+        if (flat_spieler.includes(name)) {
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: `${name} ist bereits vergeben!`,
+          });
+        }
+      }
+
+      return await ctx.prisma.spieler.upsert({
         where: {
           id: input.spielerId,
         },
-        data: {
+        create: {
           active: input.active,
-          name: input.name,
+          names: input.names,
+        },
+        update: {
+          active: input.active,
+          names: input.names,
         },
       });
     },

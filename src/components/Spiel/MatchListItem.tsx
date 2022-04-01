@@ -35,7 +35,7 @@ const NewMatchListItem: React.FC<NewProps> = (props) => {
         <div className="">
           <img
             src={getClubLogoAPI(clubId)}
-            className="object-contain aspect-square h-10"
+            className="object-contain aspect-square h-10 bg-white rounded-lg"
           />
         </div>
 

@@ -3,6 +3,7 @@ import type { NextPageWithAuthAndLayout } from '@/lib/types';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import { signOut } from 'next-auth/react';
+import toast from 'react-hot-toast';
 
 const Home: NextPageWithAuthAndLayout = () => {
   const { data: session } = useSession();

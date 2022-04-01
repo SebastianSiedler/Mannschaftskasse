@@ -34,7 +34,7 @@ export const DefaultLayout = ({ children }: DefaultLayoutProps) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Box sx={{ pb: 7 }}>
+      <Box sx={{ pb: 7 }} className="text-slate-900">
         <main>{children}</main>
         <CssBaseline />
 

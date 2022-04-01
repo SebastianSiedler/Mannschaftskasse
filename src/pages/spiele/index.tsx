@@ -1,10 +1,8 @@
-import { browserEnv } from '@/env/browser';
 import { trpc } from '@/lib/trpc';
 import type { NextPageWithAuthAndLayout } from '@/lib/types';
 import { DefaultLayout } from '@/src/components/DefaultLayout';
-import NewMatchListItem from '@/src/components/Spiel/MatchListItem';
+import MatchListItem from '@/src/components/Spiel/MatchListItem';
 import SingleMatch from '@/src/components/Spiel/SingleMatch';
-import List from '@mui/material/List';
 import { useRouter } from 'next/router';
 
 export type RESULT_SCORE =
@@ -46,10 +44,10 @@ const ListSpiele: React.FC = () => {
   return (
     <div>
       {spieleQuery.status === 'success' && (
-        <List>
+        <div>
           {spieleQuery.data.map((item) => {
             return (
-              <NewMatchListItem
+              <MatchListItem
                 key={item.id}
                 spielId={item.id}
                 kickOffDate={item.kickoffDate}
@@ -60,7 +58,7 @@ const ListSpiele: React.FC = () => {
               />
             );
           })}
-        </List>
+        </div>
       )}
     </div>
   );

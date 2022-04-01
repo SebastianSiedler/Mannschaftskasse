@@ -1,6 +1,3 @@
-import ListItem from '@mui/material/ListItem';
-import ListItemText from '@mui/material/ListItemText';
-import ListItemButton from '@mui/material/ListItemButton';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 
@@ -17,7 +14,6 @@ interface NewProps {
   result: Spiel['result'];
   resultStatus: Result;
 }
-import ListItemAvatar from '@mui/material/ListItemAvatar';
 
 const NewMatchListItem: React.FC<NewProps> = (props) => {
   const { clubId, teamName, kickOffDate, result, spielId, resultStatus } =
@@ -26,56 +22,41 @@ const NewMatchListItem: React.FC<NewProps> = (props) => {
   const router = useRouter();
 
   return (
-    <ListItem>
-      <Link
-        href={`/spiele/?spielId=${spielId}`}
-        as={`/spiele/${spielId}`}
-        scroll={false}
+    <Link
+      href={`/spiele/?spielId=${spielId}`}
+      as={`/spiele/${spielId}`}
+      scroll={false}
+    >
+      <a
+        className={`flex justify-between mx-4 my-2 items-center gap-2 ${
+          spielId === router.query.spielId && 'bg-green-200'
+        }`}
       >
-        <ListItemButton selected={spielId === router.query.spielId}>
-          <ListItemAvatar>
-            <img
-              src={getClubLogoAPI(clubId)}
-              style={{
-                height: '40px',
-                aspectRatio: '1/1',
-                objectFit: 'contain',
-              }}
-            />
-          </ListItemAvatar>
-          <ListItemText>
-            <span>{teamName}</span>
-          </ListItemText>
+        <div className="">
+          <img
+            src={getClubLogoAPI(clubId)}
+            className="object-contain aspect-square h-10"
+          />
+        </div>
 
-          <ListItemText style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <div style={{ display: 'flex', gap: '0.5rem' }}>
-              <div>
-                {kickOffDate.toLocaleDateString('de', {
-                  month: 'numeric',
-                  day: 'numeric',
-                  year: 'numeric',
-                })}
-              </div>
-              <div>
-                <span
-                  style={{
-                    fontWeight: 'medium',
-                    color:
-                      resultStatus === 'GEWONNEN'
-                        ? 'green'
-                        : resultStatus === 'VERLOREN'
-                        ? 'red'
-                        : '',
-                  }}
-                >
-                  {result} {resultStatus}
-                </span>
-              </div>
-            </div>
-          </ListItemText>
-        </ListItemButton>
-      </Link>
-    </ListItem>
+        <div className="min-w-0 flex-1">
+          <div className="overflow-hidden whitespace-nowrap text-ellipsis">
+            <span className="font-semibold">{teamName}</span>
+          </div>
+          <div className="text-slate-500">
+            {kickOffDate.toLocaleDateString('de', {
+              month: 'numeric',
+              day: 'numeric',
+              year: 'numeric',
+            })}
+          </div>
+        </div>
+        <div>
+          <div>{result}</div>
+          <div>{resultStatus.toLowerCase()}</div>
+        </div>
+      </a>
+    </Link>
   );
 };
 

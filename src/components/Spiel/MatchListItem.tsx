@@ -28,8 +28,8 @@ const NewMatchListItem: React.FC<NewProps> = (props) => {
       scroll={false}
     >
       <a
-        className={`flex justify-between mx-4 my-2 items-center gap-2 ${
-          spielId === router.query.spielId && 'bg-green-200'
+        className={`flex justify-between items-center gap-2 transition duration-300 ease ${
+          spielId === router.query.spielId && 'bg-blue-100'
         }`}
       >
         <div className="">
@@ -52,8 +52,19 @@ const NewMatchListItem: React.FC<NewProps> = (props) => {
           </div>
         </div>
         <div>
-          <div>{result}</div>
-          <div>{resultStatus.toLowerCase()}</div>
+          <div className="font-semibold	flex justify-end">{result}</div>
+
+          <div
+            className={`px-2 py-1 rounded-full font-semibold text-xs ${
+              resultStatus === 'GEWONNEN'
+                ? 'text-green-500 bg-green-200'
+                : resultStatus === 'VERLOREN'
+                ? 'text-red-500 bg-red-200'
+                : 'text-gray-500 bg-gray-200'
+            }`}
+          >
+            {resultStatus.toLowerCase().replaceAll('_', ' ')}
+          </div>
         </div>
       </a>
     </Link>

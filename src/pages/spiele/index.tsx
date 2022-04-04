@@ -40,6 +40,18 @@ SpieleHome.getLayout = (page: React.ReactElement) => {
 export default SpieleHome;
 
 const ListSpiele: React.FC = () => {
+  trpc.useQuery(['spiel.update_matches'], {
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    retry: false,
+    staleTime: 24 * 60 * 1000,
+    refetchOnMount: false,
+
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
+
   const spieleQuery = trpc.useQuery(['spiel.list'], {
     onError: (err) => {
       toast.error(err.message);
@@ -60,6 +72,7 @@ const ListSpiele: React.FC = () => {
                 teamName={item.opponent.name}
                 result={item.result}
                 resultStatus={item.resultType}
+                currentGame={item.Saison.length > 0}
               />
             );
           })}

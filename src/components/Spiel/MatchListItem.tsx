@@ -13,11 +13,19 @@ interface NewProps {
   kickOffDate: Date;
   result: Spiel['result'];
   resultStatus: Result;
+  currentGame: boolean;
 }
 
 const NewMatchListItem: React.FC<NewProps> = (props) => {
-  const { clubId, teamName, kickOffDate, result, spielId, resultStatus } =
-    props;
+  const {
+    clubId,
+    teamName,
+    kickOffDate,
+    result,
+    spielId,
+    resultStatus,
+    currentGame,
+  } = props;
 
   const router = useRouter();
 
@@ -54,16 +62,23 @@ const NewMatchListItem: React.FC<NewProps> = (props) => {
         <div>
           <div className="font-semibold	flex justify-end">{result}</div>
 
-          <div
-            className={`px-2 py-1 rounded-full font-semibold text-xs ${
-              resultStatus === 'GEWONNEN'
-                ? 'text-green-500 bg-green-200'
-                : resultStatus === 'VERLOREN'
-                ? 'text-red-500 bg-red-200'
-                : 'text-gray-500 bg-gray-200'
-            }`}
-          >
-            {resultStatus.toLowerCase().replaceAll('_', ' ')}
+          <div className="flex gap-2">
+            {currentGame && (
+              <div className="px-2 py-1 rounded-full font-semibold text-xs text-amber-200 bg-amber-500">
+                Aktuelles Spiel!
+              </div>
+            )}
+            <div
+              className={`px-2 py-1 rounded-full font-semibold text-xs ${
+                resultStatus === 'GEWONNEN'
+                  ? 'text-green-500 bg-green-200'
+                  : resultStatus === 'VERLOREN'
+                  ? 'text-red-500 bg-red-200'
+                  : 'text-gray-500 bg-gray-200'
+              }`}
+            >
+              {resultStatus.toLowerCase().replaceAll('_', ' ')}
+            </div>
           </div>
         </div>
       </a>

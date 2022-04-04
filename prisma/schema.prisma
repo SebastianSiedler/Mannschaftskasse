@@ -81,6 +81,11 @@ model Saison {
   spiel         Spiel[]
   latest        Boolean @default(false) // Ob es die aktuelle Saison ist
 
+  lastBfvUpdate DateTime @default(now())
+
+  currentSpielId String? @unique
+  currentSpiel   Spiel?  @relation("currentSpiel", fields: [currentSpielId], references: [id], onDelete: Cascade)
+
 }
 
 model Spiel {
@@ -97,6 +102,8 @@ model Spiel {
   opponent       Team   @relation(fields: [opponentTeamId], references: [id], onDelete: Cascade)
 
   spielereinsaetze Spielereinsatz[]
+
+  Saison Saison[] @relation("currentSpiel")
 
   @@index([opponentTeamId])
 }

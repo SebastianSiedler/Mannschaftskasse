@@ -4,35 +4,9 @@ import axios from 'axios';
 import { BfvLeague, BfvMatch } from './bfv.types';
 import { serverEnv } from '@/env/server';
 import { prisma } from '@/lib/prisma';
-
-import fs from 'fs';
-import path from 'path';
 import { getOpponentTeam, parse_result } from '.';
 
 const { BFV_PERMANENT_TEAM_ID } = serverEnv;
-
-/**
- * Wenn sich die Daten die vom BFV zurückkommen geändert haben
- * -> Änderungen auf DB anwenden
- */
-export const isBfvDataChanged = async () => {
-  const file_path = path.resolve(
-    'server/routers/spiele/utils/last_bfv_data.json',
-  );
-
-  const file = fs.readFileSync(file_path);
-
-  const old_data = JSON.parse(file.toString());
-
-  const data = await getBfvData(BFV_PERMANENT_TEAM_ID);
-
-  if (JSON.stringify(old_data) !== JSON.stringify(data)) {
-    fs.writeFileSync(file_path, JSON.stringify(data, null, 4));
-    return true;
-  }
-
-  return false;
-};
 
 /**
  * Get aktuelle Saison alle Spiele vom BFV
@@ -68,12 +42,35 @@ export const updateMatches = async () => {
     });
   }
 
-  await Promise.all(
+  const matches = await Promise.all(
     data.matches.map(
       async (match) =>
         await upsertMatch({ bfvMatch: match, saisonId: saison!.id }),
     ),
   );
+
+  const currentMatch = matches.find(
+    (match) => match.bfvMatchId === data.actualMatchId,
+  );
+
+  if (!currentMatch) {
+    throw new TRPCError({
+      code: 'INTERNAL_SERVER_ERROR',
+      message: "Couldn't find a game for bfvActualMatchId",
+    });
+  }
+
+  const updated_saison = await prisma.saison.update({
+    where: {
+      id: saison.id,
+    },
+    data: {
+      lastBfvUpdate: new Date(),
+      currentSpielId: currentMatch.id,
+    },
+  });
+
+  return updated_saison;
 };
 
 // const getTeamByBfvPermanentId = async (

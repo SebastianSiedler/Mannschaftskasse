@@ -20,6 +20,7 @@ import toast from 'react-hot-toast';
 import { trpc } from '@/lib/trpc';
 
 import { useRouter } from 'next/router';
+import { useState } from 'react';
 interface Props {
   spielId: string;
   open: boolean;
@@ -60,6 +61,26 @@ const SingleMatch: React.FC<Props> = (props) => {
       toast.error(err.message);
     },
   });
+
+  const addPlayersFromClipboard = trpc.useMutation(
+    'einsatz.add_by_player_list',
+    {
+      onError: (err) => {
+        toast.error(err.message);
+      },
+      onSuccess: (data) => {
+        console.log(data.unknown_players);
+        if (data.unknown_players.length > 0) {
+          toast.error(`${data.unknown_players.join(', ')} nicht gefunden`);
+        }
+        setInputNames(data.unknown_players.join('\n'));
+        spielerQuery.refetch();
+        availQuery.refetch();
+      },
+    },
+  );
+
+  const [inputNames, setInputNames] = useState('');
 
   return (
     <>
@@ -127,6 +148,25 @@ const SingleMatch: React.FC<Props> = (props) => {
               </ListItemButton>
             ))}
           </List>
+
+          <textarea
+            name=""
+            id=""
+            rows={10}
+            value={inputNames}
+            onChange={(e) => setInputNames(e.target.value)}
+            className="form-control block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+          ></textarea>
+          <button
+            onClick={() => {
+              addPlayersFromClipboard.mutate({
+                spielId: spielId,
+                names: inputNames.split('\n').map((x) => x.trim()),
+              });
+            }}
+          >
+            Einfügen
+          </button>
         </DialogContent>
       </Dialog>
 

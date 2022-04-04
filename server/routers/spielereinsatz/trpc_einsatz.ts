@@ -1,6 +1,7 @@
 import { createRouter } from 'server/createRouter';
 import { z } from 'zod';
 import { createAdminRouter } from '@/server/create-admin-router';
+import { Spieler } from '@prisma/client';
 
 export const einsatzRouter = createRouter()
   .query('list', {
@@ -49,6 +50,56 @@ export const einsatzRouter = createRouter()
   .merge(
     '',
     createAdminRouter()
+      .mutation('add_by_player_list', {
+        input: z.object({
+          names: z.string().min(2).array().min(1),
+          spielId: z.string(),
+        }),
+        async resolve({ input, ctx }) {
+          const unknown_players: string[] = [];
+          const played_players: Spieler[] = [];
+
+          const all_players = await ctx.prisma.spieler.findMany();
+
+          input.names.map((name, i) => {
+            const player = all_players.find((player) =>
+              player.names.includes(name),
+            );
+            if (!!player) {
+              played_players.push(player);
+              return;
+            }
+
+            unknown_players.push(...input.names.splice(i, 1));
+          });
+
+          await ctx.prisma.$transaction(
+            played_players.map((player) => {
+              return ctx.prisma.spielereinsatz.upsert({
+                where: {
+                  spielerId_spielId: {
+                    spielId: input.spielId,
+                    spielerId: player.id,
+                  },
+                },
+                create: {
+                  tore: 0,
+                  bezahlt: false,
+                  gelbeKarte: 0,
+                  roteKarte: 0,
+                  spielId: input.spielId,
+                  spielerId: player.id,
+                },
+                update: {},
+              });
+            }),
+          );
+
+          return {
+            unknown_players,
+          };
+        },
+      })
       .mutation('add', {
         input: z.object({
           spielId: z.string(),

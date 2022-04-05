@@ -52,7 +52,7 @@ export const einsatzRouter = createRouter()
     createAdminRouter()
       .mutation('add_by_player_list', {
         input: z.object({
-          names: z.string().min(2).array().min(1),
+          names: z.string().array().min(1),
           spielId: z.string(),
         }),
         async resolve({ input, ctx }) {
@@ -61,16 +61,17 @@ export const einsatzRouter = createRouter()
 
           const all_players = await ctx.prisma.spieler.findMany();
 
-          input.names.map((name, i) => {
+          input.names.forEach((name) => {
             const player = all_players.find((player) =>
               player.names.includes(name),
             );
+
             if (!!player) {
               played_players.push(player);
               return;
             }
 
-            unknown_players.push(...input.names.splice(i, 1));
+            unknown_players.push(name);
           });
 
           await ctx.prisma.$transaction(

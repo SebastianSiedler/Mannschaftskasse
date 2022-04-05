@@ -102,7 +102,7 @@ const SingleMatch: React.FC<Props> = (props) => {
         </AppBar>
 
         <DialogContent>
-          <div>Gespielte Spieler:</div>
+          <div className="font-semibold">Gespielte Spieler:</div>
           <List>
             {spielerQuery.data?.map((item, i) => (
               <Link
@@ -129,7 +129,7 @@ const SingleMatch: React.FC<Props> = (props) => {
             ))}
           </List>
 
-          <div>Verfügbare Spieler:</div>
+          <div className="font-semibold">Verfügbare Spieler:</div>
           <List>
             {availQuery.data?.map((item, i) => (
               <ListItemButton
@@ -149,23 +149,29 @@ const SingleMatch: React.FC<Props> = (props) => {
             ))}
           </List>
 
+          <label htmlFor="player_names_textarea" className="font-semibold">
+            Nachricht:
+          </label>
           <textarea
-            name=""
-            id=""
+            id="player_names_textarea"
             rows={10}
             value={inputNames}
             onChange={(e) => setInputNames(e.target.value)}
             className="form-control block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
           ></textarea>
           <button
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
             onClick={() => {
               addPlayersFromClipboard.mutate({
                 spielId: spielId,
-                names: inputNames.split('\n').map((x) => x.trim()),
+                names: inputNames
+                  .split('\n')
+                  .map((x) => x.trim())
+                  .filter((x) => !!x),
               });
             }}
           >
-            Einfügen
+            Hinzufügen
           </button>
         </DialogContent>
       </Dialog>

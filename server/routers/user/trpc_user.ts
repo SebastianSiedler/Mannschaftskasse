@@ -1,6 +1,7 @@
 import { TRPCError } from '@trpc/server';
 import { createRouter } from '../../createRouter';
 import { z } from 'zod';
+import { createAdminRouter } from '@/server/create-admin-router';
 
 export const userRouter = createRouter()
   .query('profile', {
@@ -28,37 +29,37 @@ export const userRouter = createRouter()
       return user;
     },
   })
-  .query('list', {
-    async resolve({ ctx }) {
-      return await ctx.prisma.user.findMany({
-        where: {
-          id: {
-            not: ctx.session?.user.id,
-          },
+  .merge(
+    '',
+    createAdminRouter()
+      .query('list', {
+        async resolve({ ctx }) {
+          return await ctx.prisma.user.findMany({
+            where: {
+              id: {
+                not: ctx.session?.user.id,
+              },
+            },
+            orderBy: {
+              name: 'asc',
+            },
+          });
         },
-        orderBy: {
-          name: 'asc',
+      })
+      .mutation('changeRole', {
+        input: z.object({
+          userId: z.string(),
+          admin: z.boolean(),
+        }),
+        async resolve({ ctx, input }) {
+          return await ctx.prisma.user.update({
+            where: {
+              id: input.userId,
+            },
+            data: {
+              role: input.admin ? 'ADMIN' : 'USER',
+            },
+          });
         },
-      });
-    },
-  })
-  .mutation('changeRole', {
-    input: z.object({
-      userId: z.string(),
-      admin: z.boolean(),
-    }),
-    async resolve({ ctx, input }) {
-      if (ctx.session?.user.role !== 'ADMIN') {
-        throw new TRPCError({ code: 'UNAUTHORIZED' });
-      }
-
-      return await ctx.prisma.user.update({
-        where: {
-          id: input.userId,
-        },
-        data: {
-          role: input.admin ? 'ADMIN' : 'USER',
-        },
-      });
-    },
-  });
+      }),
+  );

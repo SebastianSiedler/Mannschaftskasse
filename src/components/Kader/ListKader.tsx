@@ -64,8 +64,6 @@ const ListKader: React.FC = () => {
       >
         <AddIcon />
       </Fab>
-
-      <UserManagement />
     </>
   );
 };

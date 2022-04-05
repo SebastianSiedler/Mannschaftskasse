@@ -1,9 +1,23 @@
 import type { NextPageWithAuthAndLayout } from '@/lib/types';
 import { DefaultLayout } from '@/src/components/DefaultLayout';
 import ListKader from '@/src/components/Kader/ListKader';
+import { useSession } from 'next-auth/react';
+import Link from 'next/link';
 
 const KaderHome: NextPageWithAuthAndLayout = () => {
-  return <ListKader />;
+  const { data: session } = useSession();
+
+  return (
+    <>
+      <ListKader />
+
+      {session?.user.role === 'ADMIN' && (
+        <Link href="/kader/accounts">
+          <a>Manage Accounts</a>
+        </Link>
+      )}
+    </>
+  );
 };
 
 KaderHome.auth = true;

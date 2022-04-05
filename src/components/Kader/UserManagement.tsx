@@ -25,57 +25,50 @@ const UserManagement: React.FC = () => {
   return (
     <div>
       {allUsersQuery.data?.map((item) => (
-        <div
-          key={item.id}
-          style={{ display: 'flex', justifyContent: 'space-between' }}
-        >
-          <div style={{ display: 'flex', gap: '1rem' }}>
-            <div
-              style={{
-                aspectRatio: '1/1',
-                width: 50,
-                position: 'relative',
-                borderRadius: '50%',
-                overflow: 'hidden',
-              }}
-            >
+        <div key={item.id}>
+          {/* Name and Mail */}
+          <div className="flex gap-4">
+            <div className="w-12 h-12 relative">
               {item.image ? (
-                <Image src={item.image} layout="fill" />
+                <Image
+                  src={item.image}
+                  layout="fill" // required
+                  objectFit="cover" // change to suit your needs
+                  className="rounded-full"
+                />
               ) : (
-                <div
-                  style={{
-                    height: '100%',
-                    width: '100%',
-                    backgroundColor: 'gray',
-                  }}
-                ></div>
+                <div className="h-full w-full bg-gray-200"></div>
               )}
             </div>
-            <div>
-              <div>{item.name}</div>
-              <div>{item.email}</div>
+            <div className="min-w-0 flex-1">
+              <div className="overflow-hidden whitespace-nowrap text-ellipsis">
+                <span>{item.name}</span>
+              </div>
+              <div className="overflow-hidden whitespace-nowrap text-ellipsis">
+                <span>{item.email}</span>
+              </div>
             </div>
-          </div>
 
-          <div>
-            <Button
-              onClick={() => {
-                if (
-                  window.confirm(
-                    `${item.name} Rolle wirklich zu ${
-                      item.role === 'USER' ? 'Admin' : 'User'
-                    } ändern? `,
-                  )
-                ) {
-                  changeUserPermission.mutate({
-                    userId: item.id,
-                    admin: item.role === 'USER',
-                  });
-                }
-              }}
-            >
-              {item.role === 'USER' ? 'Zu Admin' : 'Zu User'}
-            </Button>
+            <div>
+              <Button
+                onClick={() => {
+                  if (
+                    window.confirm(
+                      `${item.name} Rolle wirklich zu ${
+                        item.role === 'USER' ? 'Admin' : 'User'
+                      } ändern? `,
+                    )
+                  ) {
+                    changeUserPermission.mutate({
+                      userId: item.id,
+                      admin: item.role === 'USER',
+                    });
+                  }
+                }}
+              >
+                {item.role === 'USER' ? 'Zu Admin' : 'Zu User'}
+              </Button>
+            </div>
           </div>
         </div>
       ))}

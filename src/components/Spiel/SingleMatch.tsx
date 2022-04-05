@@ -102,7 +102,9 @@ const SingleMatch: React.FC<Props> = (props) => {
         </AppBar>
 
         <DialogContent>
-          <div className="font-semibold">Gespielte Spieler:</div>
+          <div className="font-semibold">{`Gespielte Spieler: ${
+            spielerQuery.data?.length ?? 0
+          }`}</div>
           <List>
             {spielerQuery.data?.map((item, i) => (
               <Link

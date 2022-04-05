@@ -71,15 +71,17 @@ const SingleMatch: React.FC<Props> = (props) => {
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Edit</DialogTitle>
 
-        <IconButton
-          onClick={() => {
-            removeEinsatz.mutate({ spielId, spielerId });
-          }}
-        >
-          <DeleteIcon />
-        </IconButton>
-
         <DialogContent>
+          <div>
+            <IconButton
+              onClick={() => {
+                removeEinsatz.mutate({ spielId, spielerId });
+              }}
+            >
+              <DeleteIcon />
+            </IconButton>
+            <span>Einsatz löschen</span>
+          </div>
           <TextField
             label="Tore"
             type="number"
@@ -103,6 +105,7 @@ const SingleMatch: React.FC<Props> = (props) => {
             checked={form.bezahlt}
             onChange={(e) => form.setBezahlt(e.target.checked)}
           />
+          <span>Bezahlt?</span>
         </DialogContent>
 
         <DialogActions>

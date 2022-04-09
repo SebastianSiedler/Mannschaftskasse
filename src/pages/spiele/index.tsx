@@ -6,12 +6,6 @@ import SingleMatch from '@/src/components/Spiel/SingleMatch';
 import { useRouter } from 'next/router';
 import toast from 'react-hot-toast';
 
-export type RESULT_SCORE =
-  | 'GEWONNEN'
-  | 'VERLOREN'
-  | 'UNENTSCHIEDEN'
-  | 'NOT PLAYED';
-
 const SpieleHome: NextPageWithAuthAndLayout = () => {
   const router = useRouter();
 
@@ -60,9 +54,11 @@ const ListSpiele: React.FC = () => {
 
   return (
     <div>
+      {spieleQuery.status === 'loading' && <div>Loading...</div>}
+
       {spieleQuery.status === 'success' && (
         <div className="mx-2 mt-2 gap-y-4 flex flex-col">
-          {spieleQuery.data.map((item) => {
+          {spieleQuery.data?.map((item) => {
             return (
               <MatchListItem
                 key={item.id}

@@ -2,8 +2,9 @@ import { serverEnv } from '@/env/server';
 import { TRPCError } from '@trpc/server';
 import { createRouter } from 'server/createRouter';
 import { z } from 'zod';
-import { getBfvData, updateMatches } from './utils/useBfv';
+import { getBfvData } from './utils/useBfv';
 import isEqual from 'lodash.isequal';
+import { updateMatches } from './utils/updateMatches';
 
 export const spielRouter = createRouter()
   .query('update_matches', {

@@ -85,3 +85,8 @@ export const getOpponentTeam = (match: BfvMatch): OpponentTeam => {
     };
   }
 };
+
+export const getParsedDate = (date: string, time: string) => {
+  const [day, month, year] = date.split('.');
+  return new Date(`${year}.${month}.${day} ${time}`);
+};

@@ -1,44 +1,38 @@
+import { serverEnv } from '@/env/server';
 import { TRPCError } from '@trpc/server';
 import { createRouter } from 'server/createRouter';
 import { z } from 'zod';
-import { updateMatches } from './utils/useBfv';
+import { getBfvData, updateMatches } from './utils/useBfv';
+import isEqual from 'lodash.isequal';
 
 export const spielRouter = createRouter()
-  /**
-   * Run only once on init if no data available
-   */
   .query('update_matches', {
     async resolve({ ctx }) {
       const saison = await ctx.prisma.saison.findFirst({
-        where: { latest: true },
+        where: {
+          latest: true,
+        },
       });
 
+      /* Passiert nur, wenn noch nie ein BFV request gemacht wurde */
       if (!saison) {
-        throw new TRPCError({
-          code: 'NOT_FOUND',
-          message: 'No active saison found',
-        });
+        await updateMatches();
+        return 'first RQ';
       }
 
-      const diff_ms = Math.abs(
-        new Date().getTime() - new Date(saison.lastBfvUpdate).getTime(),
-      );
+      const { BFV_PERMANENT_TEAM_ID } = serverEnv;
 
-      /* Update (at earliest) every 600s */
-      if (diff_ms / 1000 > 600) {
+      const data = await getBfvData(BFV_PERMANENT_TEAM_ID);
+
+      /* BFV Data has changed*/
+      if (!isEqual(saison?.bfvData, data)) {
         await updateMatches();
         return {
-          updated: true,
-          lastUpdate: saison.lastBfvUpdate,
-          lastUpdateDiffMs: diff_ms,
+          message: 'data changed',
+          bfv_new_data: data,
+          old_data: saison.bfvData,
         };
       }
-
-      return {
-        updated: false,
-        lastUpdate: saison.lastBfvUpdate,
-        lastUpdateDiffMs: diff_ms,
-      };
     },
   })
   .query('list', {

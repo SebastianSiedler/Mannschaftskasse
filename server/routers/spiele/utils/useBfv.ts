@@ -1,17 +1,17 @@
-import { Context } from '@/server/context';
 import { TRPCError } from '@trpc/server';
 import axios from 'axios';
 import { BfvLeague, BfvMatch } from './bfv.types';
 import { serverEnv } from '@/env/server';
 import { prisma } from '@/lib/prisma';
 import { getOpponentTeam, parse_result } from '.';
+import { Prisma } from '@prisma/client';
 
 const { BFV_PERMANENT_TEAM_ID } = serverEnv;
 
 /**
  * Get aktuelle Saison alle Spiele vom BFV
  */
-const getBfvData = async (permanentTeamId: string) => {
+export const getBfvData = async (permanentTeamId: string) => {
   const { data } = await axios.get<BfvLeague>(
     `https://widget-prod.bfv.de/api/service/widget/v1/team/${permanentTeamId}/matches`,
   );
@@ -38,6 +38,7 @@ export const updateMatches = async () => {
         name: data.team.seasonId,
         bfvCompoundID: data.team.compoundId,
         latest: true,
+        bfvData: data as unknown as Prisma.JsonObject,
       },
     });
   }
@@ -67,44 +68,12 @@ export const updateMatches = async () => {
     data: {
       lastBfvUpdate: new Date(),
       currentSpielId: currentMatch.id,
+      bfvData: data as unknown as Prisma.JsonObject,
     },
   });
 
   return updated_saison;
 };
-
-// const getTeamByBfvPermanentId = async (
-//   permanentTeamId: string,
-//   teamName: string,
-// ) => {
-//   const team = await prisma.team.findUnique({
-//     where: {
-//       bfvTeamPermanentId: permanentTeamId,
-//     },
-//   });
-
-//   if (!team) {
-//     const { data } = await getBfvClubInfo(permanentTeamId);
-
-//     if (!data?.club) {
-//       throw new TRPCError({
-//         code: 'NOT_FOUND',
-//         message: 'No corresponding bfv club to team found',
-//       });
-//     }
-
-//     return await prisma.team.create({
-//       data: {
-//         bfvTeamPermanentId: permanentTeamId,
-//         name: teamName,
-//         bfvClubId: data.club.id,
-//         logo: data.club.logoUrl,
-//       },
-//     });
-//   }
-
-//   return team;
-// };
 
 interface UpsertMatchopts {
   bfvMatch: BfvMatch;

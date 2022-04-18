@@ -59,7 +59,9 @@ const StatsHome: NextPageWithAuthAndLayout = () => {
         <div key={i}>
           <table className="relative w-full border">
             <thead className="sticky top-0 bg-slate-300">
-              <div>{`Saison: ${saison.name}`}</div>
+              <tr>
+                <td>{`Saison: ${saison.name}`}</td>
+              </tr>
               <tr>
                 <th>Name</th>
                 <th>Spiele</th>

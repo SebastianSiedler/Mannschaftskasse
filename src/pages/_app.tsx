@@ -65,10 +65,6 @@ function getBaseUrl() {
 export default withTRPC<AppRouter>({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   config() {
-    /**
-     * If you want to use SSR, you need to use the server's full URL
-     * @link https://trpc.io/docs/ssr
-     */
     return {
       /**
        * @link https://trpc.io/docs/links
@@ -110,20 +106,5 @@ export default withTRPC<AppRouter>({
   /**
    * @link https://trpc.io/docs/ssr
    */
-  ssr: true,
-  /**
-   * Set headers or status code when doing SSR
-   */
-  responseMeta({ clientErrors }) {
-    if (clientErrors.length) {
-      // propagate http first error from API calls
-      return {
-        status: clientErrors[0].data?.httpStatus ?? 500,
-      };
-    }
-
-    // for app caching with SSR see https://trpc.io/docs/caching
-
-    return {};
-  },
+  ssr: false,
 })(MyApp);

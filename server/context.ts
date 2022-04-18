@@ -9,17 +9,13 @@ export const createContext = async ({
   req,
   res,
 }: trpcNext.CreateNextContextOptions) => {
-  const { data: session, duration } = await measureTime(() =>
-    getServerSession({ req, res }, authOptions),
-  );
+  const session = await getServerSession({ req, res }, authOptions);
 
   return {
-    req,
-    res,
+    // req,
+    // res,
     prisma,
     session,
-
-    sessionDuration: session == null ? null : duration,
   };
 };
 

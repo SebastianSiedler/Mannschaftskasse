@@ -66,7 +66,6 @@ export const updateMatches = async () => {
       id: saison.id,
     },
     data: {
-      lastBfvUpdate: new Date(),
       currentSpielId: currentMatch.id,
       bfvData: data as unknown as Prisma.JsonObject,
     },

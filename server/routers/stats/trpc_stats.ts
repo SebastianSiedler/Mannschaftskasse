@@ -1,8 +1,6 @@
-import { TRPCError } from '@trpc/server';
 import { createRouter } from 'server/createRouter';
 import { z } from 'zod';
-import { Context } from '@/server/context';
-import { getUserByCtx } from '@/server/utils';
+import { createAdminRouter } from '@/server/create-admin-router';
 
 export const statsRouter = createRouter()
   .query('list', {
@@ -51,6 +49,7 @@ export const statsRouter = createRouter()
       }));
     },
   })
+  .merge('', createAdminRouter())
   .mutation('clearDebts', {
     input: z.object({ spielerId: z.string() }),
     async resolve({ ctx, input }) {

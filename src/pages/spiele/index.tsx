@@ -27,7 +27,7 @@ const SpieleHome: NextPageWithAuthAndLayout = () => {
 };
 
 SpieleHome.auth = true;
-SpieleHome.getLayout = (page: React.ReactElement) => {
+SpieleHome.getLayout = (page) => {
   return <DefaultLayout>{page}</DefaultLayout>;
 };
 
@@ -57,7 +57,7 @@ const ListSpiele: React.FC = () => {
       {spieleQuery.status === 'loading' && <div>Loading...</div>}
 
       {spieleQuery.status === 'success' && (
-        <div className="mx-2 mt-2 gap-y-4 flex flex-col">
+        <div className="flex flex-col mx-2 mt-2 gap-y-4">
           {spieleQuery.data?.map((item) => {
             return (
               <MatchListItem

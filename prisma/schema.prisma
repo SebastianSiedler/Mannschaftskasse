@@ -3,7 +3,7 @@
 
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["referentialIntegrity", "fullTextSearch", "fullTextIndex", "cockroachdb", "extendedIndexes"]
+  previewFeatures = ["referentialIntegrity", "fullTextSearch", "fullTextIndex", "extendedIndexes"]
 }
 
 datasource db {
@@ -81,7 +81,7 @@ model Saison {
   spiel         Spiel[]
   latest        Boolean @default(false) // Ob es die aktuelle Saison ist
 
-  bfvData       Json?
+  bfvData Json?
 
   currentSpielId String? @unique
   currentSpiel   Spiel?  @relation("currentSpiel", fields: [currentSpielId], references: [id], onDelete: Cascade)

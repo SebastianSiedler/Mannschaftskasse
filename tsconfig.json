@@ -15,7 +15,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
-    "types": ["@types/jest", "jest-playwright-preset", "expect-playwright"],
+    "types": ["@types/jest"],
     "baseUrl": ".",
     "paths": {
       "@/src/*": ["src/*"],

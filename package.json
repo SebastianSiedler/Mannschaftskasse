@@ -3,8 +3,9 @@
   "version": "9.20.0",
   "private": true,
   "scripts": {
-    "build:1-migrate": "prisma migrate deploy",
-    "build:2-build": "next build",
+    "build:1-generate": "prisma generate",
+    "build:2-migrate": "prisma migrate deploy",
+    "build:3-build": "next build",
     "build": "run-s build:*",
     "db-up": "docker-compose up -d",
     "db-seed": "prisma db seed",

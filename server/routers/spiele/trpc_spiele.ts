@@ -6,8 +6,16 @@ import isEqual from 'lodash.isequal';
 import { updateMatches } from './utils/updateMatches';
 
 export const spielRouter = createRouter()
+  /**
+   * Update matches in local DB
+   * if an error occours:
+   * force update: /api/trpc/spiel.update_matches?input={"json":{"force":true}}
+   */
   .query('update_matches', {
-    async resolve({ ctx }) {
+    input: z.object({
+      force: z.boolean().optional(),
+    }),
+    async resolve({ ctx, input }) {
       const saison = await ctx.prisma.saison.findFirst({
         where: {
           latest: true,
@@ -25,7 +33,7 @@ export const spielRouter = createRouter()
       const data = await getBfvData(BFV_PERMANENT_TEAM_ID);
 
       /* BFV Data has changed*/
-      if (!isEqual(saison?.bfvData, data)) {
+      if (!isEqual(saison?.bfvData, data) || input.force) {
         await updateMatches();
         return {
           message: 'data changed',
@@ -33,6 +41,8 @@ export const spielRouter = createRouter()
           old_data: saison.bfvData,
         };
       }
+
+      return 'Nothing to update';
     },
   })
   .query('list', {

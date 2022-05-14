@@ -3,7 +3,7 @@ import toast from 'react-hot-toast';
 import MatchListItem from './MatchListItem';
 
 const ListSpiele: React.FC = () => {
-  trpc.useQuery(['spiel.update_matches'], {
+  trpc.useQuery(['spiel.update_matches', {}], {
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
     retry: false,

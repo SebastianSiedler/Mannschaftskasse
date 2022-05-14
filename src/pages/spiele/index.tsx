@@ -1,12 +1,12 @@
-import { trpc } from '@/lib/trpc';
-import type { NextPageWithAuthAndLayout } from '@/lib/types';
+import { ssg } from '@/server/ssg';
 import { DefaultLayout } from '@/src/components/DefaultLayout';
-import MatchListItem from '@/src/components/Spiel/MatchListItem';
+import ListSpiele from '@/src/components/Spiel/ListSpiele';
 import SingleMatch from '@/src/components/Spiel/SingleMatch';
+import { GetStaticPropsContext } from 'next';
 import { useRouter } from 'next/router';
-import toast from 'react-hot-toast';
+import type { SSGLayout } from '@/lib/types';
 
-const SpieleHome: NextPageWithAuthAndLayout = () => {
+const SpieleHome: SSGLayout<typeof getStaticProps> = () => {
   const router = useRouter();
 
   return (
@@ -33,47 +33,13 @@ SpieleHome.getLayout = (page) => {
 
 export default SpieleHome;
 
-const ListSpiele: React.FC = () => {
-  trpc.useQuery(['spiel.update_matches'], {
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-    retry: false,
-    staleTime: 24 * 60 * 1000,
-    refetchOnMount: false,
+export const getStaticProps = async (context: GetStaticPropsContext) => {
+  await ssg.fetchQuery('spiel.list');
 
-    onError: (err) => {
-      toast.error(err.message);
+  return {
+    props: {
+      trpcState: ssg.dehydrate(),
     },
-  });
-
-  const spieleQuery = trpc.useQuery(['spiel.list'], {
-    onError: (err) => {
-      toast.error(err.message);
-    },
-  });
-
-  return (
-    <div>
-      {spieleQuery.status === 'loading' && <div>Loading...</div>}
-
-      {spieleQuery.status === 'success' && (
-        <div className="flex flex-col mx-2 mt-2 gap-y-4">
-          {spieleQuery.data?.map((item) => {
-            return (
-              <MatchListItem
-                key={item.id}
-                spielId={item.id}
-                kickOffDate={item.kickoffDate}
-                clubId={item.opponent.bfvClubId}
-                teamName={item.opponent.name}
-                result={item.result}
-                resultStatus={item.resultType}
-                currentGame={item.Saison.length > 0}
-              />
-            );
-          })}
-        </div>
-      )}
-    </div>
-  );
+    revalidate: 1,
+  };
 };

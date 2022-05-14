@@ -1,9 +1,9 @@
 import { TRPCError } from '@trpc/server';
-import { createRouter } from '../../createRouter';
 import { z } from 'zod';
 import { createAdminRouter } from '@/server/create-admin-router';
+import { createProtectedRouter } from '@/server/create-protected-router';
 
-export const userRouter = createRouter()
+export const userRouter = createProtectedRouter()
   .query('profile', {
     input: z.object({
       id: z.string(),

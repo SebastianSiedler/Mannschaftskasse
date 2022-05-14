@@ -1,5 +1,4 @@
 import { serverEnv } from '@/env/server';
-import { TRPCError } from '@trpc/server';
 import { createRouter } from 'server/createRouter';
 import { z } from 'zod';
 import { getBfvData } from './utils/useBfv';

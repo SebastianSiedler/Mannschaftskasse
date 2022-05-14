@@ -1,8 +1,8 @@
-import { createRouter } from 'server/createRouter';
 import { z } from 'zod';
 import { createAdminRouter } from '@/server/create-admin-router';
+import { createProtectedRouter } from '@/server/create-protected-router';
 
-export const statsRouter = createRouter()
+export const statsRouter = createProtectedRouter()
   .query('list', {
     async resolve({ ctx }) {
       const saisons = await ctx.prisma.saison.findMany();

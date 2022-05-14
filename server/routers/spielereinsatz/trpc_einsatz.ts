@@ -1,9 +1,9 @@
-import { createRouter } from 'server/createRouter';
 import { z } from 'zod';
 import { createAdminRouter } from '@/server/create-admin-router';
 import { Spieler } from '@prisma/client';
+import { createProtectedRouter } from '@/server/create-protected-router';
 
-export const einsatzRouter = createRouter()
+export const einsatzRouter = createProtectedRouter()
   .query('list', {
     input: z.object({ spielId: z.string() }),
     async resolve({ ctx, input }) {

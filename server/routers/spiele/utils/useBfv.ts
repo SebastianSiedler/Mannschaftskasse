@@ -8,6 +8,17 @@ export const getBfvData = async (permanentTeamId: string) => {
   const { data } = await axios.get<BfvLeague>(
     `https://widget-prod.bfv.de/api/service/widget/v1/team/${permanentTeamId}/matches`,
   );
+
+  /* Spielfreie Spieltage herausfiltern */
+  data.data.matches = data.data.matches.filter(
+    (match) =>
+      !(
+        match.guestClubId == null ||
+        match.homeClubId === null ||
+        match.guestTeamName === 'SPIELFREI'
+      ),
+  );
+
   return data.data;
 };
 

@@ -3,7 +3,7 @@ import type {
   GetServerSidePropsContext,
   InferGetServerSidePropsType,
 } from 'next';
-import { getServerSession } from 'next-auth/next';
+import { unstable_getServerSession as getServerSession } from 'next-auth/next';
 import { getProviders, signIn } from 'next-auth/react';
 import Head from 'next/head';
 import Div100vh from 'react-div-100vh';
@@ -26,7 +26,7 @@ const SignIn = ({
             {Object.values(providers ?? {}).map((provider) => (
               <div key={provider.name}>
                 <button
-                  className="flex outline rounded-xl p-3 gap-2"
+                  className="flex gap-2 p-3 outline rounded-xl"
                   onClick={() => signIn(provider.id)}
                 >
                   <Image src={GoogleIcon}></Image>
@@ -44,7 +44,7 @@ const SignIn = ({
 export const getServerSideProps = async (
   context: GetServerSidePropsContext,
 ) => {
-  const session = await getServerSession(context, authOptions);
+  const session = await getServerSession(context.req, context.res, authOptions);
 
   const providers = await getProviders();
 

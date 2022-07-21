@@ -26,7 +26,7 @@ const SpieleHome: SSGLayout<typeof getStaticProps> = () => {
   );
 };
 
-SpieleHome.auth = true;
+SpieleHome.auth = false;
 SpieleHome.getLayout = (page) => {
   return <DefaultLayout>{page}</DefaultLayout>;
 };

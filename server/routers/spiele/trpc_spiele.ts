@@ -1,21 +1,23 @@
 import { serverEnv } from '@/env/server';
-import { createRouter } from 'server/createRouter';
 import { z } from 'zod';
 import { getBfvData } from './utils/useBfv';
 import isEqual from 'lodash.isequal';
 import { updateMatches } from './utils/updateMatches';
+import { t } from '@/server/trpc';
 
-export const spielRouter = createRouter()
+export const spielRouter = t.router({
   /**
    * Update matches in local DB
    * if an error occours:
    * force update: /api/trpc/spiel.update_matches?input={"json":{"force":true}}
    */
-  .query('update_matches', {
-    input: z.object({
-      force: z.boolean().optional(),
-    }),
-    async resolve({ ctx, input }) {
+  update_matches: t.procedure
+    .input(
+      z.object({
+        force: z.boolean().optional(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
       const saison = await ctx.prisma.saison.findFirst({
         where: {
           latest: true,
@@ -43,31 +45,30 @@ export const spielRouter = createRouter()
       }
 
       return 'Nothing to update';
-    },
-  })
-  .query('list', {
-    async resolve({ ctx }) {
-      const matches = await ctx.prisma.spiel.findMany({
-        where: {
-          saison: {
-            latest: true,
-          },
-        },
-        include: {
-          opponent: true,
-          Saison: true,
-        },
-        orderBy: {
-          kickoffDate: 'asc',
-        },
-      });
+    }),
 
-      return matches;
-    },
-  })
-  .query('detail', {
-    input: z.object({ spielId: z.string() }),
-    async resolve({ ctx, input }) {
+  list: t.procedure.query(async ({ ctx }) => {
+    const matches = await ctx.prisma.spiel.findMany({
+      where: {
+        saison: {
+          latest: true,
+        },
+      },
+      include: {
+        opponent: true,
+        Saison: true,
+      },
+      orderBy: {
+        kickoffDate: 'asc',
+      },
+    });
+
+    return matches;
+  }),
+
+  detail: t.procedure
+    .input(z.object({ spielId: z.string() }))
+    .query(async ({ ctx, input }) => {
       const spiel = await ctx.prisma.spiel.findUnique({
         where: {
           id: input.spielId,
@@ -78,5 +79,5 @@ export const spielRouter = createRouter()
       });
 
       return spiel;
-    },
-  });
+    }),
+});

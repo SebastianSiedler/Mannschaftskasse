@@ -1,14 +1,17 @@
+import { isAdmin, isAuthenticated } from '@/server/middleware';
+import { t } from '@/server/trpc';
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
-import { createAdminRouter } from '@/server/create-admin-router';
-import { createProtectedRouter } from '@/server/create-protected-router';
 
-export const userRouter = createProtectedRouter()
-  .query('profile', {
-    input: z.object({
-      id: z.string(),
-    }),
-    async resolve({ ctx, input }) {
+export const userRouter = t.router({
+  profile: t.procedure
+    .use(isAuthenticated)
+    .input(
+      z.object({
+        id: z.string(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
       const { id } = input;
       const user = await ctx.prisma.user.findUnique({
         where: { id },
@@ -27,39 +30,37 @@ export const userRouter = createProtectedRouter()
       }
 
       return user;
-    },
-  })
-  .merge(
-    '',
-    createAdminRouter()
-      .query('list', {
-        async resolve({ ctx }) {
-          return await ctx.prisma.user.findMany({
-            where: {
-              id: {
-                not: ctx.session?.user.id,
-              },
-            },
-            orderBy: {
-              name: 'asc',
-            },
-          });
+    }),
+
+  list: t.procedure.use(isAdmin).query(async ({ ctx }) => {
+    return await ctx.prisma.user.findMany({
+      where: {
+        id: {
+          not: ctx.session?.user.id,
         },
-      })
-      .mutation('changeRole', {
-        input: z.object({
-          userId: z.string(),
-          admin: z.boolean(),
-        }),
-        async resolve({ ctx, input }) {
-          return await ctx.prisma.user.update({
-            where: {
-              id: input.userId,
-            },
-            data: {
-              role: input.admin ? 'ADMIN' : 'USER',
-            },
-          });
-        },
+      },
+      orderBy: {
+        name: 'asc',
+      },
+    });
+  }),
+
+  changeRole: t.procedure
+    .use(isAdmin)
+    .input(
+      z.object({
+        userId: z.string(),
+        admin: z.boolean(),
       }),
-  );
+    )
+    .mutation(async ({ ctx, input }) => {
+      return await ctx.prisma.user.update({
+        where: {
+          id: input.userId,
+        },
+        data: {
+          role: input.admin ? 'ADMIN' : 'USER',
+        },
+      });
+    }),
+});

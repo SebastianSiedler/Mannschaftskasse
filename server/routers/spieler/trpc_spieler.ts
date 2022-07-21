@@ -1,20 +1,23 @@
 import { z } from 'zod';
 import { TRPCError } from '@trpc/server';
-import { createAdminRouter } from '@/server/create-admin-router';
+import { t } from '@/server/trpc';
+import { isAdmin } from '@/server/middleware';
 
-export const spielerRouter = createAdminRouter()
-  .query('list', {
-    async resolve({ ctx }) {
-      return await ctx.prisma.spieler.findMany();
-    },
-  })
-  .mutation('upsert', {
-    input: z.object({
-      names: z.string().min(2).array().min(1),
-      spielerId: z.string().optional(),
-      active: z.boolean(),
-    }),
-    async resolve({ input, ctx }) {
+export const spielerRouter = t.router({
+  list: t.procedure.use(isAdmin).query(async ({ ctx }) => {
+    return await ctx.prisma.spieler.findMany();
+  }),
+
+  upsert: t.procedure
+    .use(isAdmin)
+    .input(
+      z.object({
+        names: z.string().min(2).array().min(1),
+        spielerId: z.string().optional(),
+        active: z.boolean(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
       /* Input array contais dublicates */
       if (input.names.length !== new Set(input.names).size) {
         throw new TRPCError({
@@ -54,5 +57,5 @@ export const spielerRouter = createAdminRouter()
           names: input.names,
         },
       });
-    },
-  });
+    }),
+});

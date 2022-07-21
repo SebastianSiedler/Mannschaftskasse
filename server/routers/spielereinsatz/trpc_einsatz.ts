@@ -1,12 +1,13 @@
 import { z } from 'zod';
-import { createAdminRouter } from '@/server/create-admin-router';
 import { Spieler } from '@prisma/client';
-import { createProtectedRouter } from '@/server/create-protected-router';
+import { t } from '@/server/trpc';
+import { isAdmin, isAuthenticated } from '@/server/middleware';
 
-export const einsatzRouter = createProtectedRouter()
-  .query('list', {
-    input: z.object({ spielId: z.string() }),
-    async resolve({ ctx, input }) {
+export const einsatzRouter = t.router({
+  list: t.procedure
+    .use(isAuthenticated)
+    .input(z.object({ spielId: z.string() }))
+    .query(async ({ ctx, input }) => {
       return await ctx.prisma.spielereinsatz.findMany({
         where: {
           spielId: input.spielId,
@@ -15,11 +16,12 @@ export const einsatzRouter = createProtectedRouter()
           spieler: true,
         },
       });
-    },
-  })
-  .query('detail', {
-    input: z.object({ spielId: z.string(), spielerId: z.string() }),
-    async resolve({ ctx, input }) {
+    }),
+
+  detail: t.procedure
+    .use(isAuthenticated)
+    .input(z.object({ spielId: z.string(), spielerId: z.string() }))
+    .query(async ({ ctx, input }) => {
       return await ctx.prisma.spielereinsatz.findUnique({
         where: {
           spielerId_spielId: {
@@ -28,11 +30,12 @@ export const einsatzRouter = createProtectedRouter()
           },
         },
       });
-    },
-  })
-  .query('list.availablePlayers', {
-    input: z.object({ spielId: z.string() }),
-    async resolve({ ctx, input }) {
+    }),
+
+  'list.availablePlayers': t.procedure
+    .use(isAuthenticated)
+    .input(z.object({ spielId: z.string() }))
+    .query(async ({ ctx, input }) => {
       return await ctx.prisma.spieler.findMany({
         where: {
           spielereinsaetze: {
@@ -43,115 +46,121 @@ export const einsatzRouter = createProtectedRouter()
           active: true,
         },
       });
-    },
-  })
+    }),
 
-  /* Admin Only routes*/
-  .merge(
-    '',
-    createAdminRouter()
-      .mutation('add_by_player_list', {
-        input: z.object({
-          names: z.string().array().min(1),
-          spielId: z.string(),
-        }),
-        async resolve({ input, ctx }) {
-          const unknown_players: string[] = [];
-          const played_players: Spieler[] = [];
+  add_by_player_list: t.procedure
+    .use(isAdmin)
+    .input(
+      z.object({
+        names: z.string().array().min(1),
+        spielId: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const unknown_players: string[] = [];
+      const played_players: Spieler[] = [];
 
-          const all_players = await ctx.prisma.spieler.findMany();
+      const all_players = await ctx.prisma.spieler.findMany();
 
-          input.names.forEach((name) => {
-            const player = all_players.find((player) =>
-              player.names.includes(name),
-            );
+      input.names.forEach((name) => {
+        const player = all_players.find((player) =>
+          player.names.includes(name),
+        );
 
-            if (!!player) {
-              played_players.push(player);
-              return;
-            }
+        if (!!player) {
+          played_players.push(player);
+          return;
+        }
 
-            unknown_players.push(name);
-          });
+        unknown_players.push(name);
+      });
 
-          await ctx.prisma.$transaction(
-            played_players.map((player) => {
-              return ctx.prisma.spielereinsatz.upsert({
-                where: {
-                  spielerId_spielId: {
-                    spielId: input.spielId,
-                    spielerId: player.id,
-                  },
-                },
-                create: {
-                  tore: 0,
-                  bezahlt: false,
-                  gelbeKarte: 0,
-                  roteKarte: 0,
-                  spielId: input.spielId,
-                  spielerId: player.id,
-                },
-                update: {},
-              });
-            }),
-          );
-
-          return {
-            unknown_players,
-          };
-        },
-      })
-      .mutation('add', {
-        input: z.object({
-          spielId: z.string(),
-          spielerId: z.string(),
-          tore: z.number().min(0).default(0),
-          gelbeKarte: z.number().default(0),
-          roteKarte: z.number().default(0),
-          bezahlt: z.boolean().default(false),
-        }),
-        async resolve({ input, ctx }) {
-          return await ctx.prisma.spielereinsatz.create({
-            data: input,
-          });
-        },
-      })
-      .mutation('update', {
-        input: z.object({
-          spielId: z.string(),
-          spielerId: z.string(),
-          tore: z.number().min(0).optional(),
-          gelbeKarte: z.number().optional(),
-          roteKarte: z.number().optional(),
-          bezahlt: z.boolean().optional(),
-        }),
-        async resolve({ ctx, input }) {
-          const { spielId, spielerId } = input;
-          return await ctx.prisma.spielereinsatz.update({
-            where: {
-              spielerId_spielId: {
-                spielId,
-                spielerId,
-              },
-            },
-            data: input,
-          });
-        },
-      })
-      .mutation('remove', {
-        input: z.object({
-          spielId: z.string(),
-          spielerId: z.string(),
-        }),
-        async resolve({ ctx, input }) {
-          return await ctx.prisma.spielereinsatz.delete({
+      await ctx.prisma.$transaction(
+        played_players.map((player) => {
+          return ctx.prisma.spielereinsatz.upsert({
             where: {
               spielerId_spielId: {
                 spielId: input.spielId,
-                spielerId: input.spielerId,
+                spielerId: player.id,
               },
             },
+            create: {
+              tore: 0,
+              bezahlt: false,
+              gelbeKarte: 0,
+              roteKarte: 0,
+              spielId: input.spielId,
+              spielerId: player.id,
+            },
+            update: {},
           });
-        },
+        }),
+      );
+
+      return {
+        unknown_players,
+      };
+    }),
+
+  add: t.procedure
+    .use(isAdmin)
+    .input(
+      z.object({
+        spielId: z.string(),
+        spielerId: z.string(),
+        tore: z.number().min(0).default(0),
+        gelbeKarte: z.number().default(0),
+        roteKarte: z.number().default(0),
+        bezahlt: z.boolean().default(false),
       }),
-  );
+    )
+    .mutation(async ({ ctx, input }) => {
+      return await ctx.prisma.spielereinsatz.create({
+        data: input,
+      });
+    }),
+
+  update: t.procedure
+    .use(isAdmin)
+    .input(
+      z.object({
+        spielId: z.string(),
+        spielerId: z.string(),
+        tore: z.number().min(0).optional(),
+        gelbeKarte: z.number().optional(),
+        roteKarte: z.number().optional(),
+        bezahlt: z.boolean().optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { spielId, spielerId } = input;
+      return await ctx.prisma.spielereinsatz.update({
+        where: {
+          spielerId_spielId: {
+            spielId,
+            spielerId,
+          },
+        },
+        data: input,
+      });
+    }),
+
+  remove: t.procedure
+    .use(isAdmin)
+    .input(
+      z.object({
+        spielId: z.string(),
+        spielerId: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      return await ctx.prisma.spielereinsatz.delete({
+        where: {
+          spielerId_spielId: {
+            spielId: input.spielId,
+            spielerId: input.spielerId,
+          },
+        },
+      });
+    }),
+});

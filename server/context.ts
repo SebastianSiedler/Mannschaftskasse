@@ -3,7 +3,6 @@ import { prisma } from '@/lib/prisma';
 import * as trpc from '@trpc/server';
 import * as trpcNext from '@trpc/server/adapters/next';
 import { unstable_getServerSession as getServerSession } from 'next-auth/next';
-import { measureTime } from '../lib';
 
 export const createContext = async ({
   req,

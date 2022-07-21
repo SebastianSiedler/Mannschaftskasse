@@ -5,7 +5,19 @@ import { createProtectedRouter } from '@/server/create-protected-router';
 export const statsRouter = createProtectedRouter()
   .query('list', {
     async resolve({ ctx }) {
-      const saisons = await ctx.prisma.saison.findMany();
+      const saisons = await ctx.prisma.saison.findMany({
+        include: {
+          spiel: {
+            include: {
+              spielereinsaetze: {
+                include: {
+                  spieler: true,
+                },
+              },
+            },
+          },
+        },
+      });
 
       const stats = await ctx.prisma.$transaction(
         saisons.map((saison) => {
@@ -20,11 +32,6 @@ export const statsRouter = createProtectedRouter()
               },
             },
             include: {
-              _count: {
-                select: {
-                  spielereinsaetze: true,
-                },
-              },
               spielereinsaetze: {
                 where: {
                   Spiel: {
@@ -44,8 +51,23 @@ export const statsRouter = createProtectedRouter()
       );
 
       return stats.map((saison_stats, i) => ({
-        saison_stats,
         saison: saisons[i],
+        saison_stats: saison_stats
+          .map((player) => {
+            const schulden = player.spielereinsaetze.reduce(
+              (prev, curr) => (prev += curr.bezahlt ? 0 : 5),
+              0,
+            );
+            const anz_spiele = player.spielereinsaetze.length;
+
+            return {
+              schulden,
+              anz_spiele,
+              name: player.names[0],
+              ...player,
+            };
+          })
+          .sort((a, b) => b.schulden - a.schulden),
       }));
     },
   })

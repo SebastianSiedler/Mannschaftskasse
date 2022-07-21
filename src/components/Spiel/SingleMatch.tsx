@@ -32,18 +32,24 @@ const SingleMatch: React.FC<Props> = (props) => {
 
   const router = useRouter();
 
-  const matchQuery = trpc.useQuery(['spiel.detail', { spielId }], {
-    onError: (err) => {
-      toast.error(err.message);
+  const matchQuery = trpc.proxy.spiel.detail.useQuery(
+    { spielId },
+    {
+      onError: (err) => {
+        toast.error(err.message);
+      },
     },
-  });
-  const spielerQuery = trpc.useQuery(['einsatz.list', { spielId }], {
-    onError: (err) => {
-      toast.error(err.message);
+  );
+  const spielerQuery = trpc.proxy.einsatz.list.useQuery(
+    { spielId },
+    {
+      onError: (err) => {
+        toast.error(err.message);
+      },
     },
-  });
-  const availQuery = trpc.useQuery(
-    ['einsatz.list.availablePlayers', { spielId }],
+  );
+  const availQuery = trpc.proxy.einsatz.listAvailablePlayers.useQuery(
+    { spielId },
     {
       onError: (err) => {
         toast.error(err.message);
@@ -51,7 +57,7 @@ const SingleMatch: React.FC<Props> = (props) => {
     },
   );
 
-  const addPlayerMutation = trpc.useMutation('einsatz.add', {
+  const addPlayerMutation = trpc.proxy.einsatz.add.useMutation({
     onSuccess: () => {
       spielerQuery.refetch();
       availQuery.refetch();
@@ -62,9 +68,8 @@ const SingleMatch: React.FC<Props> = (props) => {
     },
   });
 
-  const addPlayersFromClipboard = trpc.useMutation(
-    'einsatz.add_by_player_list',
-    {
+  const addPlayersFromClipboard =
+    trpc.proxy.einsatz.add_by_player_list.useMutation({
       onError: (err) => {
         toast.error(err.message);
       },
@@ -77,8 +82,7 @@ const SingleMatch: React.FC<Props> = (props) => {
         spielerQuery.refetch();
         availQuery.refetch();
       },
-    },
-  );
+    });
 
   const [inputNames, setInputNames] = useState('');
 
@@ -162,7 +166,7 @@ const SingleMatch: React.FC<Props> = (props) => {
             className="form-control block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
           ></textarea>
           <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            className="px-4 py-2 font-bold text-white bg-blue-500 rounded hover:bg-blue-700"
             onClick={() => {
               addPlayersFromClipboard.mutate({
                 spielId: spielId,

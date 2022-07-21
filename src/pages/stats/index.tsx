@@ -5,13 +5,13 @@ import Button from '@mui/material/Button';
 import toast from 'react-hot-toast';
 
 const StatsHome: NextPageWithAuthAndLayout = () => {
-  const statsQuery = trpc.useQuery(['stats.list'], {
+  const statsQuery = trpc.proxy.stats.list.useQuery(undefined, {
     onError: (err) => {
       toast.error(err.message);
     },
   });
 
-  const schuldenBegleichen = trpc.useMutation('stats.clearDebts', {
+  const schuldenBegleichen = trpc.proxy.stats.clearDebts.useMutation({
     onSuccess: () => {
       statsQuery.refetch();
       toast.success('Schulden beglichen');

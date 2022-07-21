@@ -3,19 +3,22 @@ import toast from 'react-hot-toast';
 import MatchListItem from './MatchListItem';
 
 const ListSpiele: React.FC = () => {
-  trpc.useQuery(['spiel.update_matches', {}], {
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-    retry: false,
-    staleTime: 24 * 60 * 1000,
-    refetchOnMount: false,
+  trpc.proxy.spiel.update_matches.useQuery(
+    {},
+    {
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      retry: false,
+      staleTime: 24 * 60 * 1000,
+      refetchOnMount: false,
 
-    onError: (err) => {
-      toast.error(err.message);
+      onError: (err) => {
+        toast.error(err.message);
+      },
     },
-  });
+  );
 
-  const spieleQuery = trpc.useQuery(['spiel.list'], {
+  const spieleQuery = trpc.proxy.spiel.list.useQuery(undefined, {
     onError: (err) => {
       toast.error(err.message);
     },

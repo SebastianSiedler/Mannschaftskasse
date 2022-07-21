@@ -1,10 +1,5 @@
-import { AppRouter } from 'server/routers/_app';
-import { transformer, trpc } from '@/lib/trpc';
+import { trpc } from '@/lib/trpc';
 import type { NextPageWithAuthAndLayout } from '@/lib/types';
-import { httpBatchLink } from '@trpc/client/links/httpBatchLink';
-import { loggerLink } from '@trpc/client/links/loggerLink';
-import { withTRPC } from '@trpc/next';
-import { TRPCError } from '@trpc/server';
 import { SessionProvider, signIn, useSession } from 'next-auth/react';
 import type { AppProps } from 'next/app';
 import * as React from 'react';

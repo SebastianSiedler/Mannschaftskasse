@@ -24,8 +24,8 @@ const SingleMatch: React.FC<Props> = (props) => {
   const spielId = router.query.spielId as unknown as string;
   const spielerId = router.query.spielerId as unknown as string;
 
-  const { refetch: refetchEinsatz } = trpc.useQuery(
-    ['einsatz.detail', { spielId, spielerId }],
+  const { refetch: refetchEinsatz } = trpc.proxy.einsatz.detail.useQuery(
+    { spielId, spielerId },
     {
       enabled: false,
       onError: (err) => {
@@ -47,7 +47,7 @@ const SingleMatch: React.FC<Props> = (props) => {
     refetchEinsatz();
   }, [router.query]);
 
-  const einsatzMutation = trpc.useMutation('einsatz.update', {
+  const einsatzMutation = trpc.proxy.einsatz.update.useMutation({
     onSuccess: () => {
       handleClose();
       toast.success('Erfolgreich gespeichert');
@@ -57,7 +57,7 @@ const SingleMatch: React.FC<Props> = (props) => {
     },
   });
 
-  const removeEinsatz = trpc.useMutation('einsatz.remove', {
+  const removeEinsatz = trpc.proxy.einsatz.remove.useMutation({
     onSuccess: () => {
       handleClose();
       toast.success('Erfolgreich gelöscht');

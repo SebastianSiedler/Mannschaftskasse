@@ -33,7 +33,7 @@ export const einsatzRouter = t.router({
       return einsatz;
     }),
 
-  'list.availablePlayers': t.procedure
+  listAvailablePlayers: t.procedure
     .use(isAuthenticated)
     .input(z.object({ spielId: z.string() }))
     .query(async ({ ctx, input }) => {

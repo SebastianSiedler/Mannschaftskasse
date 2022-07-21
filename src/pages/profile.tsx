@@ -8,11 +8,14 @@ import toast from 'react-hot-toast';
 const Home: NextPageWithAuthAndLayout = () => {
   const { data: session } = useSession();
 
-  const userQuery = trpc.useQuery(['user.profile', { id: session?.user.id! }], {
-    onError: (err) => {
-      toast.error(err.message);
+  const userQuery = trpc.proxy.user.profile.useQuery(
+    { id: session?.user.id! },
+    {
+      onError: (err) => {
+        toast.error(err.message);
+      },
     },
-  });
+  );
 
   return (
     <>
@@ -24,7 +27,7 @@ const Home: NextPageWithAuthAndLayout = () => {
                 <div>{userQuery.data?.name}</div>
               </div>
 
-              <div className="w-20 relative aspect-square">
+              <div className="relative w-20 aspect-square">
                 <Image
                   src={userQuery.data?.image!}
                   layout="fill"

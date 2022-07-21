@@ -6,13 +6,13 @@ import { trpc } from '@/lib/trpc';
 
 const UserManagement: React.FC = () => {
   const { data } = useSession();
-  const allUsersQuery = trpc.useQuery(['user.list'], {
+  const allUsersQuery = trpc.proxy.user.list.useQuery(undefined, {
     onError: (err) => {
       toast.error(err.message);
     },
   });
 
-  const changeUserPermission = trpc.useMutation('user.changeRole', {
+  const changeUserPermission = trpc.proxy.user.changeRole.useMutation({
     onSuccess: () => {
       allUsersQuery.refetch();
       toast.success('Rolle geändert');
@@ -28,7 +28,7 @@ const UserManagement: React.FC = () => {
         <div key={item.id}>
           {/* Name and Mail */}
           <div className="flex gap-4">
-            <div className="w-12 h-12 relative">
+            <div className="relative w-12 h-12">
               {item.image ? (
                 <Image
                   src={item.image}
@@ -37,10 +37,10 @@ const UserManagement: React.FC = () => {
                   className="rounded-full"
                 />
               ) : (
-                <div className="h-full w-full bg-gray-200"></div>
+                <div className="w-full h-full bg-gray-200"></div>
               )}
             </div>
-            <div className="min-w-0 flex-1">
+            <div className="flex-1 min-w-0">
               <div className="overflow-hidden whitespace-nowrap text-ellipsis">
                 <span>{item.name}</span>
               </div>

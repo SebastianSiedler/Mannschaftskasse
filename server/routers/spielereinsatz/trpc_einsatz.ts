@@ -22,7 +22,7 @@ export const einsatzRouter = t.router({
     .use(isAuthenticated)
     .input(z.object({ spielId: z.string(), spielerId: z.string() }))
     .query(async ({ ctx, input }) => {
-      return await ctx.prisma.spielereinsatz.findUnique({
+      const einsatz = await ctx.prisma.spielereinsatz.findUniqueOrThrow({
         where: {
           spielerId_spielId: {
             spielId: input.spielId,
@@ -30,6 +30,7 @@ export const einsatzRouter = t.router({
           },
         },
       });
+      return einsatz;
     }),
 
   'list.availablePlayers': t.procedure

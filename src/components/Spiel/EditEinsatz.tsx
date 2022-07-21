@@ -31,20 +31,21 @@ const SingleMatch: React.FC<Props> = (props) => {
       onError: (err) => {
         toast.error(err.message);
       },
+      onSuccess: (data) => {
+        form.setTore(data.tore);
+        form.setBezahlt(data.bezahlt);
+        form.setGelbeKarte(data.gelbeKarte);
+        form.setRoteKarte(data.roteKarte);
+      },
     },
   );
 
   const form = useEinsatzForm();
 
+  /* Fetch Data, only after Route Change */
   useEffect(() => {
-    refetchEinsatz().then((res) => {
-      const { data } = res;
-      form.setTore(data!.tore);
-      form.setBezahlt(data!.bezahlt);
-      form.setGelbeKarte(data!.gelbeKarte);
-      form.setRoteKarte(data!.roteKarte);
-    });
-  }, []);
+    refetchEinsatz();
+  }, [router.query]);
 
   const einsatzMutation = trpc.useMutation('einsatz.update', {
     onSuccess: () => {

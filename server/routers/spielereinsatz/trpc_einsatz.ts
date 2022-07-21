@@ -49,7 +49,7 @@ export const einsatzRouter = t.router({
       });
     }),
 
-  add_by_player_list: t.procedure
+  addByPlayerList: t.procedure
     .use(isAdmin)
     .input(
       z.object({

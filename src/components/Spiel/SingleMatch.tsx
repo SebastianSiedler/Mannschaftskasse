@@ -69,7 +69,7 @@ const SingleMatch: React.FC<Props> = (props) => {
   });
 
   const addPlayersFromClipboard =
-    trpc.proxy.einsatz.add_by_player_list.useMutation({
+    trpc.proxy.einsatz.addByPlayerList.useMutation({
       onError: (err) => {
         toast.error(err.message);
       },

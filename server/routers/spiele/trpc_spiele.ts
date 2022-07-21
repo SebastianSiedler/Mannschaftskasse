@@ -11,7 +11,7 @@ export const spielRouter = t.router({
    * if an error occours:
    * force update: /api/trpc/spiel.update_matches?input={"json":{"force":true}}
    */
-  update_matches: t.procedure
+  updateMatches: t.procedure
     .input(
       z.object({
         force: z.boolean().optional(),

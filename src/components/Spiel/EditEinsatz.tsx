@@ -89,19 +89,21 @@ const SingleMatch: React.FC<Props> = (props) => {
             value={form.tore}
             onChange={(e) => form.setTore(Number(e.target.value))}
           />
+          <br />
           <TextField
             label="Gelbe Karten"
             value={form.gelbeKarte}
             type="number"
             onChange={(e) => form.setTore(Number(e.target.value))}
           />
+          <br />
           <TextField
             label="Rote Karten"
             type="number"
             value={form.roteKarte}
             onChange={(e) => form.setTore(Number(e.target.value))}
           />
-
+          <br />
           <Checkbox
             checked={form.bezahlt}
             onChange={(e) => form.setBezahlt(e.target.checked)}

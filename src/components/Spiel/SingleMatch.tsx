@@ -110,49 +110,53 @@ const SingleMatch: React.FC<Props> = (props) => {
             spielerQuery.data?.length ?? 0
           }`}</div>
           <List>
-            {spielerQuery.data?.map((item, i) => (
-              <Link
-                href={`/spiele/?spielId=${spielId}&spielerId=${item.spielerId}`}
-                as={`/spiele/${spielId}/${item.spielerId}`}
-                key={i}
-              >
-                <ListItemButton
-                  selected={
-                    spielId === router.query.spielId &&
-                    item.spielerId === router.query.spielerId
-                  }
+            {spielerQuery.status === 'loading' && <div>Loading...</div>}
+            {spielerQuery.status === 'success' &&
+              spielerQuery.data?.map((item, i) => (
+                <Link
+                  href={`/spiele/?spielId=${spielId}&spielerId=${item.spielerId}`}
+                  as={`/spiele/${spielId}/${item.spielerId}`}
+                  key={i}
                 >
-                  <ListItemText>{item.spieler.names[0]} </ListItemText>
-                  <ListItemIcon>
-                    {item.bezahlt ? (
-                      <CheckCircleOutline color="success" />
-                    ) : (
-                      <HighlightOffOutlined color="error" />
-                    )}
-                  </ListItemIcon>
-                </ListItemButton>
-              </Link>
-            ))}
+                  <ListItemButton
+                    selected={
+                      spielId === router.query.spielId &&
+                      item.spielerId === router.query.spielerId
+                    }
+                  >
+                    <ListItemText>{item.spieler.names[0]} </ListItemText>
+                    <ListItemIcon>
+                      {item.bezahlt ? (
+                        <CheckCircleOutline color="success" />
+                      ) : (
+                        <HighlightOffOutlined color="error" />
+                      )}
+                    </ListItemIcon>
+                  </ListItemButton>
+                </Link>
+              ))}
           </List>
 
           <div className="font-semibold">Verfügbare Spieler:</div>
           <List>
-            {availQuery.data?.map((item, i) => (
-              <ListItemButton
-                key={i}
-                onClick={() => {
-                  addPlayerMutation.mutate({
-                    spielId: spielId,
-                    spielerId: item.id,
-                  });
-                }}
-              >
-                <ListItemText>{item.names[0]}</ListItemText>
-                <ListItemIcon>
-                  <AddCircleOutline />
-                </ListItemIcon>
-              </ListItemButton>
-            ))}
+            {availQuery.status === 'loading' && <div>Loading...</div>}
+            {availQuery.status === 'success' &&
+              availQuery.data?.map((item, i) => (
+                <ListItemButton
+                  key={i}
+                  onClick={() => {
+                    addPlayerMutation.mutate({
+                      spielId: spielId,
+                      spielerId: item.id,
+                    });
+                  }}
+                >
+                  <ListItemText>{item.names[0]}</ListItemText>
+                  <ListItemIcon>
+                    <AddCircleOutline />
+                  </ListItemIcon>
+                </ListItemButton>
+              ))}
           </List>
 
           <label htmlFor="player_names_textarea" className="font-semibold">

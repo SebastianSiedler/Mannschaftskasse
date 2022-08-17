@@ -55,7 +55,7 @@ const ListKader: React.FC = () => {
       <Fab
         color="primary"
         aria-label="add"
-        sx={{ position: 'absolute', bottom: 64, right: 16 }}
+        sx={{ position: 'fixed', bottom: 64, right: 16 }}
         onClick={() => {
           setActivePlayer(emptyPlayer);
           setOpen(true);

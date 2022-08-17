@@ -42,36 +42,39 @@ const StatsHome: NextPageWithAuthAndLayout = () => {
                 </tr>
               </thead>
               <tbody>
-                {saison_stats.map((player, i) => (
-                  <tr
-                    key={player.id}
-                    className={
-                      (i % 2 == 0 ? 'bg-gray-100' : '') + ' min-h-[300px]'
-                    }
-                  >
-                    <td className="">{player.name}</td>
-                    <td className="text-center">{player.anz_spiele}</td>
-                    <td className="text-center">
-                      {player.schulden > 0 && (
-                        <Button
-                          onClick={() => {
-                            if (
-                              window.confirm(
-                                `Schulden von ${player.names[0]} wirklich begleichen?`,
-                              )
-                            ) {
-                              schuldenBegleichen.mutate({
-                                spielerId: player.id,
-                              });
-                            }
-                          }}
-                        >
-                          {`${player.schulden}€ begleichen?`}
-                        </Button>
-                      )}
-                    </td>
-                  </tr>
-                ))}
+                {saison_stats
+                  .sort((a, z) => z.anz_spiele - a.anz_spiele)
+                  .sort((a, z) => z.schulden - a.schulden)
+                  .map((player, i) => (
+                    <tr
+                      key={player.id}
+                      className={
+                        (i % 2 == 0 ? 'bg-gray-100' : '') + ' min-h-[300px]'
+                      }
+                    >
+                      <td className="">{player.name}</td>
+                      <td className="text-center">{player.anz_spiele}</td>
+                      <td className="text-center">
+                        {player.schulden > 0 && (
+                          <Button
+                            onClick={() => {
+                              if (
+                                window.confirm(
+                                  `Schulden von ${player.names[0]} wirklich begleichen?`,
+                                )
+                              ) {
+                                schuldenBegleichen.mutate({
+                                  spielerId: player.id,
+                                });
+                              }
+                            }}
+                          >
+                            {`${player.schulden}€ begleichen?`}
+                          </Button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
           </div>

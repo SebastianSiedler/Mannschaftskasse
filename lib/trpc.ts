@@ -2,12 +2,9 @@ import type { AppRouter } from '@/server/routers/_app';
 import type {
   inferProcedureInput,
   inferProcedureOutput,
-  inferSubscriptionOutput,
   TRPCError,
 } from '@trpc/server';
 import superjson from 'superjson';
-import { initTRPC } from '@trpc/server';
-import { Context } from '@/server/context';
 import { setupTRPC } from '@trpc/next';
 import type { NextPageContext } from 'next';
 import { httpBatchLink, loggerLink } from '@trpc/client';
@@ -131,7 +128,7 @@ export const trpc = setupTRPC<AppRouter, SSRContext>({
               if (trcpErrorCode === 'NOT_FOUND') {
                 return false;
               }
-              if (failureCount < 3) {
+              if (failureCount < 3 && trcpErrorCode !== 'UNAUTHORIZED') {
                 return true;
               }
               return false;

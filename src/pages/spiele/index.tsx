@@ -34,7 +34,7 @@ SpieleHome.getLayout = (page) => {
 export default SpieleHome;
 
 export const getStaticProps = async (context: GetStaticPropsContext) => {
-  await ssg.fetchQuery('spiel.list', undefined);
+  await ssg.spiel.list.fetch();
 
   return {
     props: {

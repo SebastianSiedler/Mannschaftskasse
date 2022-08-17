@@ -24,7 +24,7 @@ const UserManagement: React.FC = () => {
   return (
     <div>
       {allUsersQuery.status === 'loading' && <div>Loading...</div>}
-      
+
       {allUsersQuery.data?.map((item) => (
         <div key={item.id}>
           {/* Name and Mail */}

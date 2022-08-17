@@ -32,6 +32,10 @@ export const userRouter = t.router({
       return user;
     }),
 
+  /**
+   * Return a list of all other accounts, except the one of the
+   * logged in user.
+   */
   list: t.procedure.use(isAdmin).query(async ({ ctx }) => {
     return await ctx.prisma.user.findMany({
       where: {

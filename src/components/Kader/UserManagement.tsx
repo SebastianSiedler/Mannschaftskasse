@@ -5,7 +5,6 @@ import { useSession } from 'next-auth/react';
 import { trpc } from '@/lib/trpc';
 
 const UserManagement: React.FC = () => {
-  const { data } = useSession();
   const allUsersQuery = trpc.proxy.user.list.useQuery(undefined, {
     onError: (err) => {
       toast.error(err.message);
@@ -24,6 +23,8 @@ const UserManagement: React.FC = () => {
 
   return (
     <div>
+      {allUsersQuery.status === 'loading' && <div>Loading...</div>}
+      
       {allUsersQuery.data?.map((item) => (
         <div key={item.id}>
           {/* Name and Mail */}

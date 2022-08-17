@@ -36,6 +36,7 @@ const ListKader: React.FC = () => {
 
   return (
     <>
+      {kaderQuery.status === 'loading' && <div>Loading ...</div>}
       <List>
         {kaderQuery.data?.map((item, i) => (
           <ListItemButton

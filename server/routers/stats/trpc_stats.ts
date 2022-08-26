@@ -59,15 +59,20 @@ export const statsRouter = t.router({
       saison: saisons[i],
       saison_stats: saison_stats
         .map((player) => {
-          const schulden = player.spielereinsaetze.reduce(
-            (prev, curr) => (prev += curr.bezahlt ? 0 : 5),
-            0,
-          );
+          const schulden = player.spielereinsaetze.reduce((prev, curr) => {
+            return (prev += curr.bezahlt ? 0 : 5);
+          }, 0);
+
+          const tore = player.spielereinsaetze.reduce((acc, curr) => {
+            return (acc += curr.tore);
+          }, 0);
+
           const anz_spiele = player.spielereinsaetze.length;
 
           return {
             schulden,
             anz_spiele,
+            tore,
             name: player.names[0],
             ...player,
           };

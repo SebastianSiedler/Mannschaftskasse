@@ -38,6 +38,7 @@ const StatsHome: NextPageWithAuthAndLayout = () => {
                 <tr>
                   <th>Name</th>
                   <th>Spiele</th>
+                  <th>Tore</th>
                   <th>Schulden</th>
                 </tr>
               </thead>
@@ -54,6 +55,7 @@ const StatsHome: NextPageWithAuthAndLayout = () => {
                     >
                       <td className="">{player.name}</td>
                       <td className="text-center">{player.anz_spiele}</td>
+                      <td className="text-center">{player.tore || ''}</td>
                       <td className="text-center">
                         {player.schulden > 0 && (
                           <Button

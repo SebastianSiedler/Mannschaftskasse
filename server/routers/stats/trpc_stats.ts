@@ -19,6 +19,9 @@ export const statsRouter = t.router({
           },
         },
       },
+      orderBy: {
+        name: 'desc',
+      },
     });
 
     const stats = await ctx.prisma.$transaction(

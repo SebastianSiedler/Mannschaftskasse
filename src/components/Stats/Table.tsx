@@ -123,9 +123,9 @@ const StatsTable: React.FC<Props> = ({ data, saisonName }) => {
   return (
     <>
       <table className="relative w-full border" id={TABLE_NAME}>
-        <thead className="sticky top-0 bg-slate-300">
+        <thead className="sticky top-0 w-full bg-slate-300">
           <tr>
-            <td>{`Saison: ${saisonName}`}</td>
+            <td colSpan={3} className="font-bold">{`Saison: ${saisonName}`}</td>
             <td>
               <Button variant="contained" onClick={() => exportPDF()}>
                 Download

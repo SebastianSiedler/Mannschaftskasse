@@ -74,6 +74,7 @@ export const statsRouter = t.router({
             anz_spiele,
             tore,
             name: player.names[0],
+            playerId: player.id,
             ...player,
           };
         })

@@ -40,5 +40,9 @@ import { signOut } from 'next-auth/react';
 import StatsTable from '../components/Stats/Table';
 
 const SignOut: React.FC = () => {
-  return <Button onClick={() => signOut()}>Sign out</Button>;
+  return (
+    <Button variant="outlined" onClick={() => signOut()}>
+      Sign out
+    </Button>
+  );
 };

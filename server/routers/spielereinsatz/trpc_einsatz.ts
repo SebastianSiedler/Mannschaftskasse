@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import { Spieler } from '@prisma/client';
-import { t } from '@/server/trpc';
-import { isAdmin, isAuthenticated } from '@/server/middleware';
+import { t } from '@/server/trpc';import { isAdmin, isAuthenticated } from '@/server/middleware';
 
 export const einsatzRouter = t.router({
   list: t.procedure

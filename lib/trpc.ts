@@ -5,7 +5,7 @@ import type {
   TRPCError,
 } from '@trpc/server';
 import superjson from 'superjson';
-import { setupTRPC } from '@trpc/next';
+import { createTRPCNext } from '@trpc/next';
 import type { NextPageContext } from 'next';
 import { httpBatchLink, loggerLink } from '@trpc/client';
 
@@ -94,8 +94,8 @@ const getBaseUrl = () => {
  * A set of strongly-typed React hooks from your `AppRouter` type signature with `createReactQueryHooks`.
  * @link https://trpc.io/docs/react#3-create-trpc-hooks
  */
-export const trpc = setupTRPC<AppRouter, SSRContext>({
-  config() {
+export const trpc = createTRPCNext<AppRouter, SSRContext>({
+  config({ ctx }) {
     /**
      * If you want to use SSR, you need to use the server's full URL
      * @link https://trpc.io/docs/ssr

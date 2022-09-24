@@ -32,7 +32,7 @@ const SingleMatch: React.FC<Props> = (props) => {
 
   const router = useRouter();
 
-  const matchQuery = trpc.proxy.spiel.detail.useQuery(
+  const matchQuery = trpc.spiel.detail.useQuery(
     { spielId },
     {
       onError: (err) => {
@@ -40,7 +40,7 @@ const SingleMatch: React.FC<Props> = (props) => {
       },
     },
   );
-  const spielerQuery = trpc.proxy.einsatz.list.useQuery(
+  const spielerQuery = trpc.einsatz.list.useQuery(
     { spielId },
     {
       onError: (err) => {
@@ -48,7 +48,7 @@ const SingleMatch: React.FC<Props> = (props) => {
       },
     },
   );
-  const availQuery = trpc.proxy.einsatz.listAvailablePlayers.useQuery(
+  const availQuery = trpc.einsatz.listAvailablePlayers.useQuery(
     { spielId },
     {
       onError: (err) => {
@@ -57,7 +57,7 @@ const SingleMatch: React.FC<Props> = (props) => {
     },
   );
 
-  const addPlayerMutation = trpc.proxy.einsatz.add.useMutation({
+  const addPlayerMutation = trpc.einsatz.add.useMutation({
     onSuccess: () => {
       spielerQuery.refetch();
       availQuery.refetch();
@@ -68,21 +68,20 @@ const SingleMatch: React.FC<Props> = (props) => {
     },
   });
 
-  const addPlayersFromClipboard =
-    trpc.proxy.einsatz.addByPlayerList.useMutation({
-      onError: (err) => {
-        toast.error(err.message);
-      },
-      onSuccess: (data) => {
-        console.log(data.unknown_players);
-        if (data.unknown_players.length > 0) {
-          toast.error(`${data.unknown_players.join(', ')} nicht gefunden`);
-        }
-        setInputNames(data.unknown_players.join('\n'));
-        spielerQuery.refetch();
-        availQuery.refetch();
-      },
-    });
+  const addPlayersFromClipboard = trpc.einsatz.addByPlayerList.useMutation({
+    onError: (err) => {
+      toast.error(err.message);
+    },
+    onSuccess: (data) => {
+      console.log(data.unknown_players);
+      if (data.unknown_players.length > 0) {
+        toast.error(`${data.unknown_players.join(', ')} nicht gefunden`);
+      }
+      setInputNames(data.unknown_players.join('\n'));
+      spielerQuery.refetch();
+      availQuery.refetch();
+    },
+  });
 
   const [inputNames, setInputNames] = useState('');
 

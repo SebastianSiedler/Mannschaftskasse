@@ -1,6 +1,5 @@
 import { isAdmin, isAuthenticated } from '@/server/middleware';
-import { t } from '@/server/trpc';
-import { TRPCError } from '@trpc/server';
+import { t } from '@/server/trpc';import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 
 export const userRouter = t.router({

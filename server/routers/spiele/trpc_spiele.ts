@@ -4,7 +4,6 @@ import { getBfvData } from './utils/useBfv';
 import isEqual from 'lodash.isequal';
 import { updateMatches } from './utils/updateMatches';
 import { t } from '@/server/trpc';
-
 export const spielRouter = t.router({
   /**
    * Update matches in local DB

@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import { TRPCError } from '@trpc/server';
-import { t } from '@/server/trpc';
-import { isAdmin } from '@/server/middleware';
+import { t } from '@/server/trpc';import { isAdmin } from '@/server/middleware';
 
 export const spielerRouter = t.router({
   list: t.procedure.use(isAdmin).query(async ({ ctx }) => {

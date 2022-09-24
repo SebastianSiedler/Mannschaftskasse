@@ -1,5 +1,6 @@
 import { isAdmin, isAuthenticated } from '@/server/middleware';
-import { t } from '@/server/trpc';import { TRPCError } from '@trpc/server';
+import { adminProcedure, t } from '@/server/trpc';
+import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 
 export const userRouter = t.router({
@@ -35,7 +36,7 @@ export const userRouter = t.router({
    * Return a list of all other accounts, except the one of the
    * logged in user.
    */
-  list: t.procedure.use(isAdmin).query(async ({ ctx }) => {
+  list: adminProcedure.query(async ({ ctx }) => {
     return await ctx.prisma.user.findMany({
       where: {
         id: {

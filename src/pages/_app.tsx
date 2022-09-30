@@ -4,6 +4,7 @@ import { SessionProvider, signIn, useSession } from 'next-auth/react';
 import type { AppProps } from 'next/app';
 import * as React from 'react';
 import { Toaster } from 'react-hot-toast';
+import Spinner from '../components/misc/Spinner';
 import '../styles/globals.css';
 
 type AppPropsWithAuthAndLayout = AppProps & {
@@ -40,7 +41,11 @@ function Auth({ children }: { children: React.ReactNode }) {
 
   // Session is being fetched, or no user.
   // If no user, useEffect() will redirect.
-  return <div>Null</div>;
+  return (
+    <div>
+      <span>Waiting for Authentication...</span> <Spinner />
+    </div>
+  );
 }
 
 export default trpc.withTRPC(MyApp);

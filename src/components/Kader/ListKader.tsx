@@ -9,7 +9,7 @@ import EditPlayer from './EditPlayer';
 import toast from 'react-hot-toast';
 
 const ListKader: React.FC = () => {
-  const kaderQuery = trpc.proxy.spieler.list.useQuery(undefined, {
+  const kaderQuery = trpc.spieler.list.useQuery(undefined, {
     onError: (err) => {
       toast.error(err.message);
     },

@@ -10,10 +10,8 @@ type AppPropsWithAuthAndLayout = AppProps & {
   Component: NextPageWithAuthAndLayout;
 };
 
-function MyApp({
-  Component,
-  pageProps: { session, ...pageProps },
-}: AppPropsWithAuthAndLayout) {
+function MyApp({ Component, pageProps }: AppPropsWithAuthAndLayout) {
+  const session = (pageProps as any).session;
   const getLayout = Component.getLayout ?? ((page) => page);
 
   return (
@@ -42,7 +40,7 @@ function Auth({ children }: { children: React.ReactNode }) {
 
   // Session is being fetched, or no user.
   // If no user, useEffect() will redirect.
-  return null;
+  return <div>Null</div>;
 }
 
 export default trpc.withTRPC(MyApp);

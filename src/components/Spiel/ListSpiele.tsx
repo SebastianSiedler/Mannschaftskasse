@@ -3,7 +3,7 @@ import toast from 'react-hot-toast';
 import MatchListItem from './MatchListItem';
 
 const ListSpiele: React.FC = () => {
-  trpc.proxy.spiel.updateMatches.useQuery(
+  trpc.spiel.updateMatches.useQuery(
     {},
     {
       refetchOnWindowFocus: false,
@@ -18,7 +18,7 @@ const ListSpiele: React.FC = () => {
     },
   );
 
-  const spieleQuery = trpc.proxy.spiel.list.useQuery(undefined, {
+  const spieleQuery = trpc.spiel.list.useQuery(undefined, {
     onError: (err) => {
       toast.error(err.message);
     },

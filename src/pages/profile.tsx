@@ -8,7 +8,7 @@ import toast from 'react-hot-toast';
 const Home: NextPageWithAuthAndLayout = () => {
   const { data: session } = useSession();
 
-  const userQuery = trpc.proxy.user.profile.useQuery(
+  const userQuery = trpc.user.profile.useQuery(
     { id: session?.user.id! },
     {
       onError: (err) => {

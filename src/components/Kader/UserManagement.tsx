@@ -5,13 +5,13 @@ import { useSession } from 'next-auth/react';
 import { trpc } from '@/lib/trpc';
 
 const UserManagement: React.FC = () => {
-  const allUsersQuery = trpc.proxy.user.list.useQuery(undefined, {
+  const allUsersQuery = trpc.user.list.useQuery(undefined, {
     onError: (err) => {
       toast.error(err.message);
     },
   });
 
-  const changeUserPermission = trpc.proxy.user.changeRole.useMutation({
+  const changeUserPermission = trpc.user.changeRole.useMutation({
     onSuccess: () => {
       allUsersQuery.refetch();
       toast.success('Rolle geändert');

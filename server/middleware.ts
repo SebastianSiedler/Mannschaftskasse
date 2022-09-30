@@ -1,5 +1,4 @@
-import { t } from '@/server/trpc';
-import { TRPCError } from '@trpc/server';
+import { t } from '@/server/trpc';import { TRPCError } from '@trpc/server';
 
 export const isAuthenticated = t.middleware(async ({ ctx, next }) => {
   if (!ctx.session) {

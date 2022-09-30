@@ -47,7 +47,7 @@ const EditPlayer: React.FC<Props> = ({ player, open, handleClose }) => {
     }
   }, [names]);
 
-  const upsertPlayer = trpc.proxy.spieler.upsert.useMutation({
+  const upsertPlayer = trpc.spieler.upsert.useMutation({
     onSuccess: () => {
       handleClose();
       toast.success('gespeichert');

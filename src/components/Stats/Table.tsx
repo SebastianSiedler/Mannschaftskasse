@@ -71,9 +71,9 @@ const StatsTable: React.FC<Props> = ({ data, saisonName }) => {
     }),
   ];
 
-  const utils = trpc.proxy.useContext();
+  const utils = trpc.useContext();
 
-  const schuldenBegleichen = trpc.proxy.stats.clearDebts.useMutation({
+  const schuldenBegleichen = trpc.stats.clearDebts.useMutation({
     onSuccess: async () => {
       await utils.stats.list.invalidate();
       toast.success('Schulden beglichen');

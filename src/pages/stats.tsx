@@ -5,7 +5,7 @@ import Button from '@mui/material/Button';
 import toast from 'react-hot-toast';
 
 const StatsHome: NextPageWithAuthAndLayout = () => {
-  const statsQuery = trpc.proxy.stats.list.useQuery(undefined, {
+  const statsQuery = trpc.stats.list.useQuery(undefined, {
     onError: (err) => {
       toast.error(err.message);
     },

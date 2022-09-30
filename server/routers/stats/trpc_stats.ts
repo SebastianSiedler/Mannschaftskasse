@@ -1,12 +1,12 @@
 import { isAdmin, isAuthenticated } from '@/server/middleware';
-import { t } from '@/server/trpc';
+import { authProcedure, t } from '@/server/trpc';
 import { z } from 'zod';
 
 export const statsRouter = t.router({
   /**
    * List alle Spielereinsätze nach Saison aufgelistet
    */
-  list: t.procedure.use(isAuthenticated).query(async ({ ctx }) => {
+  list: authProcedure.query(async ({ ctx }) => {
     const saisons = await ctx.prisma.saison.findMany({
       include: {
         spiel: {

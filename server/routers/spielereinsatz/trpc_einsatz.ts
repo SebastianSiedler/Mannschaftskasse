@@ -15,6 +15,9 @@ export const einsatzRouter = t.router({
         include: {
           spieler: true,
         },
+        orderBy: {
+          bezahlt: 'asc',
+        },
       });
     }),
 

@@ -1,5 +1,4 @@
-import { isAdmin, isAuthenticated } from '@/server/middleware';
-import { authProcedure, t } from '@/server/trpc';
+import { adminProcedure, authProcedure, t } from '@/server/trpc';
 import { z } from 'zod';
 
 export const statsRouter = t.router({
@@ -85,8 +84,7 @@ export const statsRouter = t.router({
   /**
    * Schulden für einen Spieler begleichen
    */
-  clearDebts: t.procedure
-    .use(isAdmin)
+  clearDebts: adminProcedure
     .input(
       z.object({
         spielerId: z.string(),

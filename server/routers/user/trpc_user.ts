@@ -1,11 +1,9 @@
-import { isAdmin, isAuthenticated } from '@/server/middleware';
-import { adminProcedure, t } from '@/server/trpc';
+import { adminProcedure, authProcedure, t } from '@/server/trpc';
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 
 export const userRouter = t.router({
-  profile: t.procedure
-    .use(isAuthenticated)
+  profile: authProcedure
     .input(
       z.object({
         id: z.string(),
@@ -49,8 +47,7 @@ export const userRouter = t.router({
     });
   }),
 
-  changeRole: t.procedure
-    .use(isAdmin)
+  changeRole: adminProcedure
     .input(
       z.object({
         userId: z.string(),

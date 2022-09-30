@@ -1,11 +1,9 @@
 import { z } from 'zod';
 import { Spieler } from '@prisma/client';
-import { t } from '@/server/trpc';
-import { isAdmin, isAuthenticated } from '@/server/middleware';
+import { adminProcedure, authProcedure, t } from '@/server/trpc';
 
 export const einsatzRouter = t.router({
-  list: t.procedure
-    .use(isAuthenticated)
+  list: authProcedure
     .input(z.object({ spielId: z.string() }))
     .query(async ({ ctx, input }) => {
       return await ctx.prisma.spielereinsatz.findMany({
@@ -21,8 +19,7 @@ export const einsatzRouter = t.router({
       });
     }),
 
-  detail: t.procedure
-    .use(isAuthenticated)
+  detail: authProcedure
     .input(z.object({ spielId: z.string(), spielerId: z.string() }))
     .query(async ({ ctx, input }) => {
       const einsatz = await ctx.prisma.spielereinsatz.findUniqueOrThrow({
@@ -36,8 +33,7 @@ export const einsatzRouter = t.router({
       return einsatz;
     }),
 
-  listAvailablePlayers: t.procedure
-    .use(isAuthenticated)
+  listAvailablePlayers: authProcedure
     .input(z.object({ spielId: z.string() }))
     .query(async ({ ctx, input }) => {
       return await ctx.prisma.spieler.findMany({
@@ -52,8 +48,7 @@ export const einsatzRouter = t.router({
       });
     }),
 
-  addByPlayerList: t.procedure
-    .use(isAdmin)
+  addByPlayerList: adminProcedure
     .input(
       z.object({
         names: z.string().array().min(1),
@@ -106,8 +101,7 @@ export const einsatzRouter = t.router({
       };
     }),
 
-  add: t.procedure
-    .use(isAdmin)
+  add: adminProcedure
     .input(
       z.object({
         spielId: z.string(),
@@ -124,8 +118,7 @@ export const einsatzRouter = t.router({
       });
     }),
 
-  update: t.procedure
-    .use(isAdmin)
+  update: adminProcedure
     .input(
       z.object({
         spielId: z.string(),
@@ -149,8 +142,7 @@ export const einsatzRouter = t.router({
       });
     }),
 
-  remove: t.procedure
-    .use(isAdmin)
+  remove: adminProcedure
     .input(
       z.object({
         spielId: z.string(),

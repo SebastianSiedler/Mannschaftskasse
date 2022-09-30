@@ -1,15 +1,13 @@
 import { z } from 'zod';
 import { TRPCError } from '@trpc/server';
 import { adminProcedure, t } from '@/server/trpc';
-import { isAdmin } from '@/server/middleware';
 
 export const spielerRouter = t.router({
   list: adminProcedure.query(async ({ ctx }) => {
     return await ctx.prisma.spieler.findMany();
   }),
 
-  upsert: t.procedure
-    .use(isAdmin)
+  upsert: adminProcedure
     .input(
       z.object({
         names: z.string().min(2).array().min(1),

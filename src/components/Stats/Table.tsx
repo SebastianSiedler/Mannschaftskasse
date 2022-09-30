@@ -52,6 +52,7 @@ const StatsTable: React.FC<Props> = ({ data, saisonName }) => {
           <span>
             {schulden > 0 && (
               <Button
+                className="z-0"
                 onClick={() => {
                   if (
                     window.confirm(`Schulden von ${name} wirklich begleichen?`)
@@ -82,6 +83,7 @@ const StatsTable: React.FC<Props> = ({ data, saisonName }) => {
       toast.error(err.message);
     },
   });
+
   const [sorting, setSorting] = useState<SortingState>([
     { id: 'schulden', desc: true },
     { id: 'anz_spiele', desc: true },
@@ -123,7 +125,7 @@ const StatsTable: React.FC<Props> = ({ data, saisonName }) => {
   return (
     <>
       <table className="relative w-full border" id={TABLE_NAME}>
-        <thead className="sticky top-0 w-full bg-slate-300">
+        <thead className="sticky top-0 z-10 w-full bg-slate-300">
           <tr>
             <td colSpan={3} className="font-bold">{`Saison: ${saisonName}`}</td>
             <td>

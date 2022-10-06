@@ -44,10 +44,19 @@ export const statsRouter = t.router({
                   },
                 },
               },
-              select: {
-                tore: true,
-                bezahlt: true,
+              include: {
+                Spiel: {
+                  include: {
+                    opponent: true,
+                  },
+                },
               },
+              // select: {
+              //   tore: true,
+              //   bezahlt: true,
+              //   Spiel: true,
+              //   spielId: true,
+              // },
             },
           },
         });

@@ -28,6 +28,8 @@ interface Props {
 }
 
 const StatsTable: React.FC<Props> = ({ data, saisonName }) => {
+  console.log(data);
+
   const columns = [
     columnHelper.accessor('name', {
       header: () => <span>Name</span>,
@@ -46,7 +48,12 @@ const StatsTable: React.FC<Props> = ({ data, saisonName }) => {
     columnHelper.accessor('schulden', {
       header: () => <span>Schulden</span>,
       cell: (info) => {
-        const { schulden, name, playerId } = info.row.original;
+        const { schulden, name, playerId, spielereinsaetze } =
+          info.row.original;
+
+        const unpaid_games_opponents = spielereinsaetze
+          .filter((x) => x.bezahlt === false)
+          .map((x) => x.Spiel.opponent.name);
 
         return (
           <span>
@@ -55,7 +62,11 @@ const StatsTable: React.FC<Props> = ({ data, saisonName }) => {
                 className="z-0"
                 onClick={() => {
                   if (
-                    window.confirm(`Schulden von ${name} wirklich begleichen?`)
+                    window.confirm(
+                      `Schulden von ${name} wirklich begleichen?\n ${unpaid_games_opponents.join(
+                        '\n',
+                      )}`,
+                    )
                   ) {
                     schuldenBegleichen.mutate({
                       spielerId: playerId,

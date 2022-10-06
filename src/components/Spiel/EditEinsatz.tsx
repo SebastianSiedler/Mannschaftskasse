@@ -17,7 +17,7 @@ interface Props {
   handleClose: () => void;
 }
 
-const SingleMatch: React.FC<Props> = (props) => {
+const EditEinsatz: React.FC<Props> = (props) => {
   const { handleClose, open } = props;
 
   const router = useRouter();
@@ -132,7 +132,7 @@ const SingleMatch: React.FC<Props> = (props) => {
   );
 };
 
-export default SingleMatch;
+export default EditEinsatz;
 
 const useEinsatzForm = () => {
   const [tore, setTore] = useState(0);

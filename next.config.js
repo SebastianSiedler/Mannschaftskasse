@@ -11,6 +11,11 @@ module.exports = {
         destination: '/spiele',
         permanent: true,
       },
+      {
+        source: '/spiele/:spielId/:spielerId',
+        destination: '/spiele/:spielId',
+        permanent: true,
+      },
     ];
   },
 };

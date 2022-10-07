@@ -6,6 +6,7 @@ import * as React from 'react';
 import { Toaster } from 'react-hot-toast';
 import Spinner from '../components/misc/Spinner';
 import '../styles/globals.css';
+import { ChakraProvider } from '@chakra-ui/react';
 
 type AppPropsWithAuthAndLayout = AppProps & {
   Component: NextPageWithAuthAndLayout;
@@ -16,14 +17,16 @@ function MyApp({ Component, pageProps }: AppPropsWithAuthAndLayout) {
   const getLayout = Component.getLayout ?? ((page) => page);
 
   return (
-    <SessionProvider session={session} refetchOnWindowFocus={false}>
-      {Component.auth ? (
-        <Auth>{getLayout(<Component {...pageProps} />)}</Auth>
-      ) : (
-        getLayout(<Component {...pageProps} />)
-      )}
-      <Toaster />
-    </SessionProvider>
+    // <ChakraProvider>
+      <SessionProvider session={session} refetchOnWindowFocus={false}>
+        {Component.auth ? (
+          <Auth>{getLayout(<Component {...pageProps} />)}</Auth>
+        ) : (
+          getLayout(<Component {...pageProps} />)
+        )}
+        <Toaster />
+      </SessionProvider>
+    // </ChakraProvider>
   );
 }
 

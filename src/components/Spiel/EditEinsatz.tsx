@@ -3,14 +3,30 @@ import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
-import Button from '@mui/material/Button';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
-import TextField from '@mui/material/TextField';
-import Checkbox from '@mui/material/Checkbox';
+import { useEffect } from 'react';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
 import toast from 'react-hot-toast';
+import { z } from 'zod';
+import { useTRPCForm } from '@/lib/trpc-forms';
+
+import {
+  FormErrorMessage,
+  FormLabel,
+  FormControl,
+  Input,
+  Button,
+} from '@chakra-ui/react';
+
+export const updateEinsatzSchema = z.object({
+  spielId: z.string(),
+  spielerId: z.string(),
+  tore: z.number().min(0).optional(),
+  gelbeKarte: z.number().optional(),
+  roteKarte: z.number().optional(),
+  bezahlt: z.boolean().optional(),
+});
 
 interface Props {
   open: boolean;
@@ -32,29 +48,38 @@ const EditEinsatz: React.FC<Props> = (props) => {
         toast.error(err.message);
       },
       onSuccess: (data) => {
-        form.setTore(data.tore);
-        form.setBezahlt(data.bezahlt);
-        form.setGelbeKarte(data.gelbeKarte);
-        form.setRoteKarte(data.roteKarte);
+        (Object.keys(data) as (keyof typeof data)[]).forEach((key) => {
+          console.log(key, data[key]);
+          setValue(key, data[key]);
+        });
       },
     },
   );
-
-  const form = useEinsatzForm();
 
   /* Fetch Data, only after Route Change */
   useEffect(() => {
     refetchEinsatz();
   }, [router.query]);
 
-  const einsatzMutation = trpc.einsatz.update.useMutation({
-    onSuccess: () => {
-      handleClose();
-      toast.success('Erfolgreich gespeichert');
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+    control,
+  } = useTRPCForm({
+    mutation: trpc.einsatz.update,
+    validator: updateEinsatzSchema,
+    mutationOptions: {
+      onSuccess: (data) => {
+        handleClose();
+        toast.success('Erfolgreich gespeichert');
+      },
+      onError: (err) => {
+        toast.error(err.message);
+      },
     },
-    onError: (err) => {
-      toast.error(err.message);
-    },
+    formOptions: {},
   });
 
   const removeEinsatz = trpc.einsatz.remove.useMutation({
@@ -67,88 +92,66 @@ const EditEinsatz: React.FC<Props> = (props) => {
     },
   });
 
+  useEffect(() => {
+    console.log({ errors });
+  }, [errors]);
+
   return (
     <div>
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Edit</DialogTitle>
-
-        <DialogContent>
-          <div>
-            <IconButton
-              onClick={() => {
-                removeEinsatz.mutate({ spielId, spielerId });
-              }}
-            >
-              <DeleteIcon />
-            </IconButton>
-            <span>Einsatz löschen</span>
-          </div>
-          <TextField
-            label="Tore"
-            type="number"
-            value={form.tore}
-            onChange={(e) => form.setTore(Number(e.target.value))}
-          />
-          <br />
-          <TextField
-            label="Gelbe Karten"
-            value={form.gelbeKarte}
-            type="number"
-            onChange={(e) => form.setTore(Number(e.target.value))}
-          />
-          <br />
-          <TextField
-            label="Rote Karten"
-            type="number"
-            value={form.roteKarte}
-            onChange={(e) => form.setTore(Number(e.target.value))}
-          />
-          <br />
-          <Checkbox
-            checked={form.bezahlt}
-            onChange={(e) => form.setBezahlt(e.target.checked)}
-          />
-          <span>Bezahlt?</span>
-        </DialogContent>
-
-        <DialogActions>
-          <Button
-            onClick={() => {
-              einsatzMutation.mutate({
-                spielId,
-                spielerId,
-                roteKarte: form.roteKarte,
-                gelbeKarte: form.gelbeKarte,
-                bezahlt: form.bezahlt,
-                tore: form.tore,
-              });
-            }}
+        <form onSubmit={handleSubmit}>
+          <FormControl
+          // isInvalid={errors.name}
           >
-            Speichern
-          </Button>
-        </DialogActions>
+            <DialogTitle>Edit</DialogTitle>
+
+            <DialogContent>
+              <div>
+                <IconButton
+                  onClick={() => {
+                    removeEinsatz.mutate({ spielId, spielerId });
+                  }}
+                >
+                  <DeleteIcon />
+                </IconButton>
+                <span>Einsatz löschen</span>
+              </div>
+              <Input
+                {...register('tore', { valueAsNumber: true })}
+                placeholder="Tore"
+                type="number"
+                variant="outline"
+              />
+              <br />
+              <Input
+                // label="Gelbe Karten"
+                type="number"
+                {...register('gelbeKarte', { valueAsNumber: true })}
+              />
+              <br />
+              <Input
+                // label="Rote Karten"
+                type="number"
+                {...register('roteKarte', { valueAsNumber: true })}
+              />
+              <br />
+
+              <input type="checkbox" {...register('bezahlt')} />
+              <span>Bezahlt?</span>
+            </DialogContent>
+            {/* 
+            <FormErrorMessage>
+              {errors.name && errors.name.message}
+            </FormErrorMessage> */}
+          </FormControl>
+
+          <DialogActions>
+            <Button type="submit">Speichern</Button>
+          </DialogActions>
+        </form>
       </Dialog>
     </div>
   );
 };
 
 export default EditEinsatz;
-
-const useEinsatzForm = () => {
-  const [tore, setTore] = useState(0);
-  const [bezahlt, setBezahlt] = useState(false);
-  const [gelbeKarte, setGelbeKarte] = useState(0);
-  const [roteKarte, setRoteKarte] = useState(0);
-
-  return {
-    tore,
-    bezahlt,
-    gelbeKarte,
-    roteKarte,
-
-    setTore,
-    setBezahlt,
-    setGelbeKarte,
-    setRoteKarte,
-  };
-};

@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { Spieler } from '@prisma/client';
 import { adminProcedure, authProcedure, t } from '@/server/trpc';
+import { updateEinsatzSchema } from '@/src/components/Spiel/EditEinsatz';
 
 export const einsatzRouter = t.router({
   list: authProcedure
@@ -119,16 +120,7 @@ export const einsatzRouter = t.router({
     }),
 
   update: adminProcedure
-    .input(
-      z.object({
-        spielId: z.string(),
-        spielerId: z.string(),
-        tore: z.number().min(0).optional(),
-        gelbeKarte: z.number().optional(),
-        roteKarte: z.number().optional(),
-        bezahlt: z.boolean().optional(),
-      }),
-    )
+    .input(updateEinsatzSchema)
     .mutation(async ({ ctx, input }) => {
       const { spielId, spielerId } = input;
       return await ctx.prisma.spielereinsatz.update({

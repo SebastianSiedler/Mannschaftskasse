@@ -13,7 +13,7 @@ const KaderHome: NextPageWithAuthAndLayout = () => {
 
       {session?.user.role === 'ADMIN' && (
         <Link href="/kader/accounts">
-          <a>Manage Accounts</a>
+          <span>Manage Accounts</span>
         </Link>
       )}
     </>

@@ -35,7 +35,7 @@ const NewMatchListItem: React.FC<NewProps> = (props) => {
       as={`/spiele/${spielId}`}
       scroll={false}
     >
-      <a
+      <span
         className={`flex justify-between items-center gap-2 transition duration-500 ease rounded-xl px-2 py-2 ${
           spielId === router.query.spielId && 'bg-blue-100'
         }`}
@@ -81,7 +81,7 @@ const NewMatchListItem: React.FC<NewProps> = (props) => {
             </div>
           </div>
         </div>
-      </a>
+      </span>
     </Link>
   );
 };

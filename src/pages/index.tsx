@@ -5,16 +5,16 @@ const Home: NextPageWithAuthAndLayout = () => {
   return (
     <>
       <Link href="/profile">
-        <a className="text-blue-600">Profile</a>
+        <span className="text-blue-600">Profile</span>
       </Link>
       <Link href="/search">
-        <a className="text-blue-600">Search</a>
+        <span className="text-blue-600">Search</span>
       </Link>
       <Link href="/tenant">
-        <a className="text-blue-600">Tenant</a>
+        <span className="text-blue-600">Tenant</span>
       </Link>
       <Link href="/spiele">
-        <a className="text-blue-600">Spiele</a>
+        <span className="text-blue-600">Spiele</span>
       </Link>
     </>
   );

@@ -22,8 +22,8 @@ export const updateEinsatzSchema = z.object({
   spielId: z.string(),
   spielerId: z.string(),
   tore: z.number().min(0).optional(),
-  gelbeKarte: z.number().optional(),
-  roteKarte: z.number().optional(),
+  gelbeKarte: z.number().min(0).optional(),
+  roteKarte: z.number().min(0).optional(),
   bezahlt: z.boolean().optional(),
 });
 

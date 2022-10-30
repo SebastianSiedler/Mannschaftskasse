@@ -7,7 +7,7 @@ import { unstable_getServerSession as getServerSession } from 'next-auth/next';
 import { getProviders, signIn } from 'next-auth/react';
 import Head from 'next/head';
 import Div100vh from 'react-div-100vh';
-import Image from 'next/image';
+import Image from 'next/legacy/image';
 import GoogleIcon from '../../public/providerIcons/Google.svg';
 
 const SignIn = ({

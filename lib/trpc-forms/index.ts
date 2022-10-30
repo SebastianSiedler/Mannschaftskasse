@@ -2,7 +2,7 @@ import { TRPCClientErrorLike } from '@trpc/client';
 import type {
   DecorateProcedure,
   UseTRPCMutationOptions,
-} from '@trpc/react/shared';
+} from '@trpc/react-query/shared';
 import type {
   AnyMutationProcedure,
   inferProcedureInput,

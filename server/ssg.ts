@@ -1,4 +1,4 @@
-import { createProxySSGHelpers } from '@trpc/react/ssg';
+import { createProxySSGHelpers } from '@trpc/react-query/ssg';
 import { appRouter } from './routers/_app';
 import { prisma } from '@/lib/prisma';
 import superjson from 'superjson';

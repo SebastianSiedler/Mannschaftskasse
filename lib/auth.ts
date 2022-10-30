@@ -19,13 +19,6 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async signIn({ profile }) {
-      if (profile.notAllowed) {
-        return false;
-      }
-
-      return true;
-    },
     async session({ session, user }) {
       return {
         ...session,

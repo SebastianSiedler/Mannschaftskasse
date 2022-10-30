@@ -1,7 +1,7 @@
 import { trpc } from '@/lib/trpc';
 import type { NextPageWithAuthAndLayout } from '@/lib/types';
 import { useSession } from 'next-auth/react';
-import Image from 'next/image';
+import Image from 'next/legacy/image';
 import { signOut } from 'next-auth/react';
 import toast from 'react-hot-toast';
 

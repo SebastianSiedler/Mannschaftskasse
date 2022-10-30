@@ -29,7 +29,7 @@ export type NextPageWithAuthAndLayout<T = Record<string, unknown>> =
    return <div>...
    }
  */
-export type SSGLayout<T = Record<string, unknown>> = NextPage<
+export type SSGLayout<T extends (args: any) => any> = NextPage<
   InferGetStaticPropsType<T>
 > &
   AuthLayout;
@@ -42,7 +42,7 @@ export type SSGLayout<T = Record<string, unknown>> = NextPage<
    return <div>...
    }
  */
-export type SSRLayout<T = Record<string, unknown>> = NextPage<
+export type SSRLayout<T extends (args: any) => any> = NextPage<
   InferGetServerSidePropsType<T>
 > &
   AuthLayout;

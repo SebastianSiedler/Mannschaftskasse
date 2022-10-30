@@ -1,5 +1,5 @@
 import Button from '@mui/material/Button';
-import Image from 'next/image';
+import Image from 'next/legacy/image';
 import toast from 'react-hot-toast';
 import { useSession } from 'next-auth/react';
 import { trpc } from '@/lib/trpc';

@@ -3,7 +3,6 @@ import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
-import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -53,8 +52,6 @@ const EditEinsatz: React.FC<Props> = (props) => {
     },
   );
 
-  if (einsatzQuery.status !== 'success') return <div>Loading...</div>;
-
   const {
     register,
     handleSubmit,
@@ -69,7 +66,8 @@ const EditEinsatz: React.FC<Props> = (props) => {
         handleClose();
         toast.success('Erfolgreich gespeichert');
       },
-      onError: (err) => {
+      onError: (err, b) => {
+        console.log(b);
         toast.error(err.message);
       },
     },
@@ -89,6 +87,12 @@ const EditEinsatz: React.FC<Props> = (props) => {
   useEffect(() => {
     console.log({ errors });
   }, [errors]);
+
+  useEffect(() => {
+    einsatzQuery.refetch();
+  });
+
+  if (einsatzQuery.status !== 'success') return <div>Loading...</div>;
 
   return (
     <div>
@@ -118,13 +122,13 @@ const EditEinsatz: React.FC<Props> = (props) => {
               />
               <br />
               <Input
-                // label="Gelbe Karten"
+                placeholder="Gelbe Karten"
                 type="number"
                 {...register('gelbeKarte', { valueAsNumber: true })}
               />
               <br />
               <Input
-                // label="Rote Karten"
+                placeholder="Rote Karten"
                 type="number"
                 {...register('roteKarte', { valueAsNumber: true })}
               />

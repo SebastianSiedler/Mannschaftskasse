@@ -41,9 +41,10 @@ export const useTRPCForm = <TProcedure extends AnyMutationProcedure>({
 
   const actions = mutation.useMutation({
     ...mutationOptions,
-    onError(error) {
+    onError: (error, variables, context) => {
       console.error('onError', error.message);
-      console.log('errors', form.formState.errors);
+      console.log('errors#1', form.formState.errors);
+      mutationOptions?.onError?.(error, variables, context);
     },
   });
 

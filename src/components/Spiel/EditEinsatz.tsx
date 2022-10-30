@@ -31,19 +31,16 @@ export const updateEinsatzSchema = z.object({
 interface Props {
   open: boolean;
   handleClose: () => void;
+  spielId: string;
+  spielerId: string;
 }
 
 const EditEinsatz: React.FC<Props> = (props) => {
-  const { handleClose, open } = props;
+  const { handleClose, open, spielId, spielerId } = props;
 
-  const router = useRouter();
-  const spielId = router.query.spielId as unknown as string;
-  const spielerId = router.query.spielerId as unknown as string;
-
-  const { refetch: refetchEinsatz } = trpc.einsatz.detail.useQuery(
+  const einsatzQuery = trpc.einsatz.detail.useQuery(
     { spielId, spielerId },
     {
-      enabled: false,
       onError: (err) => {
         toast.error(err.message);
       },
@@ -56,10 +53,7 @@ const EditEinsatz: React.FC<Props> = (props) => {
     },
   );
 
-  /* Fetch Data, only after Route Change */
-  useEffect(() => {
-    refetchEinsatz();
-  }, [router.query]);
+  if (einsatzQuery.status !== 'success') return <div>Loading...</div>;
 
   const {
     register,

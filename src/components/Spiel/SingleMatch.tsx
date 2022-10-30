@@ -188,11 +188,14 @@ const SingleMatch: React.FC<Props> = (props) => {
       {!!router.query.spielId && !!router.query.spielerId && (
         <EditEinsatz
           open={!!router.query.spielId && !!router.query.spielerId}
+          spielId={router.query.spielId as unknown as string}
+          spielerId={router.query.spielerId as unknown as string}
           handleClose={() => {
             router.replace(`/spiele/?spielId=${spielId}`, `/spiele/${spielId}`);
             spielerQuery.refetch();
             availQuery.refetch();
           }}
+          key={JSON.stringify(router.query)}
         />
       )}
     </>

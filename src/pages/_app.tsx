@@ -18,14 +18,14 @@ function MyApp({ Component, pageProps }: AppPropsWithAuthAndLayout) {
 
   return (
     // <ChakraProvider>
-      <SessionProvider session={session} refetchOnWindowFocus={false}>
-        {Component.auth ? (
-          <Auth>{getLayout(<Component {...pageProps} />)}</Auth>
-        ) : (
-          getLayout(<Component {...pageProps} />)
-        )}
-        <Toaster />
-      </SessionProvider>
+    <SessionProvider session={session} refetchOnWindowFocus={false}>
+      {Component.auth ? (
+        <Auth>{getLayout(<Component {...pageProps} />)}</Auth>
+      ) : (
+        getLayout(<Component {...pageProps} />)
+      )}
+      <Toaster />
+    </SessionProvider>
     // </ChakraProvider>
   );
 }

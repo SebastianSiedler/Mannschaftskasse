@@ -6,8 +6,8 @@ const Test = () => {
       <EditEinsatz
         open={true}
         handleClose={() => null}
-        spielId="cl9vvsrz6001ozu1dgdpaj888"
-        spielerId="cl9vw3xzr0005zu1s9q3zlpka"
+        spielId="cl6y1p26q0109dwp655jh1vlo"
+        spielerId="cl6y1fh6d00013sp6ycj2wyzl"
       />
     </div>
   );

@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { type UseFormProps, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-type UseZodFormProps<TValidator extends z.ZodType> = UseFormProps<
+export type UseZodFormProps<TValidator extends z.ZodType> = UseFormProps<
   z.input<TValidator>
 > & {
   validator: TValidator;
@@ -11,8 +11,15 @@ type UseZodFormProps<TValidator extends z.ZodType> = UseFormProps<
 export const useZodForm = <TValidator extends z.ZodType>(
   props: UseZodFormProps<TValidator>,
 ) => {
-  return useForm<z.input<TValidator>>({
-    resolver: zodResolver(props.validator),
+  const resolver = zodResolver(props.validator);
+
+  const form = useForm<z.input<TValidator>>({
+    resolver,
     ...props,
   });
+
+  return {
+    ...form,
+    resolver,
+  };
 };

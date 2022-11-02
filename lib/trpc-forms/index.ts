@@ -10,13 +10,19 @@ import type {
 } from '@trpc/server';
 import { z } from 'zod';
 import { useZodForm } from './utils/use-zod-form';
-import { type UseFormProps } from 'react-hook-form';
+import {
+  FieldValues,
+  SubmitErrorHandler,
+  SubmitHandler,
+  UseFormHandleSubmit,
+  type UseFormProps,
+} from 'react-hook-form';
 
 type OmitNullish<TType> = Omit<TType, 'undefined' | 'null'>;
 
-type UseTRPCFormProps<
+export type UseTRPCFormProps<
   TProcedure extends AnyMutationProcedure,
-  TInput = inferProcedureInput<TProcedure>,
+  TInput = inferProcedureInput<TProcedure> & FieldValues,
 > = {
   mutation: DecorateProcedure<TProcedure, ''>;
   validator: z.ZodType<TInput>;
@@ -26,14 +32,16 @@ type UseTRPCFormProps<
     inferProcedureOutput<TProcedure>
   >;
   formOptions?: UseFormProps<OmitNullish<TInput>>;
+  onSubmit: {
+    onValid: SubmitHandler<OmitNullish<TInput>>;
+    onInvalid: SubmitErrorHandler<OmitNullish<TInput>>;
+  };
 };
 
-export const useTRPCForm = <TProcedure extends AnyMutationProcedure>({
-  mutation,
-  validator,
-  mutationOptions,
-  formOptions,
-}: UseTRPCFormProps<TProcedure>) => {
+export const useTRPCForm = <TProcedure extends AnyMutationProcedure>(
+  props: UseTRPCFormProps<TProcedure>,
+) => {
+  const { mutation, validator, mutationOptions, formOptions, onSubmit } = props;
   const form = useZodForm({
     validator,
     ...formOptions,
@@ -42,20 +50,22 @@ export const useTRPCForm = <TProcedure extends AnyMutationProcedure>({
   const actions = mutation.useMutation({
     ...mutationOptions,
     onError: (error, variables, context) => {
-      console.error('onError', error.message);
-      console.log('errors#1', form.formState.errors);
       mutationOptions?.onError?.(error, variables, context);
     },
   });
 
-  const handleSubmit = form.handleSubmit((data) => {
-    console.log('SUBMIT');
-    console.log(data);
-    actions.mutate(form.getValues());
-  });
+  const handleSubmit: UseFormHandleSubmit<
+    inferProcedureInput<TProcedure> & FieldValues
+  > = (onValid, onInvalid) =>
+    form.handleSubmit(async (data, e) => {
+      await onValid(data, e);
+      console.log(data);
+      actions.mutate(form.getValues());
+    }, onInvalid);
 
   return {
     ...form,
+    validator,
     handleSubmit,
   };
 };

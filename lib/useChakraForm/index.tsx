@@ -1,11 +1,13 @@
-import { updateEinsatzSchema } from '@/src/components/Spiel/EditEinsatz';
+import { AnyMutationProcedure } from '@trpc/server';
 import { FieldValues, Path, UseFormReturn } from 'react-hook-form';
-import { useZodForm } from '../trpc-forms/utils/use-zod-form';
+import { z } from 'zod';
+import { useTRPCForm, UseTRPCFormProps } from '../trpc-forms';
 import { useCheckbox } from './useCheckbox';
 import { useInputField } from './useInputField';
 
 export type UseChakraFormParams<T extends FieldValues> = {
   form: UseFormReturn<T>;
+  validator?: z.ZodType<T>;
 };
 
 /**
@@ -25,12 +27,11 @@ export type SupportedTypes<TObj extends FieldValues, Filter> = FilterKeys<
 > &
   Path<TObj>;
 
-const useChakraForm = <T extends FieldValues>(
-  params: UseChakraFormParams<T>,
+export const useChakraTRPCForm = <TProcedure extends AnyMutationProcedure>(
+  props: UseTRPCFormProps<TProcedure>,
 ) => {
-  const { form } = params;
-
-  const { InputField } = useInputField({ form });
+  const { validator, ...form } = useTRPCForm(props);
+  const { InputField } = useInputField({ form, validator });
   const { Checkbox } = useCheckbox({ form });
 
   const components = {
@@ -38,23 +39,57 @@ const useChakraForm = <T extends FieldValues>(
     Checkbox,
   };
 
-  return { components };
+  return {
+    ...form,
+    components,
+  };
 };
 
-const Page = () => {
-  const form = useZodForm({ validator: updateEinsatzSchema });
-  const { components } = useChakraForm({ form });
-  const { InputField, Checkbox } = components;
+// const Page = () => {
+//   const { components } = useChakraTRPCForm({
+//     validator: updateEinsatzSchema,
+//     mutation: trpc.einsatz.update,
+//   });
+//   const { InputField, Checkbox } = components;
 
-  return (
-    <div>
-      {/* <InputField name="wrongKey" /> */}
-      <InputField name="gelbeKarte" />
-      <InputField name="tore" />
-      {/* <InputField name="bezahlt" /> */}
-      <Checkbox name="bezahlt" />
-      {/* <Checkbox name="tore" />
-      <Checkbox name="" /> */}
-    </div>
-  );
-};
+//   return (
+//     <div>
+//       <InputField name="wrongKey" label="" />
+//       <InputField name="gelbeKarte" label="" />
+//       <InputField name="tore" label="" />
+//       <InputField name="bezahlt" label="" />
+//       <Checkbox name="bezahlt" label="" />
+//       <Checkbox name="tore" label="" />
+//       <Checkbox name="" label="" />
+//     </div>
+//   );
+// };
+
+/**
+ * How i want to use it:
+ * @example
+ * const useMyField = useCustomField<{
+ *   supportedTypes: string|number,
+ *   props: {label:string}
+ * }>({validator, form}) => {
+ *  ...
+ *
+ *  return (
+ *    <>
+ *      <span>{label}</span>
+ *      <input {...form.register()} />
+ *    </>
+ * )
+ * }
+ */
+const useCustomField = <
+  TInputObj extends FieldValues,
+  TReturnComp extends {
+    [componentName: string]: (params: {
+      name: SupportedTypes<TInputObj, number>;
+      [key: string]: any;
+    }) => JSX.Element;
+  },
+>(
+  fn: (params: UseChakraFormParams<TInputObj>) => TReturnComp,
+) => fn;

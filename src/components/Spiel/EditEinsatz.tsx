@@ -2,7 +2,6 @@ import { trpc } from '@/lib/trpc';
 import { useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { z } from 'zod';
-import { useTRPCForm } from '@/lib/trpc-forms';
 import {
   Modal,
   ModalOverlay,
@@ -11,21 +10,16 @@ import {
   ModalFooter,
   ModalBody,
   ModalCloseButton,
-  FormHelperText,
   Box,
   IconButton,
-} from '@chakra-ui/react';
-
-import {
-  FormErrorMessage,
-  FormLabel,
   FormControl,
-  Input,
   Button,
   ChakraProvider,
 } from '@chakra-ui/react';
+
 import { theme } from './theme';
 import { DeleteIcon } from '@chakra-ui/icons';
+import { useChakraTRPCForm } from '@/lib/useChakraForm';
 
 export const updateEinsatzSchema = z.object({
   spielId: z.string(),
@@ -61,7 +55,11 @@ const EditEinsatz: React.FC<Props> = (props) => {
     },
   );
 
-  const form = useTRPCForm({
+  const {
+    components: { InputField, Checkbox },
+    handleSubmit,
+    setValue,
+  } = useChakraTRPCForm({
     mutation: trpc.einsatz.update,
     validator: updateEinsatzSchema,
     mutationOptions: {
@@ -74,18 +72,9 @@ const EditEinsatz: React.FC<Props> = (props) => {
         toast.error(err.message);
       },
     },
-    formOptions: {
-      shouldFocusError: false,
-    },
   });
 
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    formState: { errors },
-    control,
-  } = form;
+  const onSubmit = handleSubmit((data, e) => {});
 
   const removeEinsatz = trpc.einsatz.remove.useMutation({
     onSuccess: () => {
@@ -96,10 +85,6 @@ const EditEinsatz: React.FC<Props> = (props) => {
       toast.error(err.message);
     },
   });
-
-  useEffect(() => {
-    console.log({ errors });
-  }, [errors]);
 
   useEffect(() => {
     console.warn('MOUNTED');
@@ -114,7 +99,7 @@ const EditEinsatz: React.FC<Props> = (props) => {
         <Modal isOpen={open} onClose={handleClose} autoFocus={false}>
           <ModalOverlay />
           <ModalContent>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={onSubmit}>
               <FormControl>
                 <ModalHeader>Edit</ModalHeader>
 
@@ -131,55 +116,22 @@ const EditEinsatz: React.FC<Props> = (props) => {
                       <span>Einsatz löschen</span>
                     </div>
                     <Box p={8}>
-                      <FormControl variant="floating" isInvalid={!!errors.tore}>
-                        <Input
-                          {...register('tore', { valueAsNumber: true })}
-                          type="number"
-                          variant="outline"
-                        />
-                        <FormLabel>Tore</FormLabel>
-                        <FormErrorMessage>
-                          {errors.tore && errors.tore.message}
-                        </FormErrorMessage>
-                      </FormControl>
+                      <InputField name="tore" label="Tore" />
                     </Box>
 
                     <Box p={8}>
-                      <FormControl
-                        variant="floating"
-                        isInvalid={!!errors.gelbeKarte}
-                      >
-                        <Input
-                          {...register('gelbeKarte', { valueAsNumber: true })}
-                          type="number"
-                          variant="outline"
-                        />
-                        <FormLabel>Gelbe Karten</FormLabel>
-                        <FormErrorMessage>
-                          {errors.gelbeKarte && errors.gelbeKarte.message}
-                        </FormErrorMessage>
-                      </FormControl>
+                      <InputField name="gelbeKarte" label="Gelbe karten" />
                     </Box>
 
                     <Box p={8}>
-                      <FormControl
-                        variant="floating"
-                        isInvalid={!!errors.roteKarte}
-                      >
-                        <Input
-                          {...register('roteKarte', { valueAsNumber: true })}
-                          type="number"
-                          variant="outline"
-                        />
-                        <FormLabel>Rote Karten</FormLabel>
-                        <FormErrorMessage>
-                          {errors.roteKarte && errors.roteKarte.message}
-                        </FormErrorMessage>
-                      </FormControl>
+                      <InputField name="roteKarte" label="Rote Karten" />
                     </Box>
 
-                    <input type="checkbox" {...register('bezahlt')} />
-                    <span>Bezahlt?</span>
+                    <Box p={8}>
+                      <InputField name="spielerId" label="SpielerID" />
+                    </Box>
+
+                    <Checkbox name="bezahlt" label="Bezahlt?" />
                   </div>
                 </ModalBody>
 

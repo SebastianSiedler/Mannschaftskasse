@@ -10,19 +10,13 @@ import type {
 } from '@trpc/server';
 import { z } from 'zod';
 import { useZodForm } from './utils/use-zod-form';
-import {
-  FieldValues,
-  SubmitErrorHandler,
-  SubmitHandler,
-  UseFormHandleSubmit,
-  type UseFormProps,
-} from 'react-hook-form';
+import { FieldValues, type UseFormProps } from 'react-hook-form';
 
-type OmitNullish<TType> = Omit<TType, 'undefined' | 'null'>;
+export type OmitNullish<TType> = Omit<TType, 'undefined' | 'null'>;
 
 export type UseTRPCFormProps<
   TProcedure extends AnyMutationProcedure,
-  TInput = inferProcedureInput<TProcedure> & FieldValues,
+  TInput = inferProcedureInput<TProcedure>,
 > = {
   mutation: DecorateProcedure<TProcedure, ''>;
   validator: z.ZodType<TInput>;
@@ -32,16 +26,16 @@ export type UseTRPCFormProps<
     inferProcedureOutput<TProcedure>
   >;
   formOptions?: UseFormProps<OmitNullish<TInput>>;
-  onSubmit: {
-    onValid: SubmitHandler<OmitNullish<TInput>>;
-    onInvalid: SubmitErrorHandler<OmitNullish<TInput>>;
-  };
+  //onSubmit?: {
+  //  onValid: SubmitHandler<OmitNullish<TInput>>;
+  //  onInvalid: SubmitErrorHandler<OmitNullish<TInput>>;
+  //};
 };
 
 export const useTRPCForm = <TProcedure extends AnyMutationProcedure>(
   props: UseTRPCFormProps<TProcedure>,
 ) => {
-  const { mutation, validator, mutationOptions, formOptions, onSubmit } = props;
+  const { mutation, validator, mutationOptions, formOptions } = props;
   const form = useZodForm({
     validator,
     ...formOptions,
@@ -54,18 +48,18 @@ export const useTRPCForm = <TProcedure extends AnyMutationProcedure>(
     },
   });
 
-  const handleSubmit: UseFormHandleSubmit<
+  /*   const handleSubmit: UseFormHandleSubmit<
     inferProcedureInput<TProcedure> & FieldValues
   > = (onValid, onInvalid) =>
     form.handleSubmit(async (data, e) => {
       await onValid(data, e);
       console.log(data);
       actions.mutate(form.getValues());
-    }, onInvalid);
+    }, onInvalid); */
 
   return {
     ...form,
     validator,
-    handleSubmit,
+    // handleSubmit,
   };
 };

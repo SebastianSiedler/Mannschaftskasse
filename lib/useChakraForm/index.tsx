@@ -1,6 +1,9 @@
+import { updateEinsatzSchema } from '@/src/components/Spiel/EditEinsatz';
 import { AnyMutationProcedure } from '@trpc/server';
 import { FieldValues, Path, UseFormReturn } from 'react-hook-form';
+import toast from 'react-hot-toast';
 import { z } from 'zod';
+import { trpc } from '../trpc';
 import { useTRPCForm, UseTRPCFormProps } from '../trpc-forms';
 import { useCheckbox } from './useCheckbox';
 import { useInputField } from './useInputField';
@@ -30,8 +33,11 @@ export type SupportedTypes<TObj extends FieldValues, Filter> = FilterKeys<
 export const useChakraTRPCForm = <TProcedure extends AnyMutationProcedure>(
   props: UseTRPCFormProps<TProcedure>,
 ) => {
-  const { validator, ...form } = useTRPCForm(props);
-  const { InputField } = useInputField({ form, validator });
+  const form = useTRPCForm(props);
+  const { InputField } = useInputField({
+    form: form,
+    validator: form.validator,
+  });
   const { Checkbox } = useCheckbox({ form });
 
   const components = {
@@ -45,25 +51,42 @@ export const useChakraTRPCForm = <TProcedure extends AnyMutationProcedure>(
   };
 };
 
-// const Page = () => {
-//   const { components } = useChakraTRPCForm({
-//     validator: updateEinsatzSchema,
-//     mutation: trpc.einsatz.update,
-//   });
-//   const { InputField, Checkbox } = components;
+const Page = () => {
+  const { components } = useChakraTRPCForm({
+    validator: updateEinsatzSchema,
+    mutation: trpc.einsatz.update,
+    mutationOptions: {
+      onSuccess: (data) => {
+        toast.success('Success');
+      },
+      onError: (error) => {
+        toast.error(error.message);
+      },
+    },
+    /* onSubmit: {
+      onValid: (data) => {
+        return;
+      },
+      onInvalid: (errors) => {
+        return;
+      },
+    }, */
+  });
+  const { InputField, Checkbox } = components;
 
-//   return (
-//     <div>
-//       <InputField name="wrongKey" label="" />
-//       <InputField name="gelbeKarte" label="" />
-//       <InputField name="tore" label="" />
-//       <InputField name="bezahlt" label="" />
-//       <Checkbox name="bezahlt" label="" />
-//       <Checkbox name="tore" label="" />
-//       <Checkbox name="" label="" />
-//     </div>
-//   );
-// };
+  return (
+    <div>
+      <InputField name="wrongKey" label="" />
+      <InputField name="gelbeKarte" label="" />
+      <InputField name="tore" label="" />
+      <InputField name="bezahlt" label="" />
+      <Checkbox name="bezahlt" label="" />
+      <Checkbox name="tore" label="" />
+      <Checkbox name="" label="" />
+      <Checkbox name="ddd" label="" />
+    </div>
+  );
+};
 
 /**
  * How i want to use it:

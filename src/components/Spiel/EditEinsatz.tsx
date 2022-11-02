@@ -74,7 +74,9 @@ const EditEinsatz: React.FC<Props> = (props) => {
     },
   });
 
-  const onSubmit = handleSubmit((data, e) => {});
+  const onSubmit = handleSubmit((data, e) => {
+    return;
+  });
 
   const removeEinsatz = trpc.einsatz.remove.useMutation({
     onSuccess: () => {

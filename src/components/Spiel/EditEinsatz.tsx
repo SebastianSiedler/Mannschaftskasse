@@ -9,14 +9,8 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import toast from 'react-hot-toast';
 import { z } from 'zod';
 import { useTRPCForm } from '@/lib/trpc-forms';
-
-import {
-  FormErrorMessage,
-  FormLabel,
-  FormControl,
-  Input,
-  Button,
-} from '@chakra-ui/react';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
 
 export const updateEinsatzSchema = z.object({
   spielId: z.string(),
@@ -57,7 +51,6 @@ const EditEinsatz: React.FC<Props> = (props) => {
     handleSubmit,
     setValue,
     formState: { errors },
-    control,
   } = useTRPCForm({
     mutation: trpc.einsatz.update,
     validator: updateEinsatzSchema,
@@ -98,51 +91,47 @@ const EditEinsatz: React.FC<Props> = (props) => {
     <div>
       <Dialog open={open} onClose={handleClose}>
         <form onSubmit={handleSubmit}>
-          <FormControl
-          // isInvalid={errors.name}
-          >
-            <DialogTitle>Edit</DialogTitle>
+          <DialogTitle>Edit</DialogTitle>
 
-            <DialogContent>
-              <div>
-                <IconButton
-                  onClick={() => {
-                    removeEinsatz.mutate({ spielId, spielerId });
-                  }}
-                >
-                  <DeleteIcon />
-                </IconButton>
-                <span>Einsatz löschen</span>
-              </div>
-              <Input
-                {...register('tore', { valueAsNumber: true })}
-                placeholder="Tore"
-                type="number"
-                variant="outline"
-              />
-              <br />
-              <Input
-                placeholder="Gelbe Karten"
-                type="number"
-                {...register('gelbeKarte', { valueAsNumber: true })}
-              />
-              <br />
-              <Input
-                placeholder="Rote Karten"
-                type="number"
-                {...register('roteKarte', { valueAsNumber: true })}
-              />
-              <br />
+          <DialogContent>
+            <div>
+              <IconButton
+                onClick={() => {
+                  removeEinsatz.mutate({ spielId, spielerId });
+                }}
+              >
+                <DeleteIcon />
+              </IconButton>
+              <span>Einsatz löschen</span>
+            </div>
+            <TextField
+              {...register('tore', { valueAsNumber: true })}
+              label="Tore"
+              type="number"
+              error={!!errors.tore}
+              helperText={errors.tore?.message}
+            />
+            <br />
+            <TextField
+              label="Gelbe Karten"
+              type="number"
+              {...register('gelbeKarte', { valueAsNumber: true })}
+              error={!!errors.gelbeKarte}
+              helperText={errors.gelbeKarte?.message}
+            />
+            <br />
+            <TextField
+              label="Rote Karten"
+              type="number"
+              {...register('roteKarte', { valueAsNumber: true })}
+              error={!!errors.roteKarte}
+              helperText={errors.roteKarte?.message}
+            />
+            <br />
 
-              <input type="checkbox" {...register('bezahlt')} />
-              <span>Bezahlt?</span>
-            </DialogContent>
-            {/* 
-            <FormErrorMessage>
-              {errors.name && errors.name.message}
-            </FormErrorMessage> */}
-          </FormControl>
-
+            <input type="checkbox" {...register('bezahlt')} />
+            <span>Bezahlt?</span>
+          </DialogContent>
           <DialogActions>
             <Button type="submit">Speichern</Button>
           </DialogActions>

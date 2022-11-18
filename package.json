@@ -32,7 +32,6 @@
     "singleQuote": true
   },
   "dependencies": {
-    "@chakra-ui/react": "^2.3.6",
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
     "@heroicons/react": "^2.0.12",

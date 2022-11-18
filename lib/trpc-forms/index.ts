@@ -18,7 +18,7 @@ type UseTRPCFormProps<
   TProcedure extends AnyMutationProcedure,
   TInput = inferProcedureInput<TProcedure>,
 > = {
-  mutation: DecorateProcedure<TProcedure, ''>;
+  mutation: DecorateProcedure<TProcedure, any, ''>;
   validator: z.ZodType<TInput>;
   mutationOptions?: UseTRPCMutationOptions<
     TInput,

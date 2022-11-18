@@ -37,25 +37,18 @@ const EditEinsatz: React.FC<Props> = (props) => {
       onError: (err) => {
         toast.error(err.message);
       },
-      onSuccess: (data) => {
-        (Object.keys(data) as (keyof typeof data)[]).forEach((key) => {
-          console.log(key, data[key]);
-          setValue(key, data[key]);
-        });
-      },
     },
   );
 
   const {
     register,
     handleSubmit,
-    setValue,
     formState: { errors },
   } = useTRPCForm({
     mutation: trpc.einsatz.update,
     validator: updateEinsatzSchema,
     mutationOptions: {
-      onSuccess: (data) => {
+      onSuccess: () => {
         handleClose();
         toast.success('Erfolgreich gespeichert');
       },
@@ -64,7 +57,9 @@ const EditEinsatz: React.FC<Props> = (props) => {
         toast.error(err.message);
       },
     },
-    formOptions: {},
+    formOptions: {
+      values: einsatzQuery.data,
+    },
   });
 
   const removeEinsatz = trpc.einsatz.remove.useMutation({

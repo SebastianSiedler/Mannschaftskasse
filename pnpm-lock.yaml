@@ -50,7 +50,7 @@ specifiers:
   react: ^18.2.0
   react-div-100vh: ^0.7.0
   react-dom: ^18.2.0
-  react-hook-form: 7.39.4
+  react-hook-form: 7.40.0-next.0
   react-hot-toast: ^2.4.0
   start-server-and-test: ^1.14.0
   superjson: ^1.11.0
@@ -65,7 +65,7 @@ dependencies:
   '@emotion/react': 11.10.5_fan5qbzahqtxlm5dzefqlqx5ia
   '@emotion/styled': 11.10.5_otcjdfkheatawhug6fwk7ldzni
   '@heroicons/react': 2.0.13_react@18.2.0
-  '@hookform/resolvers': 2.9.10_react-hook-form@7.39.4
+  '@hookform/resolvers': 2.9.10_qx444qtx3etqa5i5ykkbl5ytgy
   '@mui/icons-material': 5.10.14_edp4dc7hnxdrqofuyrrjp2id7y
   '@mui/material': 5.10.14_thp4wrxo45nyllusrnt46mid4u
   '@next-auth/prisma-adapter': 1.0.5_2pl3b2nwmjya7el2zbe6cwkney
@@ -89,7 +89,7 @@ dependencies:
   react: 18.2.0
   react-div-100vh: 0.7.0_react@18.2.0
   react-dom: 18.2.0_react@18.2.0
-  react-hook-form: 7.39.4_react@18.2.0
+  react-hook-form: 7.40.0-next.0_react@18.2.0
   react-hot-toast: 2.4.0_biqbaboplfbrettd7655fr4n2y
   start-server-and-test: 1.14.0
   superjson: 1.11.0
@@ -648,12 +648,12 @@ packages:
       react: 18.2.0
     dev: false
 
-  /@hookform/resolvers/2.9.10_react-hook-form@7.39.4:
+  /@hookform/resolvers/2.9.10_qx444qtx3etqa5i5ykkbl5ytgy:
     resolution: {integrity: sha512-JIL1DgJIlH9yuxcNGtyhsWX/PgNltz+5Gr6+8SX9fhXc/hPbEIk6wPI82nhgvp3uUb6ZfAM5mqg/x7KR7NAb+A==}
     peerDependencies:
       react-hook-form: ^7.0.0
     dependencies:
-      react-hook-form: 7.39.4_react@18.2.0
+      react-hook-form: 7.40.0-next.0_react@18.2.0
     dev: false
 
   /@humanwhocodes/config-array/0.11.7:
@@ -5116,8 +5116,8 @@ packages:
       react: 18.2.0
       scheduler: 0.23.0
 
-  /react-hook-form/7.39.4_react@18.2.0:
-    resolution: {integrity: sha512-B0e78r9kR9L2M4A4AXGbHoA/vyv34sB/n8QWJAw33TFz8f5t9helBbYAeqnbvcQf1EYzJxKX/bGQQh9K+evCyQ==}
+  /react-hook-form/7.40.0-next.0_react@18.2.0:
+    resolution: {integrity: sha512-ief0N0OVXl62kqP+RzPK4y8xdPqeXGdM5GA+dgC2mPDSDb3zSC8QU12Kh3SItGOHUyyNZ0Ezb5nnRBypMOKz7g==}
     engines: {node: '>=12.22.0'}
     peerDependencies:
       react: ^16.8.0 || ^17 || ^18

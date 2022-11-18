@@ -88,7 +88,7 @@ const EditEinsatz: React.FC<Props> = (props) => {
         <form onSubmit={handleSubmit}>
           <DialogTitle>Edit</DialogTitle>
 
-          <DialogContent>
+          <DialogContent className="flex flex-col gap-1">
             <div>
               <IconButton
                 onClick={() => {
@@ -124,8 +124,10 @@ const EditEinsatz: React.FC<Props> = (props) => {
             />
             <br />
 
-            <input type="checkbox" {...register('bezahlt')} />
-            <span>Bezahlt?</span>
+            <div>
+              <input type="checkbox" {...register('bezahlt')} />
+              <span>Bezahlt?</span>
+            </div>
           </DialogContent>
           <DialogActions>
             <Button type="submit">Speichern</Button>

@@ -73,12 +73,8 @@ const EditEinsatz: React.FC<Props> = (props) => {
   });
 
   useEffect(() => {
-    console.log({ errors });
-  }, [errors]);
-
-  useEffect(() => {
     einsatzQuery.refetch();
-  });
+  }, []);
 
   if (einsatzQuery.status !== 'success') return <div>Loading...</div>;
 

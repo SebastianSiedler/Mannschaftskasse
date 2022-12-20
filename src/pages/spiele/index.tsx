@@ -2,44 +2,51 @@ import { ssg } from '@/server/ssg';
 import { DefaultLayout } from '@/src/components/DefaultLayout';
 import ListSpiele from '@/src/components/Spiel/ListSpiele';
 import SingleMatch from '@/src/components/Spiel/SingleMatch';
-import { GetStaticPropsContext } from 'next';
 import { useRouter } from 'next/router';
-import type { SSGLayout } from '@/lib/types';
+import { authSSG } from '@/src/tmp';
 
-const SpieleHome: SSGLayout<typeof getStaticProps> = () => {
-  const router = useRouter();
+const x = authSSG({
+  getStaticProps: async () => {
+    console.warn('getStaticProps');
 
-  return (
-    <div>
-      <ListSpiele />
+    if (process.browser) throw 'BROOOOOWWSER';
+    await ssg.spiel.list.fetch();
 
-      {!!router.query.spielId && (
-        <SingleMatch
-          spielId={router.query.spielId as unknown as string}
-          open={!!router.query.spielId}
-          handleClose={() => {
-            router.replace('/spiele');
-          }}
-        />
-      )}
-    </div>
-  );
-};
+    return {
+      props: {
+        // trpcState: ssg.dehydrate(),
+      },
+      revalidate: 1,
+    };
+  },
 
-SpieleHome.auth = false;
-SpieleHome.getLayout = (page) => {
-  return <DefaultLayout>{page}</DefaultLayout>;
-};
+  Page: (props) => {
+    const router = useRouter();
 
-export default SpieleHome;
+    return (
+      <div>
+        <ListSpiele />
 
-export const getStaticProps = async (context: GetStaticPropsContext) => {
-  await ssg.spiel.list.fetch();
-
-  return {
-    props: {
-      trpcState: ssg.dehydrate(),
+        {!!router.query.spielId && (
+          <SingleMatch
+            spielId={router.query.spielId as unknown as string}
+            open={!!router.query.spielId}
+            handleClose={() => {
+              router.replace('/spiele');
+            }}
+          />
+        )}
+      </div>
+    );
+  },
+  customProps: {
+    auth: false,
+    getLayout: (page) => {
+      return <DefaultLayout>{page}</DefaultLayout>;
     },
-    revalidate: 1,
-  };
-};
+  },
+});
+
+export default x.Page;
+
+// export { getStaticProps };

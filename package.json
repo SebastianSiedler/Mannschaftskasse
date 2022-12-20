@@ -48,7 +48,7 @@
     "@trpc/next": "10.4.2",
     "@trpc/react-query": "10.4.2",
     "@trpc/server": "10.4.2",
-    "axios": "^1.2.0",
+    "axios": "0.27.2",
     "clsx": "^1.2.1",
     "envsafe": "^2.0.3",
     "jspdf": "^2.5.1",

@@ -26,7 +26,7 @@ specifiers:
   '@typescript-eslint/eslint-plugin': ^5.45.0
   '@typescript-eslint/parser': ^5.45.0
   autoprefixer: ^10.4.13
-  axios: ^1.2.0
+  axios: 0.27.2
   clsx: ^1.2.1
   cross-env: ^7.0.3
   envsafe: ^2.0.3
@@ -78,7 +78,7 @@ dependencies:
   '@trpc/next': 10.4.2_nsx5luom3727t3ggjgb6xj2ae4
   '@trpc/react-query': 10.4.2_6ndg2fges7kes3fsblwtjti6p4
   '@trpc/server': 10.4.2
-  axios: 1.2.0
+  axios: 0.27.2
   clsx: 1.2.1
   envsafe: 2.0.3
   jspdf: 2.5.1
@@ -2045,12 +2045,11 @@ packages:
       - debug
     dev: false
 
-  /axios/1.2.0:
-    resolution: {integrity: sha512-zT7wZyNYu3N5Bu0wuZ6QccIf93Qk1eV8LOewxgjOZFd2DenOs98cJ7+Y6703d0wkaXGY6/nZd4EweJaHz9uzQw==}
+  /axios/0.27.2:
+    resolution: {integrity: sha512-t+yRIyySRTp/wua5xEr+z1q60QmLq8ABsS5O9Me1AsE5dfKqgnCFzwiCZZ/cGNd1lq4/7akDWMxdhVlucjmnOQ==}
     dependencies:
       follow-redirects: 1.15.2_debug@4.3.2
       form-data: 4.0.0
-      proxy-from-env: 1.1.0
     transitivePeerDependencies:
       - debug
     dev: false
@@ -5022,6 +5021,7 @@ packages:
 
   /proxy-from-env/1.1.0:
     resolution: {integrity: sha512-D+zkORCbA9f1tdWRK0RaCR3GPv50cMxcrz4X8k5LTSUD1Dkw47mKJEZQNunItRTkWwgtaUSo1RVFRIG9ZXiFYg==}
+    dev: true
 
   /ps-tree/1.2.0:
     resolution: {integrity: sha512-0VnamPPYHl4uaU/nSFeZZpR21QAWRz+sRv4iW9+v/GS/J5U5iZB5BNN6J0RMoOvdx2gWM2+ZFMIm58q24e4UYA==}

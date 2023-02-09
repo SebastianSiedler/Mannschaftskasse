@@ -3,7 +3,7 @@
 
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["referentialIntegrity", "fullTextSearch", "fullTextIndex"]
+  previewFeatures = ["fullTextSearch", "fullTextIndex"]
 }
 
 datasource db {
@@ -85,7 +85,6 @@ model Saison {
 
   currentSpielId String? @unique
   currentSpiel   Spiel?  @relation("currentSpiel", fields: [currentSpielId], references: [id], onDelete: Cascade)
-
 }
 
 model Spiel {

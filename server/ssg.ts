@@ -1,9 +1,9 @@
-import { createProxySSGHelpers } from '@trpc/react-query/ssg';
+import { createServerSideHelpers } from '@trpc/react-query/server';
 import { appRouter } from './routers/_app';
 import { prisma } from '@/lib/prisma';
 import superjson from 'superjson';
 
-export const ssg = createProxySSGHelpers({
+export const ssg = createServerSideHelpers({
   router: appRouter,
   ctx: {
     prisma,

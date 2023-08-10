@@ -93,7 +93,7 @@ const EditPlayer: React.FC<Props> = ({ player, open, handleClose }) => {
         <Button
           onClick={() => {
             upsertPlayer.mutate({
-              names: names.filter((n) => !!n),
+              names: names.filter((n) => !!n).map((n) => n.trim()),
               active,
               spielerId: player.id,
             });

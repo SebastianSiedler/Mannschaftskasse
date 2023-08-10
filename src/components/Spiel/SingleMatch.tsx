@@ -174,8 +174,16 @@ const SingleMatch: React.FC<Props> = (props) => {
               addPlayersFromClipboard.mutate({
                 spielId: spielId,
                 names: inputNames
+                  /* der neue Coach schreibt vor jeden Namen immer "02. Max Mustermann" */
+                  .replaceAll(/[0-9.]+/g, '')
+
+                  /* Jeder Name ist in einer eigenen Zeile */
                   .split('\n')
+
+                  /* Leerzeichen am Anfang und Ende des Namens entfernen */
                   .map((x) => x.trim())
+
+                  /* Leere Einträge entfernen */
                   .filter((x) => !!x),
               });
             }}

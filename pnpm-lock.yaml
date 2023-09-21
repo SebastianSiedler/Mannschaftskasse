@@ -56,6 +56,9 @@ dependencies:
   axios:
     specifier: ^1.5.0
     version: 1.5.0
+  bfv-api:
+    specifier: ^1.3.0
+    version: 1.3.0(axios@1.5.0)
   clsx:
     specifier: ^2.0.0
     version: 2.0.0
@@ -1886,6 +1889,16 @@ packages:
       eslint-visitor-keys: 3.4.3
     dev: true
 
+  /@zodios/core@10.9.6(axios@1.5.0)(zod@3.22.2):
+    resolution: {integrity: sha512-aH4rOdb3AcezN7ws8vDgBfGboZMk2JGGzEq/DtW65MhnRxyTGRuLJRWVQ/2KxDgWvV2F5oTkAS+5pnjKbl0n+A==}
+    peerDependencies:
+      axios: ^0.x || ^1.0.0
+      zod: ^3.x
+    dependencies:
+      axios: 1.5.0
+      zod: 3.22.2
+    dev: false
+
   /acorn-jsx@5.3.2(acorn@8.10.0):
     resolution: {integrity: sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==}
     peerDependencies:
@@ -2231,6 +2244,15 @@ packages:
   /base64-js@1.5.1:
     resolution: {integrity: sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==}
     dev: true
+
+  /bfv-api@1.3.0(axios@1.5.0):
+    resolution: {integrity: sha512-W/N+qVby26l/5EOaswQX8fdqUhccv4/Ah0I6edAp4lbIzXWC8c+vzzsEvNvDci2KVycxnH7jGvREOxEmCPjRWA==}
+    dependencies:
+      '@zodios/core': 10.9.6(axios@1.5.0)(zod@3.22.2)
+      zod: 3.22.2
+    transitivePeerDependencies:
+      - axios
+    dev: false
 
   /big-integer@1.6.51:
     resolution: {integrity: sha512-GPEid2Y9QU1Exl1rpO9B2IPJGHPSupF5GnVIP0blYvNOMer2bTvSWs1jGOUg04hTmu67nmLsQ9TBo1puaotBHg==}

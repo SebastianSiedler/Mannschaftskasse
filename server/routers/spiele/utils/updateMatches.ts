@@ -1,15 +1,19 @@
 import { TRPCError } from '@trpc/server';
-import { BfvMatch } from './bfv.types';
 import { serverEnv } from '@/env/server';
 import { prisma } from '@/lib/prisma';
 import { getOpponentTeam, getParsedDate, parse_result } from '.';
 import { Prisma } from '@prisma/client';
-import { getBfvData } from './useBfv';
+import { bfvApi } from 'bfv-api';
+import type { Schemas } from 'bfv-api';
+
+type BfvMatch = Schemas['Match'];
 
 export const updateMatches = async () => {
   const { BFV_PERMANENT_TEAM_ID } = serverEnv;
 
-  const data = await getBfvData(BFV_PERMANENT_TEAM_ID);
+  const { data } = await bfvApi.listMatches({
+    params: { teamPermanentId: BFV_PERMANENT_TEAM_ID },
+  });
 
   let saison = await prisma.saison.findUnique({
     where: {

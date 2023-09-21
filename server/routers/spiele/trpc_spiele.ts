@@ -1,9 +1,9 @@
 import { serverEnv } from '@/env/server';
 import { z } from 'zod';
-import { getBfvData } from './utils/useBfv';
 import isEqual from 'lodash.isequal';
 import { updateMatches } from './utils/updateMatches';
 import { t } from '@/server/trpc';
+import { bfvApi } from 'bfv-api';
 export const spielRouter = t.router({
   /**
    * Update matches in local DB
@@ -31,7 +31,9 @@ export const spielRouter = t.router({
 
       const { BFV_PERMANENT_TEAM_ID } = serverEnv;
 
-      const data = await getBfvData(BFV_PERMANENT_TEAM_ID);
+      const data = await bfvApi.listMatches({
+        params: { teamPermanentId: BFV_PERMANENT_TEAM_ID },
+      });
 
       /* BFV Data has changed*/
       if (!isEqual(saison?.bfvData, data) || input.force) {

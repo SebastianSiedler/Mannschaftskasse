@@ -1,12 +1,14 @@
 import { serverEnv } from '@/env/server';
-import { BfvMatch } from './bfv.types';
+import { bfvSchemas } from 'bfv-api';
+import { z } from 'zod';
+import { Result } from '@prisma/client';
+
+type BfvMatch = z.infer<typeof bfvSchemas.Match>;
 
 const isHomeTeam = (match: BfvMatch) => {
   const BFV_PERMANENT_TEAM_ID = serverEnv.BFV_PERMANENT_TEAM_ID;
   return BFV_PERMANENT_TEAM_ID == match.homeTeamPermanentId;
 };
-
-import { Result } from '@prisma/client';
 
 interface ParsedResult {
   type: Result;

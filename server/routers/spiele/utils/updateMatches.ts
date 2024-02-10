@@ -2,7 +2,7 @@ import { TRPCError } from '@trpc/server';
 import { serverEnv } from '@/env/server';
 import { prisma } from '@/lib/prisma';
 import { getOpponentTeam, getParsedDate, parse_result } from '.';
-import { Prisma } from '@prisma/client';
+import { Prisma, Spiel } from '@prisma/client';
 import { bfvApi } from 'bfv-api';
 import type { Schemas } from 'bfv-api';
 
@@ -44,9 +44,9 @@ export const updateMatches = async () => {
     ),
   );
 
-  const currentMatch = matches.find(
-    (match) => match.bfvMatchId === data.actualMatchId,
-  );
+  const currentMatch = matches
+    .filter((match): match is Spiel => !!match) // remove nulls
+    .find((match) => match.bfvMatchId === data.actualMatchId);
 
   if (!currentMatch) {
     throw new TRPCError({
@@ -76,8 +76,17 @@ interface UpsertMatchopts {
 const upsertMatch = async (opts: UpsertMatchopts) => {
   const { bfvMatch, saisonId } = opts;
 
+  /**
+   * If the kickoffDate or kickoffTime is null, the game is not scheduled yet
+   */
+  if (bfvMatch.kickoffDate === null || bfvMatch.kickoffTime === null) {
+    return;
+  }
+
   const parsed_result = parse_result(bfvMatch);
   const opponent_team = getOpponentTeam(bfvMatch);
+
+  if (opponent_team === null) return;
 
   const match = await prisma.spiel.findUnique({
     where: {

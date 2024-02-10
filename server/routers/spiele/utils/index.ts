@@ -72,7 +72,14 @@ interface OpponentTeam {
   teamName: string;
   clubId: string;
 }
-export const getOpponentTeam = (match: BfvMatch): OpponentTeam => {
+
+/**
+ * Man ist ja nicht immer Heimmannschaft.
+ * Daher wird geschaut, wer Heimmannschaft ist und dann der Gegner zurückgegeben.
+ */
+export const getOpponentTeam = (match: BfvMatch): OpponentTeam | null => {
+  if (match.guestClubId === null || match.homeClubId === null) return null;
+
   if (isHomeTeam(match)) {
     return {
       teamPermanentId: match.guestTeamPermanentId,

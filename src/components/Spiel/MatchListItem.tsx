@@ -6,6 +6,7 @@ export const getClubLogoAPI = (ClubId: string) => {
 };
 
 import { Result, Spiel } from '@prisma/client';
+
 interface NewProps {
   spielId: string;
   clubId: string;
@@ -73,8 +74,8 @@ const NewMatchListItem: React.FC<NewProps> = (props) => {
                 resultStatus === 'GEWONNEN'
                   ? 'text-green-500 bg-green-200'
                   : resultStatus === 'VERLOREN'
-                  ? 'text-red-500 bg-red-200'
-                  : 'text-gray-500 bg-gray-200'
+                    ? 'text-red-500 bg-red-200'
+                    : 'text-gray-500 bg-gray-200'
               }`}
             >
               {resultStatus.toLowerCase().replaceAll('_', ' ')}

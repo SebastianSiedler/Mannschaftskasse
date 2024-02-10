@@ -3,7 +3,7 @@ import type {
   GetServerSidePropsContext,
   InferGetServerSidePropsType,
 } from 'next';
-import { unstable_getServerSession as getServerSession } from 'next-auth/next';
+import { getServerSession } from 'next-auth/next';
 import { getProviders, signIn } from 'next-auth/react';
 import Head from 'next/head';
 import Div100vh from 'react-div-100vh';

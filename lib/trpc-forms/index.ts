@@ -37,6 +37,9 @@ export const useTRPCForm = <TProcedure extends AnyMutationProcedure>({
   const form = useZodForm({
     validator,
     ...formOptions,
+
+    /* irgendwie sind diese server errors noch nicht richtig getyped in react-hook-form. */
+    // errors: undefined,
   });
 
   const actions = mutation.useMutation({

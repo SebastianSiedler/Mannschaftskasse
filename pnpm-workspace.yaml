@@ -1,12 +1,7 @@
-onlyBuiltDependencies:
-  - esbuild
-  - sharp
-  - unrs-resolver
-ignoredBuiltDependencies:
-  - core-js
+packages:
+  - "."
 allowBuilds:
-  "@prisma/client": set this to true or false
-  "@prisma/engines": set this to true or false
-  core-js: set this to true or false
-  esbuild: set this to true or false
-  prisma: set this to true or false
+  core-js: false
+  esbuild: true
+  sharp: true
+  unrs-resolver: true

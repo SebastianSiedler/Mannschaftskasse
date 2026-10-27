@@ -1,4 +1,5 @@
 import Button from '@mui/material/Button';
+import Skeleton from '@mui/material/Skeleton';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import {
@@ -22,8 +23,18 @@ const UserManagement: React.FC = () => {
   });
 
   return (
-    <div>
-      {allUsersQuery.isLoading && <div>Loading...</div>}
+    <div className="flex flex-col gap-3 p-2">
+      {allUsersQuery.isLoading &&
+        Array.from({ length: 5 }).map((_, i) => (
+          <div key={i} className="flex items-center gap-4">
+            <Skeleton variant="circular" width={48} height={48} />
+            <div className="flex-1 min-w-0">
+              <Skeleton variant="text" width="50%" height={24} />
+              <Skeleton variant="text" width="70%" height={20} />
+            </div>
+            <Skeleton variant="rounded" width={88} height={36} />
+          </div>
+        ))}
 
       {allUsersQuery.data?.map((item) => (
         <div key={item.id}>

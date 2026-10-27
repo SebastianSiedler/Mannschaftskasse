@@ -1,3 +1,4 @@
+import Skeleton from '@mui/material/Skeleton';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   spieleListQueryOptions,
@@ -28,7 +29,36 @@ const ListSpiele: React.FC = () => {
 
   return (
     <div>
-      {spieleQuery.isLoading && <div>Loading...</div>}
+      {spieleQuery.isLoading && (
+        <div className="flex flex-col mx-2 mt-2 gap-y-4">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div
+              key={i}
+              className="flex justify-between items-center gap-2 rounded-xl px-2 py-2"
+            >
+              <Skeleton
+                variant="rounded"
+                width={40}
+                height={40}
+                className="rounded-lg shrink-0"
+              />
+              <div className="min-w-0 flex-1">
+                <Skeleton variant="text" width="70%" height={24} />
+                <Skeleton variant="text" width="45%" height={20} />
+              </div>
+              <div className="flex flex-col items-end gap-1">
+                <Skeleton variant="text" width={36} height={24} />
+                <Skeleton
+                  variant="rounded"
+                  width={76}
+                  height={22}
+                  sx={{ borderRadius: '9999px' }}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {spieleQuery.isSuccess && (
         <div className="flex flex-col mx-2 mt-2 gap-y-4">

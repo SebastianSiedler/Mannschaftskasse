@@ -7,9 +7,11 @@ import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
+import Skeleton from '@mui/material/Skeleton';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -91,7 +93,15 @@ const SingleMatch: React.FC<Props> = (props) => {
               component="div"
               noWrap
             >
-              {matchQuery.data?.opponent.name}
+              {matchQuery.isLoading ? (
+                <Skeleton
+                  variant="text"
+                  width="60%"
+                  sx={{ bgcolor: 'rgba(255, 255, 255, 0.3)' }}
+                />
+              ) : (
+                matchQuery.data?.opponent.name
+              )}
             </Typography>
           </Toolbar>
         </AppBar>
@@ -101,7 +111,19 @@ const SingleMatch: React.FC<Props> = (props) => {
             spielerQuery.data?.length ?? 0
           }`}</div>
           <List>
-            {spielerQuery.isLoading && <div>Loading...</div>}
+            {spielerQuery.isLoading &&
+              Array.from({ length: 5 }).map((_, i) => (
+                <ListItem key={i} disablePadding className="py-2 px-4">
+                  <ListItemText
+                    primary={
+                      <Skeleton variant="text" width="45%" height={24} />
+                    }
+                  />
+                  <ListItemIcon sx={{ minWidth: 36 }}>
+                    <Skeleton variant="circular" width={24} height={24} />
+                  </ListItemIcon>
+                </ListItem>
+              ))}
             {spielerQuery.isSuccess &&
               spielerQuery.data?.map((item, i) => (
                 <Link
@@ -125,7 +147,19 @@ const SingleMatch: React.FC<Props> = (props) => {
 
           <div className="font-semibold">Verfügbare Spieler:</div>
           <List>
-            {availQuery.isLoading && <div>Loading...</div>}
+            {availQuery.isLoading &&
+              Array.from({ length: 6 }).map((_, i) => (
+                <ListItem key={i} disablePadding className="py-2 px-4">
+                  <ListItemText
+                    primary={
+                      <Skeleton variant="text" width="50%" height={24} />
+                    }
+                  />
+                  <ListItemIcon sx={{ minWidth: 36 }}>
+                    <Skeleton variant="circular" width={24} height={24} />
+                  </ListItemIcon>
+                </ListItem>
+              ))}
             {availQuery.isSuccess &&
               availQuery.data?.map((item, i) => (
                 <ListItemButton

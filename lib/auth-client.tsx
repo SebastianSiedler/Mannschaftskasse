@@ -1,7 +1,7 @@
+import Skeleton from '@mui/material/Skeleton';
 import { queryOptions, useQuery } from '@tanstack/react-query';
 import * as React from 'react';
 import { getSessionFn } from '@/server/functions/auth';
-import Spinner from '@/src/components/misc/Spinner';
 
 export const sessionQueryOptions = () =>
   queryOptions({
@@ -102,8 +102,13 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div>
-      <span>Waiting for Authentication...</span> <Spinner />
+    <div className="p-4 space-y-4">
+      <Skeleton variant="rounded" width="100%" height={48} />
+      <div className="space-y-3">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <Skeleton key={i} variant="rounded" width="100%" height={64} />
+        ))}
+      </div>
     </div>
   );
 }

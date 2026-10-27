@@ -1,7 +1,9 @@
 import AddIcon from '@mui/icons-material/Add';
 import Fab from '@mui/material/Fab';
 import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
+import Skeleton from '@mui/material/Skeleton';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import type { Spieler } from '@/lib/db';
@@ -32,8 +34,17 @@ const ListKader: React.FC = () => {
 
   return (
     <>
-      {kaderQuery.isLoading && <div>Loading ...</div>}
       <List>
+        {kaderQuery.isLoading &&
+          Array.from({ length: 10 }).map((_, i) => (
+            <ListItem key={i} className="py-2 px-4">
+              <Skeleton
+                variant="text"
+                width={`${40 + ((i * 13) % 35)}%`}
+                height={28}
+              />
+            </ListItem>
+          ))}
         {kaderQuery.data?.map((item, i) => (
           <ListItemButton
             key={i}

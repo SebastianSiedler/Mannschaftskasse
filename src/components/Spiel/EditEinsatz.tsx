@@ -163,10 +163,10 @@ const EditEinsatzForm: React.FC<EditEinsatzFormProps> = ({
     getValues,
     watch,
     setValue,
+    formState: { isDirty },
   } = useZodForm({
     validator: updateEinsatzSchema,
     defaultValues: data,
-    values: data,
   });
 
   const tore = watch('tore') ?? data.tore ?? 0;
@@ -310,10 +310,10 @@ const EditEinsatzForm: React.FC<EditEinsatzFormProps> = ({
         <Button
           type="submit"
           variant="contained"
-          disabled={updateMutation.isPending}
+          disabled={!isDirty || updateMutation.isPending}
           sx={{ borderRadius: 2, textTransform: 'none', px: 3 }}
         >
-          Speichern
+          {updateMutation.isPending ? 'Wird gespeichert...' : 'Speichern'}
         </Button>
       </DialogActions>
     </form>

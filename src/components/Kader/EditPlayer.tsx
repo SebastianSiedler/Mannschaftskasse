@@ -61,6 +61,18 @@ const EditPlayer: React.FC<Props> = ({ player, open, handleClose }) => {
     },
   });
 
+  const isNew = player.id === '-1';
+  const cleanedNames = names.map((n) => n.trim()).filter(Boolean);
+  const initialNames = (player.names || [])
+    .map((n) => n.trim())
+    .filter(Boolean);
+  const isDirty = isNew
+    ? cleanedNames.length > 0
+    : (active !== player.active ||
+        cleanedNames.length !== initialNames.length ||
+        cleanedNames.some((n, i) => n !== initialNames[i])) &&
+      cleanedNames.length > 0;
+
   return (
     <Dialog open={open} onClose={handleClose}>
       <DialogTitle>
@@ -96,6 +108,8 @@ const EditPlayer: React.FC<Props> = ({ player, open, handleClose }) => {
 
       <DialogActions>
         <Button
+          disabled={!isDirty || upsertPlayer.isPending}
+          variant="contained"
           onClick={() => {
             upsertPlayer.mutate({
               names: names.filter((n) => !!n).map((n) => n.trim()),
@@ -104,7 +118,7 @@ const EditPlayer: React.FC<Props> = ({ player, open, handleClose }) => {
             });
           }}
         >
-          Speichern
+          {upsertPlayer.isPending ? 'Wird gespeichert...' : 'Speichern'}
         </Button>
       </DialogActions>
     </Dialog>

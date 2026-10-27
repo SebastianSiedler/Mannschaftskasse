@@ -8,6 +8,13 @@
       "when": 1793128372039,
       "tag": "0000_ancient_nemesis",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1793138771880,
+      "tag": "0001_friendly_the_liberteens",
+      "breakpoints": true
     }
   ]
 }

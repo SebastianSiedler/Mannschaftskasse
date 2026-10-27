@@ -115,19 +115,23 @@ export const teams = sqliteTable(
   ],
 );
 
-export const saisons = sqliteTable('Saison', {
-  id: text('id')
-    .primaryKey()
-    .$defaultFn(() => createId()),
-  bfvCompoundID: text('bfvCompoundID').notNull().unique(),
-  name: text('name').notNull(),
-  latest: integer('latest', { mode: 'boolean' }).notNull().default(false),
-  bfvData: text('bfvData', { mode: 'json' }).$type<Record<
-    string,
-    any
-  > | null>(),
-  currentSpielId: text('currentSpielId').unique(),
-});
+export const saisons = sqliteTable(
+  'Saison',
+  {
+    id: text('id')
+      .primaryKey()
+      .$defaultFn(() => createId()),
+    bfvCompoundID: text('bfvCompoundID').notNull().unique(),
+    name: text('name').notNull(),
+    latest: integer('latest', { mode: 'boolean' }).notNull().default(false),
+    bfvData: text('bfvData', { mode: 'json' }).$type<Record<
+      string,
+      any
+    > | null>(),
+    currentSpielId: text('currentSpielId').unique(),
+  },
+  (table) => [index('Saison_latest_idx').on(table.latest)],
+);
 
 export const spiele = sqliteTable(
   'Spiel',
@@ -160,6 +164,10 @@ export const spiele = sqliteTable(
   (table) => [
     index('Spiel_opponentTeamId_idx').on(table.opponentTeamId),
     index('Spiel_saisonId_idx').on(table.saisonId),
+    index('Spiel_saisonId_kickoffDate_idx').on(
+      table.saisonId,
+      table.kickoffDate,
+    ),
   ],
 );
 
@@ -193,6 +201,10 @@ export const spielereinsaetze = sqliteTable(
     primaryKey({ columns: [table.spielerId, table.spielId] }),
     index('Spielereinsatz_spielId_idx').on(table.spielId),
     index('Spielereinsatz_spielerId_idx').on(table.spielerId),
+    index('Spielereinsatz_spielId_bezahlt_idx').on(
+      table.spielId,
+      table.bezahlt,
+    ),
   ],
 );
 

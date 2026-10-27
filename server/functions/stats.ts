@@ -10,26 +10,42 @@ export const listStatsFn = createServerFn({ method: 'GET' }).handler(
     await requireAuth();
     const [allSaisons, allPlayers] = await Promise.all([
       db.query.saisons.findMany({
-        with: {
-          spiel: {
-            with: {
-              spielereinsaetze: {
-                with: {
-                  spieler: true,
-                },
-              },
-            },
-          },
+        columns: {
+          id: true,
+          name: true,
+          latest: true,
         },
         orderBy: [desc(saisons.name)],
       }),
       db.query.spieler.findMany({
+        columns: {
+          id: true,
+          names: true,
+          active: true,
+        },
         with: {
           spielereinsaetze: {
+            columns: {
+              tore: true,
+              bezahlt: true,
+              gelbeKarte: true,
+              roteKarte: true,
+              spielId: true,
+              spielerId: true,
+            },
             with: {
               Spiel: {
+                columns: {
+                  id: true,
+                  saisonId: true,
+                },
                 with: {
-                  opponent: true,
+                  opponent: {
+                    columns: {
+                      id: true,
+                      name: true,
+                    },
+                  },
                 },
               },
             },

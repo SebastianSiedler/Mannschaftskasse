@@ -85,7 +85,12 @@ const SingleMatch: React.FC<Props> = (props) => {
             >
               <CloseIcon />
             </IconButton>
-            <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
+            <Typography
+              sx={{ ml: 2, flex: 1, minWidth: 0 }}
+              variant="h6"
+              component="div"
+              noWrap
+            >
               {matchQuery.data?.opponent.name}
             </Typography>
           </Toolbar>

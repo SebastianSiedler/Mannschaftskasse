@@ -15,7 +15,6 @@ import Skeleton from '@mui/material/Skeleton';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { Link, useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import {
@@ -35,15 +34,14 @@ import EditEinsatz from './EditEinsatz';
 
 interface Props {
   spielId: string;
-  spielerId?: string;
   open: boolean;
   handleClose: () => void;
 }
 
 const SingleMatch: React.FC<Props> = (props) => {
-  const { spielId, spielerId, open, handleClose } = props;
+  const { spielId, open, handleClose } = props;
 
-  const navigate = useNavigate();
+  const [activeSpielerId, setActiveSpielerId] = useState<string | null>(null);
 
   const matchQuery = useQuery(spielDetailQueryOptions(spielId));
   const spielerQuery = useQuery(einsatzListQueryOptions(spielId));
@@ -131,38 +129,36 @@ const SingleMatch: React.FC<Props> = (props) => {
                 </ListItem>
               ))}
             {spielerQuery.isSuccess &&
-              spielerQuery.data?.map((item, i) => (
-                <Link
-                  to="/spiele/$spielId/$spielerId"
-                  params={{ spielId, spielerId: item.spielerId }}
-                  key={i}
+              spielerQuery.data?.map((item) => (
+                <ListItemButton
+                  key={item.spielerId}
+                  selected={item.spielerId === activeSpielerId}
+                  onClick={() => setActiveSpielerId(item.spielerId)}
                 >
-                  <ListItemButton selected={item.spielerId === spielerId}>
-                    <ListItemText>{item.spieler.names[0]} </ListItemText>
-                    <div className="flex items-center gap-1 mr-3 text-slate-800">
-                      {Array.from({ length: item.tore }).map((_, goalIdx) => (
-                        <BfvGoalIcon key={goalIdx} />
-                      ))}
-                      {item.gelbeKarte > 0 && item.roteKarte > 0 ? (
-                        <BfvCardYellowRedIcon />
-                      ) : item.gelbeKarte >= 2 ? (
-                        <BfvCardYellowRedIcon />
-                      ) : (
-                        <>
-                          {item.gelbeKarte === 1 && <BfvCardYellowIcon />}
-                          {item.roteKarte > 0 && <BfvCardRedIcon />}
-                        </>
-                      )}
-                    </div>
-                    <ListItemIcon sx={{ minWidth: 'auto' }}>
-                      {item.bezahlt ? (
-                        <CheckCircleOutline color="success" />
-                      ) : (
-                        <HighlightOffOutlined color="error" />
-                      )}
-                    </ListItemIcon>
-                  </ListItemButton>
-                </Link>
+                  <ListItemText>{item.spieler.names[0]} </ListItemText>
+                  <div className="flex items-center gap-1 mr-3 text-slate-800">
+                    {Array.from({ length: item.tore }).map((_, goalIdx) => (
+                      <BfvGoalIcon key={goalIdx} />
+                    ))}
+                    {item.gelbeKarte > 0 && item.roteKarte > 0 ? (
+                      <BfvCardYellowRedIcon />
+                    ) : item.gelbeKarte >= 2 ? (
+                      <BfvCardYellowRedIcon />
+                    ) : (
+                      <>
+                        {item.gelbeKarte === 1 && <BfvCardYellowIcon />}
+                        {item.roteKarte > 0 && <BfvCardRedIcon />}
+                      </>
+                    )}
+                  </div>
+                  <ListItemIcon sx={{ minWidth: 'auto' }}>
+                    {item.bezahlt ? (
+                      <CheckCircleOutline color="success" />
+                    ) : (
+                      <HighlightOffOutlined color="error" />
+                    )}
+                  </ListItemIcon>
+                </ListItemButton>
               ))}
           </List>
 
@@ -228,21 +224,17 @@ const SingleMatch: React.FC<Props> = (props) => {
         </DialogContent>
       </Dialog>
 
-      {!!spielerId && (
+      {!!activeSpielerId && (
         <EditEinsatz
-          open={!!spielerId}
+          open={!!activeSpielerId}
           spielId={spielId}
-          spielerId={spielerId}
+          spielerId={activeSpielerId}
           handleClose={() => {
-            navigate({
-              to: '/spiele/$spielId',
-              params: { spielId },
-              replace: true,
-            });
+            setActiveSpielerId(null);
             spielerQuery.refetch();
             availQuery.refetch();
           }}
-          key={`${spielId}-${spielerId}`}
+          key={`${spielId}-${activeSpielerId}`}
         />
       )}
     </>

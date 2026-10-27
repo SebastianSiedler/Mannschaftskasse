@@ -12,14 +12,14 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as SignInRouteImport } from './routes/sign-in'
+import { Route as SpieleRouteImport } from './routes/spiele'
 import { Route as StatsRouteImport } from './routes/stats'
 import { Route as KaderIndexRouteImport } from './routes/kader/index'
 import { Route as KaderAccountsRouteImport } from './routes/kader/accounts'
 import { Route as SpieleIndexRouteImport } from './routes/spiele/index'
+import { Route as SpieleSpielIdRouteImport } from './routes/spiele/$spielId'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ApiCronUpdateMatchesRouteImport } from './routes/api/cron/update-matches'
-import { Route as SpieleSpielIdIndexRouteImport } from './routes/spiele/$spielId/index'
-import { Route as SpieleSpielIdSpielerIdRouteImport } from './routes/spiele/$spielId/$spielerId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -34,6 +34,11 @@ const ProfileRoute = ProfileRouteImport.update({
 const SignInRoute = SignInRouteImport.update({
   id: '/sign-in',
   path: '/sign-in',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SpieleRoute = SpieleRouteImport.update({
+  id: '/spiele',
+  path: '/spiele',
   getParentRoute: () => rootRouteImport,
 } as any)
 const StatsRoute = StatsRouteImport.update({
@@ -52,9 +57,14 @@ const KaderAccountsRoute = KaderAccountsRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const SpieleIndexRoute = SpieleIndexRouteImport.update({
-  id: '/spiele/',
-  path: '/spiele/',
-  getParentRoute: () => rootRouteImport,
+  id: '/',
+  path: '/',
+  getParentRoute: () => SpieleRoute,
+} as any)
+const SpieleSpielIdRoute = SpieleSpielIdRouteImport.update({
+  id: '/$spielId',
+  path: '/$spielId',
+  getParentRoute: () => SpieleRoute,
 } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
@@ -66,29 +76,19 @@ const ApiCronUpdateMatchesRoute = ApiCronUpdateMatchesRouteImport.update({
   path: '/api/cron/update-matches',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SpieleSpielIdIndexRoute = SpieleSpielIdIndexRouteImport.update({
-  id: '/spiele/$spielId/',
-  path: '/spiele/$spielId/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SpieleSpielIdSpielerIdRoute = SpieleSpielIdSpielerIdRouteImport.update({
-  id: '/spiele/$spielId/$spielerId',
-  path: '/spiele/$spielId/$spielerId',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/profile': typeof ProfileRoute
   '/sign-in': typeof SignInRoute
+  '/spiele': typeof SpieleRouteWithChildren
   '/stats': typeof StatsRoute
   '/kader/accounts': typeof KaderAccountsRoute
+  '/spiele/$spielId': typeof SpieleSpielIdRoute
   '/kader/': typeof KaderIndexRoute
   '/spiele/': typeof SpieleIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/cron/update-matches': typeof ApiCronUpdateMatchesRoute
-  '/spiele/$spielId/$spielerId': typeof SpieleSpielIdSpielerIdRoute
-  '/spiele/$spielId/': typeof SpieleSpielIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -96,26 +96,25 @@ export interface FileRoutesByTo {
   '/sign-in': typeof SignInRoute
   '/stats': typeof StatsRoute
   '/kader/accounts': typeof KaderAccountsRoute
+  '/spiele/$spielId': typeof SpieleSpielIdRoute
   '/kader': typeof KaderIndexRoute
   '/spiele': typeof SpieleIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/cron/update-matches': typeof ApiCronUpdateMatchesRoute
-  '/spiele/$spielId/$spielerId': typeof SpieleSpielIdSpielerIdRoute
-  '/spiele/$spielId': typeof SpieleSpielIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/profile': typeof ProfileRoute
   '/sign-in': typeof SignInRoute
+  '/spiele': typeof SpieleRouteWithChildren
   '/stats': typeof StatsRoute
   '/kader/accounts': typeof KaderAccountsRoute
+  '/spiele/$spielId': typeof SpieleSpielIdRoute
   '/kader/': typeof KaderIndexRoute
   '/spiele/': typeof SpieleIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/cron/update-matches': typeof ApiCronUpdateMatchesRoute
-  '/spiele/$spielId/$spielerId': typeof SpieleSpielIdSpielerIdRoute
-  '/spiele/$spielId/': typeof SpieleSpielIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -123,14 +122,14 @@ export interface FileRouteTypes {
     | '/'
     | '/profile'
     | '/sign-in'
+    | '/spiele'
     | '/stats'
     | '/kader/accounts'
+    | '/spiele/$spielId'
     | '/kader/'
     | '/spiele/'
     | '/api/auth/$'
     | '/api/cron/update-matches'
-    | '/spiele/$spielId/$spielerId'
-    | '/spiele/$spielId/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -138,39 +137,36 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/stats'
     | '/kader/accounts'
+    | '/spiele/$spielId'
     | '/kader'
     | '/spiele'
     | '/api/auth/$'
     | '/api/cron/update-matches'
-    | '/spiele/$spielId/$spielerId'
-    | '/spiele/$spielId'
   id:
     | '__root__'
     | '/'
     | '/profile'
     | '/sign-in'
+    | '/spiele'
     | '/stats'
     | '/kader/accounts'
+    | '/spiele/$spielId'
     | '/kader/'
     | '/spiele/'
     | '/api/auth/$'
     | '/api/cron/update-matches'
-    | '/spiele/$spielId/$spielerId'
-    | '/spiele/$spielId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ProfileRoute: typeof ProfileRoute
   SignInRoute: typeof SignInRoute
+  SpieleRoute: typeof SpieleRouteWithChildren
   StatsRoute: typeof StatsRoute
   KaderAccountsRoute: typeof KaderAccountsRoute
   KaderIndexRoute: typeof KaderIndexRoute
-  SpieleIndexRoute: typeof SpieleIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiCronUpdateMatchesRoute: typeof ApiCronUpdateMatchesRoute
-  SpieleSpielIdSpielerIdRoute: typeof SpieleSpielIdSpielerIdRoute
-  SpieleSpielIdIndexRoute: typeof SpieleSpielIdIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -196,6 +192,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SignInRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/spiele': {
+      id: '/spiele'
+      path: '/spiele'
+      fullPath: '/spiele'
+      preLoaderRoute: typeof SpieleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/stats': {
       id: '/stats'
       path: '/stats'
@@ -219,10 +222,17 @@ declare module '@tanstack/react-router' {
     }
     '/spiele/': {
       id: '/spiele/'
-      path: '/spiele'
+      path: '/'
       fullPath: '/spiele/'
       preLoaderRoute: typeof SpieleIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof SpieleRoute
+    }
+    '/spiele/$spielId': {
+      id: '/spiele/$spielId'
+      path: '/$spielId'
+      fullPath: '/spiele/$spielId'
+      preLoaderRoute: typeof SpieleSpielIdRouteImport
+      parentRoute: typeof SpieleRoute
     }
     '/api/auth/$': {
       id: '/api/auth/$'
@@ -238,35 +248,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiCronUpdateMatchesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/spiele/$spielId/': {
-      id: '/spiele/$spielId/'
-      path: '/spiele/$spielId'
-      fullPath: '/spiele/$spielId/'
-      preLoaderRoute: typeof SpieleSpielIdIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/spiele/$spielId/$spielerId': {
-      id: '/spiele/$spielId/$spielerId'
-      path: '/spiele/$spielId/$spielerId'
-      fullPath: '/spiele/$spielId/$spielerId'
-      preLoaderRoute: typeof SpieleSpielIdSpielerIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
+
+interface SpieleRouteChildren {
+  SpieleSpielIdRoute: typeof SpieleSpielIdRoute
+  SpieleIndexRoute: typeof SpieleIndexRoute
+}
+
+const SpieleRouteChildren: SpieleRouteChildren = {
+  SpieleSpielIdRoute: SpieleSpielIdRoute,
+  SpieleIndexRoute: SpieleIndexRoute,
+}
+
+const SpieleRouteWithChildren =
+  SpieleRoute._addFileChildren(SpieleRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ProfileRoute: ProfileRoute,
   SignInRoute: SignInRoute,
+  SpieleRoute: SpieleRouteWithChildren,
   StatsRoute: StatsRoute,
   KaderAccountsRoute: KaderAccountsRoute,
   KaderIndexRoute: KaderIndexRoute,
-  SpieleIndexRoute: SpieleIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiCronUpdateMatchesRoute: ApiCronUpdateMatchesRoute,
-  SpieleSpielIdSpielerIdRoute: SpieleSpielIdSpielerIdRoute,
-  SpieleSpielIdIndexRoute: SpieleSpielIdIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

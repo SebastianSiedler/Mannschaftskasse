@@ -18,6 +18,7 @@ import type { z } from 'zod';
 import { useZodForm } from '@/lib/trpc-forms/utils/use-zod-form';
 import {
   einsatzDetailQueryOptions,
+  type getEinsatzDetailFn,
   removeEinsatzFn,
   updateEinsatzFn,
   updateEinsatzSchema,
@@ -91,14 +92,19 @@ const StatStepperRow: React.FC<StatStepperRowProps> = ({
   );
 };
 
-const EditEinsatz: React.FC<Props> = (props) => {
-  const { handleClose, open, spielId, spielerId } = props;
+interface EditEinsatzFormProps {
+  data: Awaited<ReturnType<typeof getEinsatzDetailFn>>;
+  spielId: string;
+  spielerId: string;
+  handleClose: () => void;
+}
 
-  const einsatzQuery = useQuery({
-    ...einsatzDetailQueryOptions(spielId, spielerId),
-    refetchOnMount: 'always',
-  });
-
+const EditEinsatzForm: React.FC<EditEinsatzFormProps> = ({
+  data,
+  spielId,
+  spielerId,
+  handleClose,
+}) => {
   const updateMutation = useMutation({
     mutationFn: (input: z.infer<typeof updateEinsatzSchema>) =>
       updateEinsatzFn({ data: input }),
@@ -118,13 +124,14 @@ const EditEinsatz: React.FC<Props> = (props) => {
     setValue,
   } = useZodForm({
     validator: updateEinsatzSchema,
-    values: einsatzQuery.data,
+    defaultValues: data,
+    values: data,
   });
 
-  const tore = watch('tore') ?? 0;
-  const gelbeKarte = watch('gelbeKarte') ?? 0;
-  const roteKarte = watch('roteKarte') ?? 0;
-  const bezahlt = watch('bezahlt') ?? false;
+  const tore = watch('tore') ?? data.tore ?? 0;
+  const gelbeKarte = watch('gelbeKarte') ?? data.gelbeKarte ?? 0;
+  const roteKarte = watch('roteKarte') ?? data.roteKarte ?? 0;
+  const bezahlt = watch('bezahlt') ?? data.bezahlt ?? false;
 
   const handleSubmit = rhfHandleSubmit(() => {
     updateMutation.mutate(getValues());
@@ -142,8 +149,130 @@ const EditEinsatz: React.FC<Props> = (props) => {
     },
   });
 
-  const playerName = einsatzQuery.data?.spieler?.names?.[0] ?? 'Spieler';
-  const showSkeleton = !einsatzQuery.isSuccess || einsatzQuery.isFetching;
+  const playerName = data.spieler?.names?.[0] ?? 'Spieler';
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <DialogTitle className="flex items-center justify-between pb-1">
+        <div className="min-w-0">
+          <div className="text-lg font-bold text-slate-900 truncate">
+            {playerName}
+          </div>
+          <div className="text-xs font-normal text-slate-500">
+            Einsatz bearbeiten
+          </div>
+        </div>
+        <IconButton
+          onClick={handleClose}
+          size="small"
+          aria-label="Schließen"
+          className="text-slate-400"
+        >
+          <CloseIcon fontSize="small" />
+        </IconButton>
+      </DialogTitle>
+
+      <DialogContent className="flex flex-col gap-3 pt-3">
+        <button
+          type="button"
+          onClick={() => setValue('bezahlt', !bezahlt, { shouldDirty: true })}
+          className={`flex items-center justify-between w-full rounded-xl border px-3.5 py-3 text-left transition ${
+            bezahlt
+              ? 'border-green-200 bg-green-50/80 text-green-900'
+              : 'border-red-200 bg-red-50/70 text-red-900'
+          }`}
+        >
+          <div className="flex items-center gap-2.5">
+            {bezahlt ? (
+              <CheckCircleOutline color="success" />
+            ) : (
+              <HighlightOffOutlined color="error" />
+            )}
+            <div>
+              <div className="font-semibold text-sm">
+                {bezahlt ? 'Bezahlt' : 'Noch offen'}
+              </div>
+              <div className="text-xs opacity-75">
+                {bezahlt ? 'Spielgebühr beglichen' : 'Spielgebühr ausstehend'}
+              </div>
+            </div>
+          </div>
+          <Switch
+            checked={bezahlt}
+            color="success"
+            onChange={(e) =>
+              setValue('bezahlt', e.target.checked, { shouldDirty: true })
+            }
+            onClick={(e) => e.stopPropagation()}
+          />
+        </button>
+
+        <StatStepperRow
+          icon={<BfvGoalIcon />}
+          label="Tore"
+          value={tore}
+          onChange={(next) => setValue('tore', next, { shouldDirty: true })}
+        />
+
+        <StatStepperRow
+          icon={<BfvCardYellowIcon />}
+          label="Gelbe Karten"
+          value={gelbeKarte}
+          onChange={(next) =>
+            setValue('gelbeKarte', next, { shouldDirty: true })
+          }
+        />
+
+        <StatStepperRow
+          icon={<BfvCardRedIcon />}
+          label="Rote Karten"
+          value={roteKarte}
+          onChange={(next) =>
+            setValue('roteKarte', next, { shouldDirty: true })
+          }
+        />
+      </DialogContent>
+
+      <DialogActions
+        sx={{ justifyContent: 'space-between', px: 3, pb: 2.5, pt: 1 }}
+      >
+        <Button
+          type="button"
+          color="error"
+          variant="outlined"
+          startIcon={<DeleteOutlineIcon />}
+          disabled={removeEinsatz.isPending}
+          onClick={() => {
+            removeEinsatz.mutate({ spielId, spielerId });
+          }}
+          sx={{ borderRadius: 2, textTransform: 'none' }}
+        >
+          Löschen
+        </Button>
+
+        <Button
+          type="submit"
+          variant="contained"
+          disabled={updateMutation.isPending}
+          sx={{ borderRadius: 2, textTransform: 'none', px: 3 }}
+        >
+          Speichern
+        </Button>
+      </DialogActions>
+    </form>
+  );
+};
+
+const EditEinsatz: React.FC<Props> = (props) => {
+  const { handleClose, open, spielId, spielerId } = props;
+
+  const einsatzQuery = useQuery({
+    ...einsatzDetailQueryOptions(spielId, spielerId),
+    refetchOnMount: 'always',
+  });
+
+  const showSkeleton =
+    !einsatzQuery.isSuccess || einsatzQuery.isFetching || !einsatzQuery.data;
 
   return (
     <Dialog
@@ -175,118 +304,12 @@ const EditEinsatz: React.FC<Props> = (props) => {
           </DialogActions>
         </>
       ) : (
-        <form onSubmit={handleSubmit}>
-          <DialogTitle className="flex items-center justify-between pb-1">
-            <div className="min-w-0">
-              <div className="text-lg font-bold text-slate-900 truncate">
-                {playerName}
-              </div>
-              <div className="text-xs font-normal text-slate-500">
-                Einsatz bearbeiten
-              </div>
-            </div>
-            <IconButton
-              onClick={handleClose}
-              size="small"
-              aria-label="Schließen"
-              className="text-slate-400"
-            >
-              <CloseIcon fontSize="small" />
-            </IconButton>
-          </DialogTitle>
-
-          <DialogContent className="flex flex-col gap-3 pt-3">
-            <button
-              type="button"
-              onClick={() =>
-                setValue('bezahlt', !bezahlt, { shouldDirty: true })
-              }
-              className={`flex items-center justify-between w-full rounded-xl border px-3.5 py-3 text-left transition ${
-                bezahlt
-                  ? 'border-green-200 bg-green-50/80 text-green-900'
-                  : 'border-red-200 bg-red-50/70 text-red-900'
-              }`}
-            >
-              <div className="flex items-center gap-2.5">
-                {bezahlt ? (
-                  <CheckCircleOutline color="success" />
-                ) : (
-                  <HighlightOffOutlined color="error" />
-                )}
-                <div>
-                  <div className="font-semibold text-sm">
-                    {bezahlt ? 'Bezahlt' : 'Noch offen'}
-                  </div>
-                  <div className="text-xs opacity-75">
-                    {bezahlt
-                      ? 'Spielgebühr beglichen'
-                      : 'Spielgebühr ausstehend'}
-                  </div>
-                </div>
-              </div>
-              <Switch
-                checked={bezahlt}
-                color="success"
-                onChange={(e) =>
-                  setValue('bezahlt', e.target.checked, { shouldDirty: true })
-                }
-                onClick={(e) => e.stopPropagation()}
-              />
-            </button>
-
-            <StatStepperRow
-              icon={<BfvGoalIcon />}
-              label="Tore"
-              value={tore}
-              onChange={(next) => setValue('tore', next, { shouldDirty: true })}
-            />
-
-            <StatStepperRow
-              icon={<BfvCardYellowIcon />}
-              label="Gelbe Karten"
-              value={gelbeKarte}
-              onChange={(next) =>
-                setValue('gelbeKarte', next, { shouldDirty: true })
-              }
-            />
-
-            <StatStepperRow
-              icon={<BfvCardRedIcon />}
-              label="Rote Karten"
-              value={roteKarte}
-              onChange={(next) =>
-                setValue('roteKarte', next, { shouldDirty: true })
-              }
-            />
-          </DialogContent>
-
-          <DialogActions
-            sx={{ justifyContent: 'space-between', px: 3, pb: 2.5, pt: 1 }}
-          >
-            <Button
-              type="button"
-              color="error"
-              variant="outlined"
-              startIcon={<DeleteOutlineIcon />}
-              disabled={removeEinsatz.isPending}
-              onClick={() => {
-                removeEinsatz.mutate({ spielId, spielerId });
-              }}
-              sx={{ borderRadius: 2, textTransform: 'none' }}
-            >
-              Löschen
-            </Button>
-
-            <Button
-              type="submit"
-              variant="contained"
-              disabled={updateMutation.isPending}
-              sx={{ borderRadius: 2, textTransform: 'none', px: 3 }}
-            >
-              Speichern
-            </Button>
-          </DialogActions>
-        </form>
+        <EditEinsatzForm
+          data={einsatzQuery.data}
+          spielId={spielId}
+          spielerId={spielerId}
+          handleClose={handleClose}
+        />
       )}
     </Dialog>
   );

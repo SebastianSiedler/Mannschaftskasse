@@ -40,23 +40,33 @@ const NewMatchListItem: React.FC<NewProps> = (props) => {
   return (
     <Link to="/spiele/$spielId" params={{ spielId }} resetScroll={false}>
       <span
-        className={`flex justify-between items-center gap-2 transition duration-500 ease rounded-xl px-2 py-2 ${
-          isSelected ? 'bg-blue-100' : ''
+        className={`flex justify-between items-center gap-2.5 transition duration-300 ease rounded-xl px-3 py-2.5 ${
+          isSelected
+            ? 'bg-blue-100 ring-2 ring-blue-500'
+            : currentGame
+              ? 'bg-amber-50/80 border-2 border-amber-400 shadow-sm ring-1 ring-amber-400/40'
+              : 'hover:bg-slate-50 border border-transparent'
         }`}
       >
         <div className="">
           <img
             src={getClubLogoAPI(clubId)}
             alt={teamName}
-            className="object-contain aspect-square h-10 bg-white rounded-lg"
+            className="object-contain aspect-square h-10 bg-white rounded-lg shadow-xs"
           />
         </div>
 
         <div className="min-w-0 flex-1">
           <div className="overflow-hidden whitespace-nowrap text-ellipsis">
-            <span className="font-semibold">{teamName}</span>
+            <span
+              className={`font-semibold ${
+                currentGame ? 'text-slate-900 font-bold' : 'text-slate-800'
+              }`}
+            >
+              {teamName}
+            </span>
           </div>
-          <div className="text-slate-500">
+          <div className="text-slate-500 text-xs mt-0.5">
             {parsedDate.toLocaleString('de-DE', {
               weekday: 'short',
               day: '2-digit',
@@ -69,12 +79,15 @@ const NewMatchListItem: React.FC<NewProps> = (props) => {
           </div>
         </div>
         <div>
-          <div className="font-semibold flex justify-end">{result}</div>
+          <div className="font-semibold flex justify-end tabular-nums">
+            {result}
+          </div>
 
-          <div className="flex flex-wrap items-center justify-end gap-1.5 mt-0.5">
+          <div className="flex flex-wrap items-center justify-end gap-1.5 mt-1">
             {currentGame && (
-              <div className="px-2 py-0.5 rounded-full font-semibold text-xs text-amber-200 bg-amber-500">
-                Aktuelles Spiel!
+              <div className="px-2.5 py-0.5 rounded-full font-bold text-xs text-white bg-amber-500 flex items-center gap-1.5 shadow-xs">
+                <span className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" />
+                <span>Aktuelles Spiel</span>
               </div>
             )}
             {hasGoalMismatch && typeof bfvOwnGoals === 'number' && (

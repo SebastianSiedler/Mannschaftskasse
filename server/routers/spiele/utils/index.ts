@@ -1,9 +1,8 @@
 import type { bfvSchemas } from 'bfv-api';
-import type { z } from 'zod';
 import { serverEnv } from '@/env/server';
 import { Result } from '@/lib/db';
 
-type BfvMatch = z.infer<typeof bfvSchemas.Match>;
+type BfvMatch = (typeof bfvSchemas.Match)['_output'];
 
 const isHomeTeam = (match: BfvMatch) => {
   const BFV_PERMANENT_TEAM_ID = serverEnv.BFV_PERMANENT_TEAM_ID;

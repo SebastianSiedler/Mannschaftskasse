@@ -180,7 +180,7 @@ importers:
         version: 2.2.0(react@19.3.1)
       '@hookform/resolvers':
         specifier: ^6.0.0
-        version: 6.0.0(react-hook-form@7.91.0(@types/react@19.3.0)(react@19.3.1))(zod@3.25.76)
+        version: 6.0.0(react-hook-form@7.91.0(@types/react@19.3.0)(react@19.3.1))(zod@4.6.7)
       '@libsql/client':
         specifier: ^0.15.4
         version: 0.15.15
@@ -248,8 +248,8 @@ importers:
         specifier: ^10.0.5
         version: 10.1.1(react@19.3.1)
       zod:
-        specifier: ^3.25.67
-        version: 3.25.76
+        specifier: ^4.6.7
+        version: 4.6.7
     devDependencies:
       '@biomejs/biome':
         specifier: ^2.0.0
@@ -3835,12 +3835,12 @@ snapshots:
     dependencies:
       react: 19.3.1
 
-  '@hookform/resolvers@6.0.0(react-hook-form@7.91.0(@types/react@19.3.0)(react@19.3.1))(zod@3.25.76)':
+  '@hookform/resolvers@6.0.0(react-hook-form@7.91.0(@types/react@19.3.0)(react@19.3.1))(zod@4.6.7)':
     dependencies:
       '@standard-schema/utils': 0.3.0
       react-hook-form: 7.91.0(@types/react@19.3.0)(react@19.3.1)
     optionalDependencies:
-      zod: 3.25.76
+      zod: 4.6.7
 
   '@internationalized/number@3.6.9':
     dependencies:

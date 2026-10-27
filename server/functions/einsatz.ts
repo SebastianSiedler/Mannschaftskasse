@@ -18,12 +18,22 @@ export const listEinsatzFn = createServerFn({ method: 'GET' })
   .validator(z.object({ spielId: z.string() }))
   .handler(async ({ data: input }) => {
     await requireAuth();
-    return await db.query.spielereinsaetze.findMany({
+    const einsaetze = await db.query.spielereinsaetze.findMany({
       where: eq(spielereinsaetze.spielId, input.spielId),
       with: {
         spieler: true,
       },
       orderBy: [asc(spielereinsaetze.bezahlt)],
+    });
+
+    return einsaetze.sort((a, b) => {
+      if (a.bezahlt !== b.bezahlt) {
+        return Number(a.bezahlt) - Number(b.bezahlt);
+      }
+      return (a.spieler.names[0] ?? '').localeCompare(
+        b.spieler.names[0] ?? '',
+        'de',
+      );
     });
   });
 
@@ -60,7 +70,8 @@ export const listAvailablePlayersFn = createServerFn({ method: 'GET' })
 
     return activePlayers
       .filter((p) => p.spielereinsaetze.length === 0)
-      .map(({ id, names, active }) => ({ id, names, active }));
+      .map(({ id, names, active }) => ({ id, names, active }))
+      .sort((a, b) => (a.names[0] ?? '').localeCompare(b.names[0] ?? '', 'de'));
   });
 
 export const addByPlayerListFn = createServerFn({ method: 'POST' })

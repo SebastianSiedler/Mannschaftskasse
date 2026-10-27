@@ -1,3 +1,4 @@
+import AccountBalanceWalletOutlined from '@mui/icons-material/AccountBalanceWalletOutlined';
 import CheckCircleOutlined from '@mui/icons-material/CheckCircleOutlined';
 import Close from '@mui/icons-material/Close';
 import Download from '@mui/icons-material/Download';
@@ -79,6 +80,14 @@ const StatsTable: React.FC<Props> = ({ data, saisonName }) => {
 
   const totalDebts = useMemo(
     () => data.reduce((sum, item) => sum + item.schulden, 0),
+    [data],
+  );
+  const totalPaid = useMemo(
+    () =>
+      data.reduce((sum, item) => {
+        const paidGames = item.spielereinsaetze.filter((e) => e.bezahlt).length;
+        return sum + paidGames * 5;
+      }, 0),
     [data],
   );
   const totalGoals = useMemo(
@@ -259,33 +268,51 @@ const StatsTable: React.FC<Props> = ({ data, saisonName }) => {
           </Button>
         </div>
 
-        <div className="grid grid-cols-3 gap-2.5 pt-3">
-          <div className="rounded-xl border border-amber-200/80 bg-amber-50/70 p-2.5 text-center">
-            <div className="flex items-center justify-center gap-1 text-amber-800 mb-0.5">
-              <PaidOutlined sx={{ fontSize: 16 }} />
-              <span className="text-xs font-medium">Offen</span>
+        <div className="grid grid-cols-4 gap-1.5 sm:gap-2.5 pt-2.5">
+          <div className="rounded-xl border border-emerald-200/80 bg-emerald-50/70 p-1.5 sm:p-2.5 text-center min-w-0">
+            <div className="flex items-center justify-center gap-1 text-emerald-800 mb-0.5">
+              <AccountBalanceWalletOutlined sx={{ fontSize: 14 }} />
+              <span className="text-[11px] sm:text-xs font-medium truncate">
+                Einnahmen
+              </span>
             </div>
-            <div className="text-base font-bold text-amber-950 tabular-nums">
+            <div className="text-sm sm:text-base font-bold text-emerald-950 tabular-nums truncate">
+              {totalPaid} €
+            </div>
+          </div>
+
+          <div className="rounded-xl border border-amber-200/80 bg-amber-50/70 p-1.5 sm:p-2.5 text-center min-w-0">
+            <div className="flex items-center justify-center gap-1 text-amber-800 mb-0.5">
+              <PaidOutlined sx={{ fontSize: 14 }} />
+              <span className="text-[11px] sm:text-xs font-medium truncate">
+                Offen
+              </span>
+            </div>
+            <div className="text-sm sm:text-base font-bold text-amber-950 tabular-nums truncate">
               {totalDebts} €
             </div>
           </div>
 
-          <div className="rounded-xl border border-emerald-200/80 bg-emerald-50/70 p-2.5 text-center">
-            <div className="flex items-center justify-center gap-1 text-emerald-800 mb-0.5">
-              <SportsSoccer sx={{ fontSize: 16 }} />
-              <span className="text-xs font-medium">Tore</span>
+          <div className="rounded-xl border border-indigo-200/80 bg-indigo-50/70 p-1.5 sm:p-2.5 text-center min-w-0">
+            <div className="flex items-center justify-center gap-1 text-indigo-800 mb-0.5">
+              <SportsSoccer sx={{ fontSize: 14 }} />
+              <span className="text-[11px] sm:text-xs font-medium truncate">
+                Tore
+              </span>
             </div>
-            <div className="text-base font-bold text-emerald-950 tabular-nums">
+            <div className="text-sm sm:text-base font-bold text-indigo-950 tabular-nums truncate">
               {totalGoals}
             </div>
           </div>
 
-          <div className="rounded-xl border border-blue-200/80 bg-blue-50/70 p-2.5 text-center">
+          <div className="rounded-xl border border-blue-200/80 bg-blue-50/70 p-1.5 sm:p-2.5 text-center min-w-0">
             <div className="flex items-center justify-center gap-1 text-blue-800 mb-0.5">
-              <PeopleOutlined sx={{ fontSize: 16 }} />
-              <span className="text-xs font-medium">Spieler</span>
+              <PeopleOutlined sx={{ fontSize: 14 }} />
+              <span className="text-[11px] sm:text-xs font-medium truncate">
+                Spieler
+              </span>
             </div>
-            <div className="text-base font-bold text-blue-950 tabular-nums">
+            <div className="text-sm sm:text-base font-bold text-blue-950 tabular-nums truncate">
               {totalPlayers}
             </div>
           </div>

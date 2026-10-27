@@ -33,20 +33,25 @@ function StatsHome() {
                     sx={{ borderRadius: 2 }}
                   />
                 </div>
-                <div className="grid grid-cols-3 gap-2.5 pt-3">
+                <div className="grid grid-cols-4 gap-1.5 sm:gap-2.5 pt-2.5">
                   <Skeleton
                     variant="rounded"
-                    height={60}
+                    height={52}
                     sx={{ borderRadius: 3 }}
                   />
                   <Skeleton
                     variant="rounded"
-                    height={60}
+                    height={52}
                     sx={{ borderRadius: 3 }}
                   />
                   <Skeleton
                     variant="rounded"
-                    height={60}
+                    height={52}
+                    sx={{ borderRadius: 3 }}
+                  />
+                  <Skeleton
+                    variant="rounded"
+                    height={52}
                     sx={{ borderRadius: 3 }}
                   />
                 </div>

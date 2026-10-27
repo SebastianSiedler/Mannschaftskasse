@@ -3,6 +3,7 @@ import {
   getCardLimits,
   getRedCardDisplay,
   getYellowCardDisplay,
+  resolveMatchCardsDisplay,
 } from './cardRules';
 import { updateEinsatzSchema } from './einsatz';
 
@@ -70,6 +71,40 @@ describe('cardRules', () => {
       expect(getRedCardDisplay(1)).toEqual({
         label: 'Rote Karte',
         subtitle: 'Direkter Platzverweis',
+      });
+    });
+  });
+
+  describe('resolveMatchCardsDisplay', () => {
+    it('returns NONE when no cards are given', () => {
+      expect(resolveMatchCardsDisplay(0, 0)).toEqual({ type: 'NONE' });
+    });
+
+    it('returns YELLOW_RED for 2 yellow cards', () => {
+      expect(resolveMatchCardsDisplay(2, 0)).toEqual({ type: 'YELLOW_RED' });
+    });
+
+    it('returns SEPARATE with both cards for 1 yellow and 1 red card', () => {
+      expect(resolveMatchCardsDisplay(1, 1)).toEqual({
+        type: 'SEPARATE',
+        hasYellow: true,
+        hasRed: true,
+      });
+    });
+
+    it('returns SEPARATE with only yellow for 1 yellow card', () => {
+      expect(resolveMatchCardsDisplay(1, 0)).toEqual({
+        type: 'SEPARATE',
+        hasYellow: true,
+        hasRed: false,
+      });
+    });
+
+    it('returns SEPARATE with only red for 1 red card', () => {
+      expect(resolveMatchCardsDisplay(0, 1)).toEqual({
+        type: 'SEPARATE',
+        hasYellow: false,
+        hasRed: true,
       });
     });
   });

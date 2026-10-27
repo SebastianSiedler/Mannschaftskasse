@@ -43,3 +43,32 @@ export function getRedCardDisplay(roteKarte: number) {
     subtitle: roteKarte === 1 ? 'Direkter Platzverweis' : undefined,
   };
 }
+
+export type CardDisplayKind =
+  | { type: 'NONE' }
+  | { type: 'YELLOW_RED' }
+  | { type: 'SEPARATE'; hasYellow: boolean; hasRed: boolean };
+
+/**
+ * Resolves card icons for match overviews:
+ * - 2 yellow cards = Yellow-Red combined icon.
+ * - 1 yellow and/or 1 red = separate individual card icons side-by-side.
+ */
+export function resolveMatchCardsDisplay(
+  gelbeKarte: number,
+  roteKarte: number,
+): CardDisplayKind {
+  if (gelbeKarte >= 2) {
+    return { type: 'YELLOW_RED' };
+  }
+  const hasYellow = gelbeKarte === 1;
+  const hasRed = roteKarte > 0;
+  if (hasYellow || hasRed) {
+    return {
+      type: 'SEPARATE',
+      hasYellow,
+      hasRed,
+    };
+  }
+  return { type: 'NONE' };
+}

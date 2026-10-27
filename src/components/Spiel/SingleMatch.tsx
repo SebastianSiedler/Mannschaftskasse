@@ -263,9 +263,7 @@ const SingleMatch: React.FC<Props> = (props) => {
                     {Array.from({ length: item.tore }).map((_, goalIdx) => (
                       <BfvGoalIcon key={goalIdx} />
                     ))}
-                    {item.gelbeKarte > 0 && item.roteKarte > 0 ? (
-                      <BfvCardYellowRedIcon />
-                    ) : item.gelbeKarte >= 2 ? (
+                    {item.gelbeKarte >= 2 ? (
                       <BfvCardYellowRedIcon />
                     ) : (
                       <>

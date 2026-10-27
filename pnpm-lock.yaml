@@ -221,11 +221,11 @@ importers:
         specifier: ^2.0.3
         version: 2.0.3
       jspdf:
-        specifier: ^3.0.1
-        version: 3.0.4
+        specifier: ^4.2.1
+        version: 4.2.1
       jspdf-autotable:
         specifier: ^5.0.2
-        version: 5.0.9(jspdf@3.0.4)
+        version: 5.0.9(jspdf@4.2.1)
       lodash.isequal:
         specifier: ^4.5.0
         version: 4.5.0
@@ -2491,8 +2491,8 @@ packages:
     peerDependencies:
       jspdf: ^2 || ^3 || ^4
 
-  jspdf@3.0.4:
-    resolution: {integrity: sha512-dc6oQ8y37rRcHn316s4ngz/nOjayLF/FFxBF4V9zamQKRqXxyiH1zagkCdktdWhtoQId5K20xt1lB90XzkB+hQ==}
+  jspdf@4.2.1:
+    resolution: {integrity: sha512-YyAXyvnmjTbR4bHQRLzex3CuINCDlQnBqoSYyjJwTP2x9jDLuKDzy7aKUl0hgx3uhcl7xzg32agn5vlie6HIlQ==}
 
   libsql@0.5.29:
     resolution: {integrity: sha512-8lMP8iMgiBzzoNbAPQ59qdVcj6UaE/Vnm+fiwX4doX4Narook0a4GPKWBEv+CR8a1OwbfkgL18uBfBjWdF0Fzg==}
@@ -5183,11 +5183,11 @@ snapshots:
 
   json5@2.2.3: {}
 
-  jspdf-autotable@5.0.9(jspdf@3.0.4):
+  jspdf-autotable@5.0.9(jspdf@4.2.1):
     dependencies:
-      jspdf: 3.0.4
+      jspdf: 4.2.1
 
-  jspdf@3.0.4:
+  jspdf@4.2.1:
     dependencies:
       '@babel/runtime': 7.29.10
       fast-png: 6.4.0

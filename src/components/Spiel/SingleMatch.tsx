@@ -1,10 +1,3 @@
-import {
-  addByPlayerListFn,
-  addEinsatzFn,
-  availablePlayersQueryOptions,
-  einsatzListQueryOptions,
-} from '@/server/functions/einsatz';
-import { spielDetailQueryOptions } from '@/server/functions/spiele';
 import AddCircleOutline from '@mui/icons-material/AddCircleOutline';
 import CheckCircleOutline from '@mui/icons-material/CheckCircleOutline';
 import CloseIcon from '@mui/icons-material/Close';
@@ -23,6 +16,13 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
+import {
+  addByPlayerListFn,
+  addEinsatzFn,
+  availablePlayersQueryOptions,
+  einsatzListQueryOptions,
+} from '@/server/functions/einsatz';
+import { spielDetailQueryOptions } from '@/server/functions/spiele';
 import EditEinsatz from './EditEinsatz';
 
 interface Props {

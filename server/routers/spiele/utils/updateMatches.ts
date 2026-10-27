@@ -1,7 +1,7 @@
-import { serverEnv } from '@/env/server';
-import { db, saisons, spiele, teams, type Spiel } from '@/lib/db';
 import { bfvApi, type Schemas } from 'bfv-api';
 import { eq } from 'drizzle-orm';
+import { serverEnv } from '@/env/server';
+import { db, type Spiel, saisons, spiele, teams } from '@/lib/db';
 import { getOpponentTeam, getParsedDate, parse_result } from '.';
 
 type BfvMatch = Schemas['Match'];

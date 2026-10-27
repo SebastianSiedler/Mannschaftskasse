@@ -1,5 +1,3 @@
-import type { Spieler } from '@/lib/db';
-import { upsertSpielerFn } from '@/server/functions/spieler';
 import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
 import Dialog from '@mui/material/Dialog';
@@ -11,6 +9,8 @@ import TextField from '@mui/material/TextField';
 import { useMutation } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import type { Spieler } from '@/lib/db';
+import { upsertSpielerFn } from '@/server/functions/spieler';
 
 interface Props {
   player: Spieler;
@@ -33,7 +33,7 @@ const EditPlayer: React.FC<Props> = ({ player, open, handleClose }) => {
    */
   useEffect(() => {
     const anz_empty_fields = names.reduce((prev, curr) => {
-      if (curr.trim() == '') {
+      if (curr.trim() === '') {
         prev += 1;
       }
       return prev;

@@ -1,10 +1,3 @@
-import { useZodForm } from '@/lib/trpc-forms/utils/use-zod-form';
-import {
-  einsatzDetailQueryOptions,
-  removeEinsatzFn,
-  updateEinsatzFn,
-  updateEinsatzSchema,
-} from '@/server/functions/einsatz';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -16,7 +9,14 @@ import TextField from '@mui/material/TextField';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import toast from 'react-hot-toast';
-import { z } from 'zod';
+import type { z } from 'zod';
+import { useZodForm } from '@/lib/trpc-forms/utils/use-zod-form';
+import {
+  einsatzDetailQueryOptions,
+  removeEinsatzFn,
+  updateEinsatzFn,
+  updateEinsatzSchema,
+} from '@/server/functions/einsatz';
 
 export { updateEinsatzSchema };
 
@@ -72,7 +72,7 @@ const EditEinsatz: React.FC<Props> = (props) => {
 
   useEffect(() => {
     einsatzQuery.refetch();
-  }, []);
+  }, [einsatzQuery.refetch]);
 
   if (!einsatzQuery.isSuccess) return <div>Loading...</div>;
 

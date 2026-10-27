@@ -1,7 +1,7 @@
-import { signIn } from '@/lib/auth-client';
-import { getAuthProvidersFn, getSessionFn } from '@/server/functions/auth';
 import { createFileRoute, redirect } from '@tanstack/react-router';
 import Div100vh from 'react-div-100vh';
+import { signIn } from '@/lib/auth-client';
+import { getAuthProvidersFn, getSessionFn } from '@/server/functions/auth';
 
 export const Route = createFileRoute('/sign-in')({
   head: () => ({

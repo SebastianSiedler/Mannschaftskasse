@@ -1,7 +1,7 @@
+import { createFileRoute, Link } from '@tanstack/react-router';
 import { AuthGuard, useSession } from '@/lib/auth-client';
 import { DefaultLayout } from '@/src/components/DefaultLayout';
 import ListKader from '@/src/components/Kader/ListKader';
-import { createFileRoute, Link } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/kader/')({
   component: KaderHome,

@@ -1,7 +1,7 @@
-import { AuthGuard, signOut, useSession } from '@/lib/auth-client';
-import { userProfileQueryOptions } from '@/server/functions/user';
 import { useQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
+import { AuthGuard, signOut, useSession } from '@/lib/auth-client';
+import { userProfileQueryOptions } from '@/server/functions/user';
 
 export const Route = createFileRoute('/profile')({
   component: ProfilePage,

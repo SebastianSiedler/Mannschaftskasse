@@ -1,4 +1,4 @@
-import { performance } from 'perf_hooks';
+import { performance } from 'node:perf_hooks';
 
 export const measureTime = async <Data>(method: () => Promise<Data>) => {
   const startTime = performance.now();

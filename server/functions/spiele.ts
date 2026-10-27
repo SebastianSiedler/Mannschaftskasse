@@ -1,12 +1,12 @@
-import { serverEnv } from '@/env/server';
-import { db, saisons, spiele } from '@/lib/db';
-import { updateMatches } from '@/server/routers/spiele/utils/updateMatches';
 import { queryOptions } from '@tanstack/react-query';
 import { createServerFn } from '@tanstack/react-start';
 import { bfvApi } from 'bfv-api';
 import { asc, eq } from 'drizzle-orm';
 import isEqual from 'lodash.isequal';
 import { z } from 'zod';
+import { serverEnv } from '@/env/server';
+import { db, saisons, spiele } from '@/lib/db';
+import { updateMatches } from '@/server/routers/spiele/utils/updateMatches';
 
 export const updateMatchesFn = createServerFn({ method: 'GET' })
   .validator(

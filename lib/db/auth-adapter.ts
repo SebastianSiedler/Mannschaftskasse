@@ -8,10 +8,10 @@ import { and, eq } from 'drizzle-orm';
 import type { Database } from './index';
 import {
   accounts,
+  type Role,
   sessions,
   users,
   verificationTokens,
-  type Role,
 } from './schema';
 
 export type ExtendedAdapterUser = AdapterUser & {
@@ -155,7 +155,7 @@ export function DrizzleAdapter(db: Database): Adapter {
         },
       });
 
-      if (!sessionWithUser || !sessionWithUser.user) {
+      if (!sessionWithUser?.user) {
         return null;
       }
 

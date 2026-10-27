@@ -1,9 +1,9 @@
-import { db, spieler } from '@/lib/db';
-import { requireAdmin } from '@/lib/auth';
 import { queryOptions } from '@tanstack/react-query';
 import { createServerFn } from '@tanstack/react-start';
 import { ne } from 'drizzle-orm';
 import { z } from 'zod';
+import { requireAdmin } from '@/lib/auth';
+import { db, spieler } from '@/lib/db';
 
 export const listSpielerFn = createServerFn({ method: 'GET' }).handler(
   async () => {
@@ -33,7 +33,7 @@ export const upsertSpielerFn = createServerFn({ method: 'POST' })
       where: isExistingId ? ne(spieler.id, input.spielerId!) : undefined,
       columns: { names: true },
     });
-    const flat_spieler = existingPlayers.map((s) => s.names).flat();
+    const flat_spieler = existingPlayers.flatMap((s) => s.names);
 
     for (const name of input.names) {
       if (flat_spieler.includes(name)) {

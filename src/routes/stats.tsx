@@ -1,10 +1,10 @@
+import Button from '@mui/material/Button';
+import { useQuery } from '@tanstack/react-query';
+import { createFileRoute } from '@tanstack/react-router';
 import { AuthGuard, signOut } from '@/lib/auth-client';
 import { statsListQueryOptions } from '@/server/functions/stats';
 import { DefaultLayout } from '@/src/components/DefaultLayout';
 import StatsTable from '@/src/components/Stats/Table';
-import Button from '@mui/material/Button';
-import { useQuery } from '@tanstack/react-query';
-import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/stats')({
   component: StatsHome,

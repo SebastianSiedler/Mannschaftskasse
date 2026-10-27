@@ -1,8 +1,8 @@
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { spieleListQueryOptions } from '@/server/functions/spiele';
 import { DefaultLayout } from '@/src/components/DefaultLayout';
 import ListSpiele from '@/src/components/Spiel/ListSpiele';
 import SingleMatch from '@/src/components/Spiel/SingleMatch';
-import { createFileRoute, useNavigate } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/spiele/$spielId/$spielerId')({
   loader: async ({ context }) => {

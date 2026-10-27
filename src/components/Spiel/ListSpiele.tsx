@@ -1,8 +1,8 @@
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   spieleListQueryOptions,
   updateMatchesFn,
 } from '@/server/functions/spiele';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
 import MatchListItem from './MatchListItem';
 
 const ListSpiele: React.FC = () => {

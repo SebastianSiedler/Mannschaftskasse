@@ -1,9 +1,9 @@
-import { db, saisons, spielereinsaetze } from '@/lib/db';
-import { requireAdmin, requireAuth } from '@/lib/auth';
 import { queryOptions } from '@tanstack/react-query';
 import { createServerFn } from '@tanstack/react-start';
 import { desc, eq } from 'drizzle-orm';
 import { z } from 'zod';
+import { requireAdmin, requireAuth } from '@/lib/auth';
+import { db, saisons, spielereinsaetze } from '@/lib/db';
 
 export const listStatsFn = createServerFn({ method: 'GET' }).handler(
   async () => {

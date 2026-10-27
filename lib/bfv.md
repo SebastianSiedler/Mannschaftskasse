@@ -1,4 +1,3 @@
-
 Alle TSC Zeuzleben Mannschaften
 https://widget-prod.bfv.de/rest/clubcontroller/fixtures/id/00ES8GNLE0000009VV0AG08LVUPGND5I/matchtype/team
 
@@ -27,5 +26,3 @@ https://widget-prod.bfv.de/rest/competitioncontroller/competition/id/02EUORBCTG0
 
 permantentTeamId gibt es über die BFV Suche oben in der URL
 https://www.bfv.de/mannschaften/sg-stettbach-ii-zeuzleben-ii/027B821L9S000000VS5489B2VVB7EFSC
-
-

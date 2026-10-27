@@ -1,6 +1,6 @@
-import { getSessionFn } from '@/server/functions/auth';
 import { queryOptions, useQuery } from '@tanstack/react-query';
 import * as React from 'react';
+import { getSessionFn } from '@/server/functions/auth';
 import Spinner from '@/src/components/misc/Spinner';
 
 export const sessionQueryOptions = () =>

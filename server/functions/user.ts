@@ -1,9 +1,9 @@
-import { db, users } from '@/lib/db';
-import { requireAdmin, requireAuth } from '@/lib/auth';
 import { queryOptions } from '@tanstack/react-query';
 import { createServerFn } from '@tanstack/react-start';
 import { asc, eq, ne } from 'drizzle-orm';
 import { z } from 'zod';
+import { requireAdmin, requireAuth } from '@/lib/auth';
+import { db, users } from '@/lib/db';
 
 export const getUserProfileFn = createServerFn({ method: 'GET' })
   .validator(

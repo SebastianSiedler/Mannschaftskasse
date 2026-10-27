@@ -1,4 +1,3 @@
-import { useSession } from '@/lib/auth-client';
 import PeopleIcon from '@mui/icons-material/People';
 import QueryStatsIcon from '@mui/icons-material/QueryStats';
 import SportsSoccerIcon from '@mui/icons-material/SportsSoccer';
@@ -9,7 +8,8 @@ import CssBaseline from '@mui/material/CssBaseline';
 import Paper from '@mui/material/Paper';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { useLocation, useNavigate } from '@tanstack/react-router';
-import { ReactNode, useEffect, useState } from 'react';
+import { type ReactNode, useEffect, useState } from 'react';
+import { useSession } from '@/lib/auth-client';
 
 type DefaultLayoutProps = { children: ReactNode };
 
@@ -38,7 +38,7 @@ export const DefaultLayout = ({ children }: DefaultLayoutProps) => {
 
   useEffect(() => {
     setValue(items.findIndex((x) => location.pathname.includes(x.route)));
-  }, [location.pathname, items.length]);
+  }, [location.pathname, items.findIndex]);
 
   return (
     <>

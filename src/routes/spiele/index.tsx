@@ -1,9 +1,9 @@
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { z } from 'zod';
 import { spieleListQueryOptions } from '@/server/functions/spiele';
 import { DefaultLayout } from '@/src/components/DefaultLayout';
 import ListSpiele from '@/src/components/Spiel/ListSpiele';
 import SingleMatch from '@/src/components/Spiel/SingleMatch';
-import { createFileRoute, useNavigate } from '@tanstack/react-router';
-import { z } from 'zod';
 
 const spieleSearchSchema = z.object({
   spielId: z.string().optional(),

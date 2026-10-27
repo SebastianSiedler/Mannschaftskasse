@@ -1,4 +1,3 @@
-import { clearDebtsFn, type StatsListOutput } from '@/server/functions/stats';
 import Button from '@mui/material/Button';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
@@ -6,13 +5,14 @@ import {
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
-  SortingState,
+  type SortingState,
   useReactTable,
 } from '@tanstack/react-table';
 import jsPDF from 'jspdf';
-import autoTable, { ColumnInput } from 'jspdf-autotable';
+import autoTable, { type ColumnInput } from 'jspdf-autotable';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
+import { clearDebtsFn, type StatsListOutput } from '@/server/functions/stats';
 import { fontArial } from './Arial-normal';
 
 type Data = StatsListOutput[number]['saison_stats'][number];
@@ -130,61 +130,59 @@ const StatsTable: React.FC<Props> = ({ data, saisonName }) => {
   };
 
   return (
-    <>
-      <table className="relative w-full border" id={TABLE_NAME}>
-        <thead className="sticky top-0 z-10 w-full bg-slate-300">
-          <tr>
-            <td colSpan={3} className="font-bold">{`Saison: ${saisonName}`}</td>
-            <td>
-              <Button variant="contained" onClick={() => exportPDF()}>
-                Download
-              </Button>
-            </td>
+    <table className="relative w-full border" id={TABLE_NAME}>
+      <thead className="sticky top-0 z-10 w-full bg-slate-300">
+        <tr>
+          <td colSpan={3} className="font-bold">{`Saison: ${saisonName}`}</td>
+          <td>
+            <Button variant="contained" onClick={() => exportPDF()}>
+              Download
+            </Button>
+          </td>
+        </tr>
+        {table.getHeaderGroups().map((headerGroup) => (
+          <tr key={headerGroup.id}>
+            {headerGroup.headers.map((header) => (
+              <th key={header.id} colSpan={header.colSpan}>
+                {header.isPlaceholder ? null : (
+                  <div
+                    {...{
+                      className: header.column.getCanSort()
+                        ? 'cursor-pointer select-none'
+                        : '',
+                      onClick: header.column.getToggleSortingHandler(),
+                    }}
+                  >
+                    {flexRender(
+                      header.column.columnDef.header,
+                      header.getContext(),
+                    )}
+                    {{
+                      asc: ' 🔼',
+                      desc: ' 🔽',
+                    }[header.column.getIsSorted() as string] ?? null}
+                  </div>
+                )}
+              </th>
+            ))}
           </tr>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <tr key={headerGroup.id}>
-              {headerGroup.headers.map((header) => (
-                <th key={header.id} colSpan={header.colSpan}>
-                  {header.isPlaceholder ? null : (
-                    <div
-                      {...{
-                        className: header.column.getCanSort()
-                          ? 'cursor-pointer select-none'
-                          : '',
-                        onClick: header.column.getToggleSortingHandler(),
-                      }}
-                    >
-                      {flexRender(
-                        header.column.columnDef.header,
-                        header.getContext(),
-                      )}
-                      {{
-                        asc: ' 🔼',
-                        desc: ' 🔽',
-                      }[header.column.getIsSorted() as string] ?? null}
-                    </div>
-                  )}
-                </th>
-              ))}
-            </tr>
-          ))}
-        </thead>
-        <tbody>
-          {table.getRowModel().rows.map((row, i) => (
-            <tr
-              key={row.id}
-              className={(i % 2 == 0 ? 'bg-gray-100' : '') + ' min-h-[300px]'}
-            >
-              {row.getVisibleCells().map((cell) => (
-                <td key={cell.id} className="text-center">
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </>
+        ))}
+      </thead>
+      <tbody>
+        {table.getRowModel().rows.map((row, i) => (
+          <tr
+            key={row.id}
+            className={`${i % 2 === 0 ? 'bg-gray-100' : ''} min-h-[300px]`}
+          >
+            {row.getVisibleCells().map((cell) => (
+              <td key={cell.id} className="text-center">
+                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+              </td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
   );
 };
 

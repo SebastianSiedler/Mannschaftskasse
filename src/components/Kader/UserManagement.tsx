@@ -1,10 +1,10 @@
+import Button from '@mui/material/Button';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import toast from 'react-hot-toast';
 import {
   changeUserRoleFn,
   usersListQueryOptions,
 } from '@/server/functions/user';
-import Button from '@mui/material/Button';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import toast from 'react-hot-toast';
 
 const UserManagement: React.FC = () => {
   const allUsersQuery = useQuery(usersListQueryOptions());

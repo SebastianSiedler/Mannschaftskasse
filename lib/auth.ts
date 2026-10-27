@@ -1,13 +1,13 @@
-import { serverEnv } from '@/env/server';
-import { db, sessions, type Role } from '@/lib/db';
-import {
-  DrizzleAdapter,
-  type ExtendedAdapterUser,
-} from '@/lib/db/auth-adapter';
 import { Auth, type AuthConfig } from '@auth/core';
 import Auth0 from '@auth/core/providers/auth0';
 import { getCookie } from '@tanstack/react-start/server';
 import { eq } from 'drizzle-orm';
+import { serverEnv } from '@/env/server';
+import { db, type Role, sessions } from '@/lib/db';
+import {
+  DrizzleAdapter,
+  type ExtendedAdapterUser,
+} from '@/lib/db/auth-adapter';
 
 export interface AppSession {
   user: {
@@ -82,7 +82,7 @@ export async function getServerAuthSession(): Promise<AppSession | null> {
     },
   });
 
-  if (!sessionRecord || !sessionRecord.user) {
+  if (!sessionRecord?.user) {
     return null;
   }
 

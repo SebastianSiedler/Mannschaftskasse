@@ -1,13 +1,13 @@
+import type { bfvSchemas } from 'bfv-api';
+import type { z } from 'zod';
 import { serverEnv } from '@/env/server';
 import { Result } from '@/lib/db';
-import { bfvSchemas } from 'bfv-api';
-import { z } from 'zod';
 
 type BfvMatch = z.infer<typeof bfvSchemas.Match>;
 
 const isHomeTeam = (match: BfvMatch) => {
   const BFV_PERMANENT_TEAM_ID = serverEnv.BFV_PERMANENT_TEAM_ID;
-  return BFV_PERMANENT_TEAM_ID == match.homeTeamPermanentId;
+  return BFV_PERMANENT_TEAM_ID === match.homeTeamPermanentId;
 };
 
 interface ParsedResult {
@@ -36,7 +36,7 @@ export const parse_result = (match: BfvMatch): ParsedResult => {
     .split(' ')[0]
     .split(':')
     .map((x) => {
-      if (isNaN(Number(x))) {
+      if (Number.isNaN(Number(x))) {
         throw 'Invalid score given';
       }
       return Number(x);

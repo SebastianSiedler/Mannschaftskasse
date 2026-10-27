@@ -23,6 +23,14 @@
       "@/server/*": ["server/*"]
     }
   },
-  "include": ["src", "server", "lib", "env", "scripts", "vite.config.ts", "drizzle.config.ts"],
+  "include": [
+    "src",
+    "server",
+    "lib",
+    "env",
+    "scripts",
+    "vite.config.ts",
+    "drizzle.config.ts"
+  ],
   "exclude": ["node_modules"]
 }

@@ -1,5 +1,5 @@
-import { getServerAuthSession, type AppSession } from '@/lib/auth';
 import { createServerFn } from '@tanstack/react-start';
+import { type AppSession, getServerAuthSession } from '@/lib/auth';
 
 export const getSessionFn = createServerFn({ method: 'GET' }).handler(
   async (): Promise<AppSession | null> => {

@@ -14,7 +14,9 @@
       "!!**/public",
       "!!**/src/routeTree.gen.ts",
       "!!**/src/components/Stats/Arial-normal.ts",
-      "!!**/pnpm-lock.yaml"
+      "!!**/pnpm-lock.yaml",
+      "!!**/vercel.json",
+      "!!**/.vercel"
     ]
   },
   "formatter": {

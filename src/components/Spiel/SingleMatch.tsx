@@ -1,5 +1,5 @@
-import AddCircleOutline from '@mui/icons-material/AddCircleOutline';
-import CheckCircleOutline from '@mui/icons-material/CheckCircleOutline';
+import AddCircleOutline from '@mui/icons-material/AddCircleOutlined';
+import CheckCircleOutline from '@mui/icons-material/CheckCircleOutlined';
 import CloseIcon from '@mui/icons-material/Close';
 import HighlightOffOutlined from '@mui/icons-material/HighlightOffOutlined';
 import AppBar from '@mui/material/AppBar';

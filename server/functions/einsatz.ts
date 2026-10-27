@@ -46,6 +46,9 @@ export const getEinsatzDetailFn = createServerFn({ method: 'GET' })
         eq(spielereinsaetze.spielId, input.spielId),
         eq(spielereinsaetze.spielerId, input.spielerId),
       ),
+      with: {
+        spieler: true,
+      },
     });
 
     if (!einsatz) {

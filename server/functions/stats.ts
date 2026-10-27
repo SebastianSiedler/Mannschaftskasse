@@ -1,6 +1,6 @@
 import { queryOptions } from '@tanstack/react-query';
 import { createServerFn } from '@tanstack/react-start';
-import { desc, eq } from 'drizzle-orm';
+import { and, desc, eq, inArray } from 'drizzle-orm';
 import { z } from 'zod';
 import { requireAdmin, requireAuth } from '@/lib/auth';
 import { db, saisons, spielereinsaetze } from '@/lib/db';
@@ -81,16 +81,25 @@ export const clearDebtsFn = createServerFn({ method: 'POST' })
   .validator(
     z.object({
       spielerId: z.string(),
+      spielIds: z.string().array().optional(),
     }),
   )
   .handler(async ({ data: input }) => {
     await requireAdmin();
+    const whereCondition =
+      input.spielIds && input.spielIds.length > 0
+        ? and(
+            eq(spielereinsaetze.spielerId, input.spielerId),
+            inArray(spielereinsaetze.spielId, input.spielIds),
+          )
+        : eq(spielereinsaetze.spielerId, input.spielerId);
+
     await db
       .update(spielereinsaetze)
       .set({
         bezahlt: true,
       })
-      .where(eq(spielereinsaetze.spielerId, input.spielerId));
+      .where(whereCondition);
   });
 
 export type StatsListOutput = Awaited<ReturnType<typeof listStatsFn>>;

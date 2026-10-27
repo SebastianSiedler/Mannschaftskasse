@@ -51,7 +51,7 @@ interface SettleModalState {
   playerId: string;
   name: string;
   schulden: number;
-  unpaidGames: Array<{ opponent: string }>;
+  unpaidGames: Array<{ spielId: string; opponent: string }>;
 }
 
 const formatSaisonName = (raw: string) => {
@@ -67,7 +67,8 @@ const StatsTable: React.FC<Props> = ({ data, saisonName }) => {
     useState<SettleModalState | null>(null);
 
   const schuldenBegleichen = useMutation({
-    mutationFn: (input: { spielerId: string }) => clearDebtsFn({ data: input }),
+    mutationFn: (input: { spielerId: string; spielIds?: string[] }) =>
+      clearDebtsFn({ data: input }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['stats', 'list'] });
       toast.success('Schulden beglichen');
@@ -164,6 +165,7 @@ const StatsTable: React.FC<Props> = ({ data, saisonName }) => {
                     unpaidGames: spielereinsaetze
                       .filter((x) => !x.bezahlt)
                       .map((x) => ({
+                        spielId: x.spielId,
                         opponent: x.Spiel.opponent.name,
                       })),
                   });
@@ -485,6 +487,9 @@ const StatsTable: React.FC<Props> = ({ data, saisonName }) => {
               if (selectedPlayerForSettle) {
                 schuldenBegleichen.mutate({
                   spielerId: selectedPlayerForSettle.playerId,
+                  spielIds: selectedPlayerForSettle.unpaidGames.map(
+                    (g) => g.spielId,
+                  ),
                 });
               }
             }}

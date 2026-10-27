@@ -1,52 +1,58 @@
-import { z } from 'zod';
-import { Spieler } from '@prisma/client';
+import { spieler, spielereinsaetze, type Spieler } from '@/lib/db';
 import { adminProcedure, authProcedure, t } from '@/server/trpc';
 import { updateEinsatzSchema } from '@/src/components/Spiel/EditEinsatz';
+import { TRPCError } from '@trpc/server';
+import { and, asc, eq } from 'drizzle-orm';
+import { z } from 'zod';
 
 export const einsatzRouter = t.router({
   list: authProcedure
     .input(z.object({ spielId: z.string() }))
     .query(async ({ ctx, input }) => {
-      return await ctx.prisma.spielereinsatz.findMany({
-        where: {
-          spielId: input.spielId,
-        },
-        include: {
+      return await ctx.db.query.spielereinsaetze.findMany({
+        where: eq(spielereinsaetze.spielId, input.spielId),
+        with: {
           spieler: true,
         },
-        orderBy: {
-          bezahlt: 'asc',
-        },
+        orderBy: [asc(spielereinsaetze.bezahlt)],
       });
     }),
 
   detail: authProcedure
     .input(z.object({ spielId: z.string(), spielerId: z.string() }))
     .query(async ({ ctx, input }) => {
-      const einsatz = await ctx.prisma.spielereinsatz.findUniqueOrThrow({
-        where: {
-          spielerId_spielId: {
-            spielId: input.spielId,
-            spielerId: input.spielerId,
-          },
-        },
+      const einsatz = await ctx.db.query.spielereinsaetze.findFirst({
+        where: and(
+          eq(spielereinsaetze.spielId, input.spielId),
+          eq(spielereinsaetze.spielerId, input.spielerId),
+        ),
       });
+
+      if (!einsatz) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Spielereinsatz nicht gefunden',
+        });
+      }
+
       return einsatz;
     }),
 
   listAvailablePlayers: authProcedure
     .input(z.object({ spielId: z.string() }))
     .query(async ({ ctx, input }) => {
-      return await ctx.prisma.spieler.findMany({
-        where: {
+      const activePlayers = await ctx.db.query.spieler.findMany({
+        where: eq(spieler.active, true),
+        with: {
           spielereinsaetze: {
-            none: {
-              spielId: input.spielId,
-            },
+            where: eq(spielereinsaetze.spielId, input.spielId),
           },
-          active: true,
         },
       });
+
+      return activePlayers
+        .filter((p) => p.spielereinsaetze.length === 0)
+        .map(({ id, names, active }) => ({ id, names, active }));
     }),
 
   addByPlayerList: adminProcedure
@@ -60,14 +66,14 @@ export const einsatzRouter = t.router({
       const unknown_players: string[] = [];
       const played_players: Spieler[] = [];
 
-      const all_players = await ctx.prisma.spieler.findMany();
+      const all_players = await ctx.db.query.spieler.findMany();
 
       input.names.forEach((name) => {
         const player = all_players.find((player) =>
           player.names.includes(name),
         );
 
-        if (!!player) {
+        if (player) {
           played_players.push(player);
           return;
         }
@@ -75,27 +81,23 @@ export const einsatzRouter = t.router({
         unknown_players.push(name);
       });
 
-      await ctx.prisma.$transaction(
-        played_players.map((player) => {
-          return ctx.prisma.spielereinsatz.upsert({
-            where: {
-              spielerId_spielId: {
-                spielId: input.spielId,
-                spielerId: player.id,
-              },
-            },
-            create: {
+      if (played_players.length > 0) {
+        await ctx.db
+          .insert(spielereinsaetze)
+          .values(
+            played_players.map((player) => ({
               tore: 0,
               bezahlt: false,
               gelbeKarte: 0,
               roteKarte: 0,
               spielId: input.spielId,
               spielerId: player.id,
-            },
-            update: {},
+            })),
+          )
+          .onConflictDoNothing({
+            target: [spielereinsaetze.spielerId, spielereinsaetze.spielId],
           });
-        }),
-      );
+      }
 
       return {
         unknown_players,
@@ -114,24 +116,28 @@ export const einsatzRouter = t.router({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      return await ctx.prisma.spielereinsatz.create({
-        data: input,
-      });
+      const [created] = await ctx.db
+        .insert(spielereinsaetze)
+        .values(input)
+        .returning();
+      return created;
     }),
 
   update: adminProcedure
     .input(updateEinsatzSchema)
     .mutation(async ({ ctx, input }) => {
-      const { spielId, spielerId } = input;
-      return await ctx.prisma.spielereinsatz.update({
-        where: {
-          spielerId_spielId: {
-            spielId,
-            spielerId,
-          },
-        },
-        data: input,
-      });
+      const { spielId, spielerId, ...rest } = input;
+      const [updated] = await ctx.db
+        .update(spielereinsaetze)
+        .set(rest)
+        .where(
+          and(
+            eq(spielereinsaetze.spielId, spielId),
+            eq(spielereinsaetze.spielerId, spielerId),
+          ),
+        )
+        .returning();
+      return updated;
     }),
 
   remove: adminProcedure
@@ -142,13 +148,15 @@ export const einsatzRouter = t.router({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      return await ctx.prisma.spielereinsatz.delete({
-        where: {
-          spielerId_spielId: {
-            spielId: input.spielId,
-            spielerId: input.spielerId,
-          },
-        },
-      });
+      const [deleted] = await ctx.db
+        .delete(spielereinsaetze)
+        .where(
+          and(
+            eq(spielereinsaetze.spielId, input.spielId),
+            eq(spielereinsaetze.spielerId, input.spielerId),
+          ),
+        )
+        .returning();
+      return deleted;
     }),
 });

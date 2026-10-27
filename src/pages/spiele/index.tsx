@@ -2,7 +2,6 @@ import { ssg } from '@/server/ssg';
 import { DefaultLayout } from '@/src/components/DefaultLayout';
 import ListSpiele from '@/src/components/Spiel/ListSpiele';
 import SingleMatch from '@/src/components/Spiel/SingleMatch';
-import { GetStaticPropsContext } from 'next';
 import { useRouter } from 'next/router';
 import type { SSGLayout } from '@/lib/types';
 
@@ -33,7 +32,7 @@ SpieleHome.getLayout = (page) => {
 
 export default SpieleHome;
 
-export const getStaticProps = async (context: GetStaticPropsContext) => {
+export const getStaticProps = async () => {
   await ssg.spiel.list.fetch();
 
   return {

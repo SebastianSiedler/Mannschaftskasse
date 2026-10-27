@@ -1,39 +1,38 @@
 import { trpc } from '@/lib/trpc';
 import type { NextPageWithAuthAndLayout } from '@/lib/types';
-import { useSession } from 'next-auth/react';
-import Image from 'next/legacy/image';
-import { signOut } from 'next-auth/react';
-import toast from 'react-hot-toast';
+import { signOut, useSession } from 'next-auth/react';
+import Image from 'next/image';
 
 const Home: NextPageWithAuthAndLayout = () => {
   const { data: session } = useSession();
 
   const userQuery = trpc.user.profile.useQuery(
-    { id: session?.user.id! },
+    { id: session?.user.id ?? '' },
     {
-      onError: (err) => {
-        toast.error(err.message);
-      },
+      enabled: !!session?.user.id,
     },
   );
 
   return (
     <>
       <div>
-        {userQuery.status !== 'loading' && (
+        {!userQuery.isLoading && (
           <div>
             <div className="flex justify-between">
               <div>
                 <div>{userQuery.data?.name}</div>
               </div>
 
-              <div className="relative w-20 aspect-square">
-                <Image
-                  src={userQuery.data?.image!}
-                  layout="fill"
-                  className="rounded-full"
-                ></Image>
-              </div>
+              {userQuery.data?.image && (
+                <div className="relative w-20 aspect-square">
+                  <Image
+                    src={userQuery.data.image}
+                    alt={userQuery.data.name ?? 'Profile'}
+                    fill
+                    className="rounded-full object-cover"
+                  />
+                </div>
+              )}
             </div>
           </div>
         )}

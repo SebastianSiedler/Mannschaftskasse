@@ -1,26 +1,26 @@
 // MUI
+import AddCircleOutline from '@mui/icons-material/AddCircleOutline';
+import CheckCircleOutline from '@mui/icons-material/CheckCircleOutline';
+import CloseIcon from '@mui/icons-material/Close';
+import HighlightOffOutlined from '@mui/icons-material/HighlightOffOutlined';
+import AppBar from '@mui/material/AppBar';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
+import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
-import ListItemText from '@mui/material/ListItemText';
-import AddCircleOutline from '@mui/icons-material/AddCircleOutline';
-import HighlightOffOutlined from '@mui/icons-material/HighlightOffOutlined';
-import CheckCircleOutline from '@mui/icons-material/CheckCircleOutline';
 import ListItemIcon from '@mui/material/ListItemIcon';
-import IconButton from '@mui/material/IconButton';
-import CloseIcon from '@mui/icons-material/Close';
-import AppBar from '@mui/material/AppBar';
-import Typography from '@mui/material/Typography';
+import ListItemText from '@mui/material/ListItemText';
 import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
 
-import EditEinsatz from './EditEinsatz';
-import Link from 'next/link';
-import toast from 'react-hot-toast';
 import { trpc } from '@/lib/trpc';
-
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
+import toast from 'react-hot-toast';
+import EditEinsatz from './EditEinsatz';
+
 interface Props {
   spielId: string;
   open: boolean;
@@ -32,30 +32,9 @@ const SingleMatch: React.FC<Props> = (props) => {
 
   const router = useRouter();
 
-  const matchQuery = trpc.spiel.detail.useQuery(
-    { spielId },
-    {
-      onError: (err) => {
-        toast.error(err.message);
-      },
-    },
-  );
-  const spielerQuery = trpc.einsatz.list.useQuery(
-    { spielId },
-    {
-      onError: (err) => {
-        toast.error(err.message);
-      },
-    },
-  );
-  const availQuery = trpc.einsatz.listAvailablePlayers.useQuery(
-    { spielId },
-    {
-      onError: (err) => {
-        toast.error(err.message);
-      },
-    },
-  );
+  const matchQuery = trpc.spiel.detail.useQuery({ spielId });
+  const spielerQuery = trpc.einsatz.list.useQuery({ spielId });
+  const availQuery = trpc.einsatz.listAvailablePlayers.useQuery({ spielId });
 
   const addPlayerMutation = trpc.einsatz.add.useMutation({
     onSuccess: () => {
@@ -73,7 +52,6 @@ const SingleMatch: React.FC<Props> = (props) => {
       toast.error(err.message);
     },
     onSuccess: (data) => {
-      console.log(data.unknown_players);
       if (data.unknown_players.length > 0) {
         toast.error(`${data.unknown_players.join(', ')} nicht gefunden`);
       }
@@ -109,8 +87,8 @@ const SingleMatch: React.FC<Props> = (props) => {
             spielerQuery.data?.length ?? 0
           }`}</div>
           <List>
-            {spielerQuery.status === 'loading' && <div>Loading...</div>}
-            {spielerQuery.status === 'success' &&
+            {spielerQuery.isLoading && <div>Loading...</div>}
+            {spielerQuery.isSuccess &&
               spielerQuery.data?.map((item, i) => (
                 <Link
                   href={`/spiele/?spielId=${spielId}&spielerId=${item.spielerId}`}
@@ -138,8 +116,8 @@ const SingleMatch: React.FC<Props> = (props) => {
 
           <div className="font-semibold">Verfügbare Spieler:</div>
           <List>
-            {availQuery.status === 'loading' && <div>Loading...</div>}
-            {availQuery.status === 'success' &&
+            {availQuery.isLoading && <div>Loading...</div>}
+            {availQuery.isSuccess &&
               availQuery.data?.map((item, i) => (
                 <ListItemButton
                   key={i}

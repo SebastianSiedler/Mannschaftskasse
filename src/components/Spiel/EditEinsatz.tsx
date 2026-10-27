@@ -1,16 +1,16 @@
 import { trpc } from '@/lib/trpc';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import DialogActions from '@mui/material/DialogActions';
-import { useEffect } from 'react';
-import IconButton from '@mui/material/IconButton';
+import { useTRPCForm } from '@/lib/trpc-forms';
 import DeleteIcon from '@mui/icons-material/Delete';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import IconButton from '@mui/material/IconButton';
+import TextField from '@mui/material/TextField';
+import { useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { z } from 'zod';
-import { useTRPCForm } from '@/lib/trpc-forms';
-import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
 
 export const updateEinsatzSchema = z.object({
   spielId: z.string(),
@@ -31,14 +31,7 @@ interface Props {
 const EditEinsatz: React.FC<Props> = (props) => {
   const { handleClose, open, spielId, spielerId } = props;
 
-  const einsatzQuery = trpc.einsatz.detail.useQuery(
-    { spielId, spielerId },
-    {
-      onError: (err) => {
-        toast.error(err.message);
-      },
-    },
-  );
+  const einsatzQuery = trpc.einsatz.detail.useQuery({ spielId, spielerId });
 
   const {
     register,
@@ -52,8 +45,7 @@ const EditEinsatz: React.FC<Props> = (props) => {
         handleClose();
         toast.success('Erfolgreich gespeichert');
       },
-      onError: (err, b) => {
-        console.log(b);
+      onError: (err) => {
         toast.error(err.message);
       },
     },
@@ -76,7 +68,7 @@ const EditEinsatz: React.FC<Props> = (props) => {
     einsatzQuery.refetch();
   }, []);
 
-  if (einsatzQuery.status !== 'success') return <div>Loading...</div>;
+  if (!einsatzQuery.isSuccess) return <div>Loading...</div>;
 
   return (
     <div>

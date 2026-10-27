@@ -1,9 +1,12 @@
 import { serverEnv } from '@/env/server';
-import { z } from 'zod';
-import isEqual from 'lodash.isequal';
-import { updateMatches } from './utils/updateMatches';
+import { saisons, spiele } from '@/lib/db';
 import { t } from '@/server/trpc';
 import { bfvApi } from 'bfv-api';
+import { asc, eq } from 'drizzle-orm';
+import isEqual from 'lodash.isequal';
+import { z } from 'zod';
+import { updateMatches } from './utils/updateMatches';
+
 export const spielRouter = t.router({
   /**
    * Update matches in local DB
@@ -17,10 +20,8 @@ export const spielRouter = t.router({
       }),
     )
     .query(async ({ ctx, input }) => {
-      const saison = await ctx.prisma.saison.findFirst({
-        where: {
-          latest: true,
-        },
+      const saison = await ctx.db.query.saisons.findFirst({
+        where: eq(saisons.latest, true),
       });
 
       /* Passiert nur, wenn noch nie ein BFV request gemacht wurde */
@@ -49,19 +50,22 @@ export const spielRouter = t.router({
     }),
 
   list: t.procedure.query(async ({ ctx }) => {
-    const matches = await ctx.prisma.spiel.findMany({
-      where: {
-        saison: {
-          latest: true,
-        },
-      },
-      include: {
+    const latestSaison = await ctx.db.query.saisons.findFirst({
+      where: eq(saisons.latest, true),
+      columns: { id: true },
+    });
+
+    if (!latestSaison) {
+      return [];
+    }
+
+    const matches = await ctx.db.query.spiele.findMany({
+      where: eq(spiele.saisonId, latestSaison.id),
+      with: {
         opponent: true,
         Saison: true,
       },
-      orderBy: {
-        kickoffDate: 'asc',
-      },
+      orderBy: [asc(spiele.kickoffDate)],
     });
 
     return matches;
@@ -70,15 +74,13 @@ export const spielRouter = t.router({
   detail: t.procedure
     .input(z.object({ spielId: z.string() }))
     .query(async ({ ctx, input }) => {
-      const spiel = await ctx.prisma.spiel.findUnique({
-        where: {
-          id: input.spielId,
-        },
-        include: {
+      const spiel = await ctx.db.query.spiele.findFirst({
+        where: eq(spiele.id, input.spielId),
+        with: {
           opponent: true,
         },
       });
 
-      return spiel;
+      return spiel ?? null;
     }),
 });

@@ -1,11 +1,10 @@
-import { useRouter } from 'next/router';
+import type { Result, Spiel } from '@/lib/db';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 
 export const getClubLogoAPI = (ClubId: string) => {
   return `https://widget-prod.bfv.de/export.media?action=getLogo&format=0&id=${ClubId}`;
 };
-
-import { Result, Spiel } from '@prisma/client';
 
 interface NewProps {
   spielId: string;
@@ -44,6 +43,7 @@ const NewMatchListItem: React.FC<NewProps> = (props) => {
         <div className="">
           <img
             src={getClubLogoAPI(clubId)}
+            alt={teamName}
             className="object-contain aspect-square h-10 bg-white rounded-lg"
           />
         </div>
@@ -61,7 +61,7 @@ const NewMatchListItem: React.FC<NewProps> = (props) => {
           </div>
         </div>
         <div>
-          <div className="font-semibold	flex justify-end">{result}</div>
+          <div className="font-semibold flex justify-end">{result}</div>
 
           <div className="flex gap-2">
             {currentGame && (

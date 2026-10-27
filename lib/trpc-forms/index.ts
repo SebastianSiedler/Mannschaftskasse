@@ -1,59 +1,59 @@
-import { TRPCClientErrorLike } from '@trpc/client';
-import type {
-  DecorateProcedure,
-  UseTRPCMutationOptions,
-} from '@trpc/react-query/shared';
-import type {
-  AnyMutationProcedure,
-  inferProcedureInput,
-  inferProcedureOutput,
-} from '@trpc/server';
+import { type FieldValues, type UseFormProps } from 'react-hook-form';
 import { z } from 'zod';
 import { useZodForm } from './utils/use-zod-form';
-import { type UseFormProps } from 'react-hook-form';
 
-type OmitNullish<TType> = Omit<TType, 'undefined' | 'null'>;
+interface MutationHookOptions<
+  TInput,
+  TError = { message: string },
+  TOutput = unknown,
+> {
+  onSuccess?: (data: TOutput, variables: TInput, context: unknown) => unknown;
+  onError?: (error: TError, variables: TInput, context: unknown) => unknown;
+}
+
+interface TRPCMutationLike<
+  TInput,
+  TError = { message: string },
+  TOutput = unknown,
+> {
+  useMutation: (opts?: MutationHookOptions<TInput, TError, TOutput>) => {
+    mutate: (variables: TInput) => void;
+  };
+}
 
 type UseTRPCFormProps<
-  TProcedure extends AnyMutationProcedure,
-  TInput = inferProcedureInput<TProcedure>,
+  TSchema extends z.ZodType<any, any, any>,
+  TInput extends FieldValues = z.input<TSchema>,
 > = {
-  mutation: DecorateProcedure<TProcedure, any, ''>;
-  validator: z.ZodType<TInput>;
-  mutationOptions?: UseTRPCMutationOptions<
-    TInput,
-    TRPCClientErrorLike<TProcedure>,
-    inferProcedureOutput<TProcedure>
-  >;
-  formOptions?: UseFormProps<OmitNullish<TInput>>;
+  mutation: TRPCMutationLike<TInput, any, any>;
+  validator: TSchema;
+  mutationOptions?: MutationHookOptions<TInput, any, any>;
+  formOptions?: UseFormProps<TInput>;
 };
 
-export const useTRPCForm = <TProcedure extends AnyMutationProcedure>({
+export const useTRPCForm = <
+  TSchema extends z.ZodType<any, any, any>,
+  TInput extends FieldValues = z.input<TSchema>,
+>({
   mutation,
   validator,
   mutationOptions,
   formOptions,
-}: UseTRPCFormProps<TProcedure>) => {
+}: UseTRPCFormProps<TSchema, TInput>) => {
   const form = useZodForm({
     validator,
     ...formOptions,
-
-    /* irgendwie sind diese server errors noch nicht richtig getyped in react-hook-form. */
-    // errors: undefined,
   });
 
   const actions = mutation.useMutation({
     ...mutationOptions,
     onError: (error, variables, context) => {
-      console.error('onError', error.message);
-      console.log('errors#1', form.formState.errors);
+      console.error('onError', error?.message);
       mutationOptions?.onError?.(error, variables, context);
     },
   });
 
-  const handleSubmit = form.handleSubmit((data) => {
-    console.log('SUBMIT');
-    console.log(data);
+  const handleSubmit = form.handleSubmit(() => {
     actions.mutate(form.getValues());
   });
 

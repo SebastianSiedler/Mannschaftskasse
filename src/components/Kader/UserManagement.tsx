@@ -1,15 +1,10 @@
-import Button from '@mui/material/Button';
-import Image from 'next/legacy/image';
-import toast from 'react-hot-toast';
-import { useSession } from 'next-auth/react';
 import { trpc } from '@/lib/trpc';
+import Button from '@mui/material/Button';
+import Image from 'next/image';
+import toast from 'react-hot-toast';
 
 const UserManagement: React.FC = () => {
-  const allUsersQuery = trpc.user.list.useQuery(undefined, {
-    onError: (err) => {
-      toast.error(err.message);
-    },
-  });
+  const allUsersQuery = trpc.user.list.useQuery();
 
   const changeUserPermission = trpc.user.changeRole.useMutation({
     onSuccess: () => {
@@ -23,7 +18,7 @@ const UserManagement: React.FC = () => {
 
   return (
     <div>
-      {allUsersQuery.status === 'loading' && <div>Loading...</div>}
+      {allUsersQuery.isLoading && <div>Loading...</div>}
 
       {allUsersQuery.data?.map((item) => (
         <div key={item.id}>
@@ -33,9 +28,9 @@ const UserManagement: React.FC = () => {
               {item.image ? (
                 <Image
                   src={item.image}
-                  layout="fill" // required
-                  objectFit="cover" // change to suit your needs
-                  className="rounded-full"
+                  alt={item.name ?? 'User'}
+                  fill
+                  className="rounded-full object-cover"
                 />
               ) : (
                 <div className="w-full h-full bg-gray-200"></div>

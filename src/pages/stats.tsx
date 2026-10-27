@@ -2,14 +2,11 @@ import { trpc } from '@/lib/trpc';
 import type { NextPageWithAuthAndLayout } from '@/lib/types';
 import { DefaultLayout } from '@/src/components/DefaultLayout';
 import Button from '@mui/material/Button';
-import toast from 'react-hot-toast';
+import { signOut } from 'next-auth/react';
+import StatsTable from '../components/Stats/Table';
 
 const StatsHome: NextPageWithAuthAndLayout = () => {
-  const statsQuery = trpc.stats.list.useQuery(undefined, {
-    onError: (err) => {
-      toast.error(err.message);
-    },
-  });
+  const statsQuery = trpc.stats.list.useQuery();
 
   return (
     <>
@@ -35,9 +32,6 @@ StatsHome.getLayout = (page: React.ReactElement) => {
 };
 
 export default StatsHome;
-
-import { signOut } from 'next-auth/react';
-import StatsTable from '../components/Stats/Table';
 
 const SignOut: React.FC = () => {
   return (

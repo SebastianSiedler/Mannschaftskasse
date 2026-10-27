@@ -1,9 +1,9 @@
-import { envsafe, invalidEnvError, makeValidator, str, url } from 'envsafe';
+import { envsafe, invalidEnvError, makeValidator, str } from 'envsafe';
 import { browserEnv } from './browser';
 
-if (process.browser) {
+if (typeof window !== 'undefined') {
   throw new Error(
-    'This should only be included on the client (but the env vars wont be exposed)',
+    'This should only be included on the server (the env vars wont be exposed to the client)',
   );
 }
 
@@ -17,7 +17,20 @@ const googleParser = makeValidator<string>((input) => {
 export const serverEnv = {
   ...browserEnv,
   ...envsafe({
-    DATABASE_URL: str(),
+    TURSO_DATABASE_URL: str({
+      input:
+        process.env.TURSO_DATABASE_URL ||
+        (process.env.DATABASE_URL?.startsWith('libsql:') ||
+        process.env.DATABASE_URL?.startsWith('file:') ||
+        process.env.DATABASE_URL?.startsWith('https:')
+          ? process.env.DATABASE_URL
+          : undefined),
+      devDefault: 'file:local.db',
+    }),
+    TURSO_AUTH_TOKEN: str({
+      allowEmpty: true,
+      default: '',
+    }),
     NEXTAUTH_SECRET: str({
       devDefault: 'xxx',
     }),

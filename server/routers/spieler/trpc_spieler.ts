@@ -1,10 +1,12 @@
-import { z } from 'zod';
-import { TRPCError } from '@trpc/server';
+import { spieler } from '@/lib/db';
 import { adminProcedure, t } from '@/server/trpc';
+import { TRPCError } from '@trpc/server';
+import { ne } from 'drizzle-orm';
+import { z } from 'zod';
 
 export const spielerRouter = t.router({
   list: adminProcedure.query(async ({ ctx }) => {
-    return await ctx.prisma.spieler.findMany();
+    return await ctx.db.query.spieler.findMany();
   }),
 
   upsert: adminProcedure
@@ -16,22 +18,21 @@ export const spielerRouter = t.router({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      /* Input array contais dublicates */
+      /* Input array contains duplicates */
       if (input.names.length !== new Set(input.names).size) {
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'Namen enthalten Dublikate!',
         });
       }
-      const spieler = await ctx.prisma.spieler.findMany({
-        where: {
-          id: {
-            not: input.spielerId,
-          },
-        },
-        select: { names: true },
+
+      const isExistingId = !!input.spielerId && input.spielerId !== '-1';
+
+      const existingPlayers = await ctx.db.query.spieler.findMany({
+        where: isExistingId ? ne(spieler.id, input.spielerId!) : undefined,
+        columns: { names: true },
       });
-      const flat_spieler = spieler.map((s) => s.names).flat();
+      const flat_spieler = existingPlayers.map((s) => s.names).flat();
 
       for (const name of input.names) {
         if (flat_spieler.includes(name)) {
@@ -42,18 +43,34 @@ export const spielerRouter = t.router({
         }
       }
 
-      return await ctx.prisma.spieler.upsert({
-        where: {
-          id: input.spielerId,
-        },
-        create: {
+      if (isExistingId) {
+        const [updated] = await ctx.db
+          .insert(spieler)
+          .values({
+            id: input.spielerId!,
+            active: input.active,
+            names: input.names,
+          })
+          .onConflictDoUpdate({
+            target: spieler.id,
+            set: {
+              active: input.active,
+              names: input.names,
+            },
+          })
+          .returning();
+
+        return updated;
+      }
+
+      const [created] = await ctx.db
+        .insert(spieler)
+        .values({
           active: input.active,
           names: input.names,
-        },
-        update: {
-          active: input.active,
-          names: input.names,
-        },
-      });
+        })
+        .returning();
+
+      return created;
     }),
 });

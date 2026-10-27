@@ -6,8 +6,8 @@ import type {
 import { getServerSession } from 'next-auth/next';
 import { getProviders, signIn } from 'next-auth/react';
 import Head from 'next/head';
+import Image from 'next/image';
 import Div100vh from 'react-div-100vh';
-import Image from 'next/legacy/image';
 import GoogleIcon from '../../public/providerIcons/Google.svg';
 
 const SignIn = ({
@@ -29,7 +29,7 @@ const SignIn = ({
                   className="flex gap-2 p-3 outline rounded-xl"
                   onClick={() => signIn(provider.id)}
                 >
-                  <Image src={GoogleIcon}></Image>
+                  <Image src={GoogleIcon} alt={provider.name} />
                   <span>Sign in with {provider.name}</span>
                 </button>
               </div>

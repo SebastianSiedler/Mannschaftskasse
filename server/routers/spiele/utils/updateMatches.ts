@@ -1,10 +1,9 @@
-import { TRPCError } from '@trpc/server';
 import { serverEnv } from '@/env/server';
-import { prisma } from '@/lib/prisma';
+import { db, saisons, spiele, teams, type Spiel } from '@/lib/db';
+import { TRPCError } from '@trpc/server';
+import { bfvApi, type Schemas } from 'bfv-api';
+import { eq } from 'drizzle-orm';
 import { getOpponentTeam, getParsedDate, parse_result } from '.';
-import { Prisma, Spiel } from '@prisma/client';
-import { bfvApi } from 'bfv-api';
-import type { Schemas } from 'bfv-api';
 
 type BfvMatch = Schemas['Match'];
 
@@ -15,26 +14,27 @@ export const updateMatches = async () => {
     params: { teamPermanentId: BFV_PERMANENT_TEAM_ID },
   });
 
-  let saison = await prisma.saison.findUnique({
-    where: {
-      bfvCompoundID: data.team.compoundId,
-    },
+  let saison = await db.query.saisons.findFirst({
+    where: eq(saisons.bfvCompoundID, data.team.compoundId),
   });
 
   if (!saison) {
-    await prisma.saison.updateMany({
-      where: { latest: true },
-      data: { latest: false },
-    });
+    await db
+      .update(saisons)
+      .set({ latest: false })
+      .where(eq(saisons.latest, true));
 
-    saison = await prisma.saison.create({
-      data: {
+    const [createdSaison] = await db
+      .insert(saisons)
+      .values({
         name: data.team.seasonId,
         bfvCompoundID: data.team.compoundId,
         latest: true,
-        bfvData: data as unknown as Prisma.JsonObject,
-      },
-    });
+        bfvData: data,
+      })
+      .returning();
+
+    saison = createdSaison;
   }
 
   const matches = await Promise.all(
@@ -55,15 +55,14 @@ export const updateMatches = async () => {
     });
   }
 
-  const updated_saison = await prisma.saison.update({
-    where: {
-      id: saison.id,
-    },
-    data: {
+  const [updated_saison] = await db
+    .update(saisons)
+    .set({
       currentSpielId: currentMatch.id,
-      bfvData: data as unknown as Prisma.JsonObject,
-    },
-  });
+      bfvData: data,
+    })
+    .where(eq(saisons.id, saison.id))
+    .returning();
 
   return updated_saison;
 };
@@ -88,54 +87,53 @@ const upsertMatch = async (opts: UpsertMatchopts) => {
 
   if (opponent_team === null) return;
 
-  const match = await prisma.spiel.findUnique({
-    where: {
-      bfvMatchId: bfvMatch.matchId,
-    },
+  const match = await db.query.spiele.findFirst({
+    where: eq(spiele.bfvMatchId, bfvMatch.matchId),
   });
 
   /* Create new Game in DB */
-  if (match === null) {
-    const opponent = await prisma.team.upsert({
-      where: {
-        bfvTeamPermanentId: opponent_team.teamPermanentId,
-      },
-      update: {
+  if (!match) {
+    const [opponent] = await db
+      .insert(teams)
+      .values({
         bfvTeamPermanentId: opponent_team.teamPermanentId,
         bfvClubId: opponent_team.clubId,
         name: opponent_team.teamName,
-      },
-      create: {
-        bfvTeamPermanentId: opponent_team.teamPermanentId,
-        bfvClubId: opponent_team.clubId,
-        name: opponent_team.teamName,
-      },
-    });
+      })
+      .onConflictDoUpdate({
+        target: teams.bfvTeamPermanentId,
+        set: {
+          bfvClubId: opponent_team.clubId,
+          name: opponent_team.teamName,
+        },
+      })
+      .returning();
 
-    return await prisma.spiel.create({
-      data: {
+    const [created] = await db
+      .insert(spiele)
+      .values({
         saisonId: saisonId,
         bfvMatchId: bfvMatch.matchId,
-
         kickoffDate: getParsedDate(bfvMatch.kickoffDate, bfvMatch.kickoffTime),
-
         result: parsed_result.result,
         resultType: parsed_result.type,
-
         opponentTeamId: opponent.id,
-      },
-    });
+      })
+      .returning();
+
+    return created;
   }
 
   /* Update existing Game */
-  return await prisma.spiel.update({
-    where: {
-      id: match.id,
-    },
-    data: {
+  const [updated] = await db
+    .update(spiele)
+    .set({
       kickoffDate: getParsedDate(bfvMatch.kickoffDate, bfvMatch.kickoffTime),
       result: parsed_result.result,
       resultType: parsed_result.type,
-    },
-  });
+    })
+    .where(eq(spiele.id, match.id))
+    .returning();
+
+  return updated;
 };

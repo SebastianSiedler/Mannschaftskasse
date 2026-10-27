@@ -1,4 +1,4 @@
-import { NextPageWithAuthAndLayout, SSGLayout } from '@/lib/types';
+import { NextPageWithAuthAndLayout } from '@/lib/types';
 import { DefaultLayout } from '@/src/components/DefaultLayout';
 import SingleMatch from '@/src/components/Spiel/SingleMatch';
 import { useRouter } from 'next/router';

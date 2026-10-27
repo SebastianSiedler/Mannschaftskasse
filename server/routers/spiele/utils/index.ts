@@ -1,7 +1,7 @@
 import { serverEnv } from '@/env/server';
+import { Result } from '@/lib/db';
 import { bfvSchemas } from 'bfv-api';
 import { z } from 'zod';
-import { Result } from '@prisma/client';
 
 type BfvMatch = z.infer<typeof bfvSchemas.Match>;
 

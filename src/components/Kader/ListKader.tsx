@@ -1,19 +1,14 @@
-import { Spieler } from '@prisma/client';
-import { useState } from 'react';
+import type { Spieler } from '@/lib/db';
 import { trpc } from '@/lib/trpc';
+import AddIcon from '@mui/icons-material/Add';
+import Fab from '@mui/material/Fab';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
-import Fab from '@mui/material/Fab';
-import AddIcon from '@mui/icons-material/Add';
+import { useState } from 'react';
 import EditPlayer from './EditPlayer';
-import toast from 'react-hot-toast';
 
 const ListKader: React.FC = () => {
-  const kaderQuery = trpc.spieler.list.useQuery(undefined, {
-    onError: (err) => {
-      toast.error(err.message);
-    },
-  });
+  const kaderQuery = trpc.spieler.list.useQuery();
 
   const [open, setOpen] = useState(false);
 
@@ -26,7 +21,7 @@ const ListKader: React.FC = () => {
     setOpen(true);
   };
 
-  const emptyPlayer = {
+  const emptyPlayer: Spieler = {
     id: '-1',
     names: [],
     active: true,
@@ -36,7 +31,7 @@ const ListKader: React.FC = () => {
 
   return (
     <>
-      {kaderQuery.status === 'loading' && <div>Loading ...</div>}
+      {kaderQuery.isLoading && <div>Loading ...</div>}
       <List>
         {kaderQuery.data?.map((item, i) => (
           <ListItemButton

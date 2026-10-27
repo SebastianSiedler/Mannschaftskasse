@@ -17,9 +17,18 @@ Der erste Admin muss manuell über die Datenbank (DB) gesetzt werden. Anschließ
 
 ## Stack 🚀
 
-- 🧙‍♂️ E2E typesafety with [tRPC](https://trpc.io "tRPC")
+- 🧙‍♂️ E2E typesafety with [tRPC v11](https://trpc.io "tRPC") & [TanStack Query v5](https://tanstack.com/query "TanStack Query")
 - ⚡ Full-stack React with Next.js
-- ⚡ Database (Postgres) with Prisma
+- 🪶 Database ([Turso](https://turso.tech "Turso") SQLite / libSQL) with [Drizzle ORM](https://orm.drizzle.team "Drizzle ORM")
+
+## Datenbank & Migration
+
+- **Lokale Entwicklung (SQLite Datei):** `TURSO_DATABASE_URL=file:local.db`
+- **Remote Turso DB:** `TURSO_DATABASE_URL=libsql://<db-name>.turso.io` & `TURSO_AUTH_TOKEN=<token>`
+- **Schema anwenden:** `pnpm db:push`
+- **Daten aus alter Postgres-DB migrieren:** `pnpm db:migrate-from-postgres`
+- **Seed-Daten einfügen:** `pnpm db:seed`
+- **Drizzle Studio öffnen:** `pnpm db:studio`
 
 
 ## Nutzer
@@ -28,4 +37,3 @@ Diese App wird aktuell von der 2. Mannschaft des [TSC Zeuzleben](https://www.tsc
 
 ## Entwicklung
 Full Stack Development: [Sebastian Siedler](https://github.com/SebastianSiedler "GitHub: Sebastian Siedler")
-

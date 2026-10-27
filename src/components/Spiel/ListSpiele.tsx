@@ -1,5 +1,4 @@
 import { trpc } from '@/lib/trpc';
-import toast from 'react-hot-toast';
 import MatchListItem from './MatchListItem';
 
 const ListSpiele: React.FC = () => {
@@ -11,24 +10,16 @@ const ListSpiele: React.FC = () => {
       retry: false,
       staleTime: 24 * 60 * 1000,
       refetchOnMount: false,
-
-      onError: (err) => {
-        toast.error(err.message);
-      },
     },
   );
 
-  const spieleQuery = trpc.spiel.list.useQuery(undefined, {
-    onError: (err) => {
-      toast.error(err.message);
-    },
-  });
+  const spieleQuery = trpc.spiel.list.useQuery();
 
   return (
     <div>
-      {spieleQuery.status === 'loading' && <div>Loading...</div>}
+      {spieleQuery.isLoading && <div>Loading...</div>}
 
-      {spieleQuery.status === 'success' && (
+      {spieleQuery.isSuccess && (
         <div className="flex flex-col mx-2 mt-2 gap-y-4">
           {spieleQuery.data?.map((item) => {
             return (

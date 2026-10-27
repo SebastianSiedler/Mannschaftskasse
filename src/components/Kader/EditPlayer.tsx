@@ -1,16 +1,16 @@
 // MUI
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
 import Checkbox from '@mui/material/Checkbox';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
 import FormControlLabel from '@mui/material/FormControlLabel';
+import TextField from '@mui/material/TextField';
 
-import { Spieler } from '@prisma/client';
-import { useEffect, useState } from 'react';
+import type { Spieler } from '@/lib/db';
 import { trpc } from '@/lib/trpc';
+import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 
 interface Props {
@@ -70,8 +70,9 @@ const EditPlayer: React.FC<Props> = ({ player, open, handleClose }) => {
               value={name}
               onChange={(e) =>
                 setNames((names) => {
-                  names[i] = e.target.value;
-                  return [...names];
+                  const next = [...names];
+                  next[i] = e.target.value;
+                  return next;
                 })
               }
             />

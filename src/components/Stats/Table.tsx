@@ -1,7 +1,5 @@
-import toast from 'react-hot-toast';
-import { AppRouter } from '@/server/routers/_app';
+import { trpc, type RouterOutputs } from '@/lib/trpc';
 import Button from '@mui/material/Button';
-import { trpc } from '@/lib/trpc';
 import {
   createColumnHelper,
   flexRender,
@@ -10,15 +8,13 @@ import {
   SortingState,
   useReactTable,
 } from '@tanstack/react-table';
-import { inferProcedureOutput } from '@trpc/server';
-import { useState } from 'react';
 import jsPDF from 'jspdf';
 import autoTable, { ColumnInput } from 'jspdf-autotable';
+import { useState } from 'react';
+import toast from 'react-hot-toast';
 import { fontArial } from './Arial-normal';
 
-type Data = inferProcedureOutput<
-  AppRouter['stats']['list']
->[number]['saison_stats'][number];
+type Data = RouterOutputs['stats']['list'][number]['saison_stats'][number];
 
 const columnHelper = createColumnHelper<Data>();
 
@@ -28,8 +24,6 @@ interface Props {
 }
 
 const StatsTable: React.FC<Props> = ({ data, saisonName }) => {
-  console.log(data);
-
   const columns = [
     columnHelper.accessor('name', {
       header: () => <span>Name</span>,
@@ -83,7 +77,7 @@ const StatsTable: React.FC<Props> = ({ data, saisonName }) => {
     }),
   ];
 
-  const utils = trpc.useContext();
+  const utils = trpc.useUtils();
 
   const schuldenBegleichen = trpc.stats.clearDebts.useMutation({
     onSuccess: async () => {

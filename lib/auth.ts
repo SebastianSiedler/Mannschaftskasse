@@ -1,12 +1,11 @@
 import { serverEnv } from '@/env/server';
-import { prisma } from '@/lib/prisma';
-import { PrismaAdapter } from '@next-auth/prisma-adapter';
-import { Role } from '@prisma/client';
+import { db, type Role } from '@/lib/db';
+import { DrizzleAdapter } from '@/lib/db/auth-adapter';
 import type { NextAuthOptions } from 'next-auth';
 import Auth0Provider from 'next-auth/providers/auth0';
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma),
+  adapter: DrizzleAdapter(db),
   providers: [
     //   GoogleProvider({
     //     clientId: serverEnv.GOOGLE_CLIENT_ID,

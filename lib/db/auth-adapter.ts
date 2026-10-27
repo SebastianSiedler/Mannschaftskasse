@@ -1,42 +1,54 @@
-import { and, eq } from 'drizzle-orm';
 import type {
   Adapter,
   AdapterAccount,
   AdapterSession,
   AdapterUser,
-} from 'next-auth/adapters';
+} from '@auth/core/adapters';
+import { and, eq } from 'drizzle-orm';
 import type { Database } from './index';
-import { accounts, sessions, users, verificationTokens } from './schema';
+import {
+  accounts,
+  sessions,
+  users,
+  verificationTokens,
+  type Role,
+} from './schema';
+
+export type ExtendedAdapterUser = AdapterUser & {
+  role?: Role;
+};
 
 export function DrizzleAdapter(db: Database): Adapter {
   return {
-    async createUser(data: Omit<AdapterUser, 'id'>) {
+    async createUser(data: AdapterUser) {
+      const extData = data as ExtendedAdapterUser;
       const [user] = await db
         .insert(users)
         .values({
+          id: data.id || undefined,
           name: data.name ?? null,
           email: data.email,
           emailVerified: data.emailVerified ?? null,
           image: data.image ?? null,
-          role: data.role ?? 'USER',
+          role: extData.role ?? 'USER',
         })
         .returning();
 
-      return user as AdapterUser;
+      return user as ExtendedAdapterUser;
     },
 
     async getUser(id) {
       const user = await db.query.users.findFirst({
         where: eq(users.id, id),
       });
-      return (user as AdapterUser | undefined) ?? null;
+      return (user as ExtendedAdapterUser | undefined) ?? null;
     },
 
     async getUserByEmail(email) {
       const user = await db.query.users.findFirst({
         where: eq(users.email, email),
       });
-      return (user as AdapterUser | undefined) ?? null;
+      return (user as ExtendedAdapterUser | undefined) ?? null;
     },
 
     async getUserByAccount({ providerAccountId, provider }) {
@@ -49,28 +61,29 @@ export function DrizzleAdapter(db: Database): Adapter {
           user: true,
         },
       });
-      return (account?.user as AdapterUser | undefined) ?? null;
+      return (account?.user as ExtendedAdapterUser | undefined) ?? null;
     },
 
     async updateUser({ id, ...data }) {
       if (!id) {
         throw new Error('User id is required to update user');
       }
+      const extData = data as Partial<ExtendedAdapterUser>;
       const [user] = await db
         .update(users)
         .set({
-          ...(data.name !== undefined ? { name: data.name } : {}),
-          ...(data.email !== undefined ? { email: data.email } : {}),
-          ...(data.emailVerified !== undefined
-            ? { emailVerified: data.emailVerified }
+          ...(extData.name !== undefined ? { name: extData.name } : {}),
+          ...(extData.email !== undefined ? { email: extData.email } : {}),
+          ...(extData.emailVerified !== undefined
+            ? { emailVerified: extData.emailVerified }
             : {}),
-          ...(data.image !== undefined ? { image: data.image } : {}),
-          ...(data.role !== undefined ? { role: data.role } : {}),
+          ...(extData.image !== undefined ? { image: extData.image } : {}),
+          ...(extData.role !== undefined ? { role: extData.role } : {}),
         })
         .where(eq(users.id, id))
         .returning();
 
-      return user as AdapterUser;
+      return user as ExtendedAdapterUser;
     },
 
     async deleteUser(userId) {
@@ -93,7 +106,10 @@ export function DrizzleAdapter(db: Database): Adapter {
         token_type: account.token_type ?? null,
         scope: account.scope ?? null,
         id_token: account.id_token ?? null,
-        session_state: account.session_state ?? null,
+        session_state:
+          typeof account.session_state === 'string'
+            ? account.session_state
+            : null,
         oauth_token_secret:
           typeof account.oauth_token_secret === 'string'
             ? account.oauth_token_secret
@@ -101,6 +117,7 @@ export function DrizzleAdapter(db: Database): Adapter {
         oauth_token:
           typeof account.oauth_token === 'string' ? account.oauth_token : null,
       });
+      return account;
     },
 
     async unlinkAccount({
@@ -145,7 +162,7 @@ export function DrizzleAdapter(db: Database): Adapter {
       const { user, ...session } = sessionWithUser;
       return {
         session: session as AdapterSession,
-        user: user as AdapterUser,
+        user: user as ExtendedAdapterUser,
       };
     },
 

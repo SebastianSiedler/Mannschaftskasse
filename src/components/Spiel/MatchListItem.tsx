@@ -1,6 +1,5 @@
 import type { Result, Spiel } from '@/lib/db';
-import Link from 'next/link';
-import { useRouter } from 'next/router';
+import { Link, useLocation } from '@tanstack/react-router';
 
 export const getClubLogoAPI = (ClubId: string) => {
   return `https://widget-prod.bfv.de/export.media?action=getLogo&format=0&id=${ClubId}`;
@@ -10,7 +9,7 @@ interface NewProps {
   spielId: string;
   clubId: string;
   teamName: string;
-  kickOffDate: Date;
+  kickOffDate: Date | string | number;
   result: Spiel['result'];
   resultStatus: Result;
   currentGame: boolean;
@@ -27,17 +26,16 @@ const NewMatchListItem: React.FC<NewProps> = (props) => {
     currentGame,
   } = props;
 
-  const router = useRouter();
+  const location = useLocation();
+  const isSelected = location.pathname.includes(spielId);
+  const parsedDate =
+    kickOffDate instanceof Date ? kickOffDate : new Date(kickOffDate);
 
   return (
-    <Link
-      href={`/spiele/?spielId=${spielId}`}
-      as={`/spiele/${spielId}`}
-      scroll={false}
-    >
+    <Link to="/spiele/$spielId" params={{ spielId }} resetScroll={false}>
       <span
         className={`flex justify-between items-center gap-2 transition duration-500 ease rounded-xl px-2 py-2 ${
-          spielId === router.query.spielId && 'bg-blue-100'
+          isSelected ? 'bg-blue-100' : ''
         }`}
       >
         <div className="">
@@ -53,7 +51,7 @@ const NewMatchListItem: React.FC<NewProps> = (props) => {
             <span className="font-semibold">{teamName}</span>
           </div>
           <div className="text-slate-500">
-            {kickOffDate.toLocaleDateString('de', {
+            {parsedDate.toLocaleDateString('de', {
               month: 'numeric',
               day: 'numeric',
               year: 'numeric',

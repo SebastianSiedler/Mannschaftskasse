@@ -1,5 +1,6 @@
-import { trpc, type RouterOutputs } from '@/lib/trpc';
+import { clearDebtsFn, type StatsListOutput } from '@/server/functions/stats';
 import Button from '@mui/material/Button';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   createColumnHelper,
   flexRender,
@@ -14,7 +15,7 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { fontArial } from './Arial-normal';
 
-type Data = RouterOutputs['stats']['list'][number]['saison_stats'][number];
+type Data = StatsListOutput[number]['saison_stats'][number];
 
 const columnHelper = createColumnHelper<Data>();
 
@@ -24,6 +25,19 @@ interface Props {
 }
 
 const StatsTable: React.FC<Props> = ({ data, saisonName }) => {
+  const queryClient = useQueryClient();
+
+  const schuldenBegleichen = useMutation({
+    mutationFn: (input: { spielerId: string }) => clearDebtsFn({ data: input }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['stats', 'list'] });
+      toast.success('Schulden beglichen');
+    },
+    onError: (err: Error) => {
+      toast.error(err.message);
+    },
+  });
+
   const columns = [
     columnHelper.accessor('name', {
       header: () => <span>Name</span>,
@@ -76,18 +90,6 @@ const StatsTable: React.FC<Props> = ({ data, saisonName }) => {
       },
     }),
   ];
-
-  const utils = trpc.useUtils();
-
-  const schuldenBegleichen = trpc.stats.clearDebts.useMutation({
-    onSuccess: async () => {
-      await utils.stats.list.invalidate();
-      toast.success('Schulden beglichen');
-    },
-    onError: (err) => {
-      toast.error(err.message);
-    },
-  });
 
   const [sorting, setSorting] = useState<SortingState>([
     { id: 'schulden', desc: true },

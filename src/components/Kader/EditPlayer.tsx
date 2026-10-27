@@ -1,4 +1,5 @@
-// MUI
+import type { Spieler } from '@/lib/db';
+import { upsertSpielerFn } from '@/server/functions/spieler';
 import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
 import Dialog from '@mui/material/Dialog';
@@ -7,9 +8,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import TextField from '@mui/material/TextField';
-
-import type { Spieler } from '@/lib/db';
-import { trpc } from '@/lib/trpc';
+import { useMutation } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 
@@ -47,12 +46,17 @@ const EditPlayer: React.FC<Props> = ({ player, open, handleClose }) => {
     }
   }, [names]);
 
-  const upsertPlayer = trpc.spieler.upsert.useMutation({
+  const upsertPlayer = useMutation({
+    mutationFn: (input: {
+      names: string[];
+      active: boolean;
+      spielerId?: string;
+    }) => upsertSpielerFn({ data: input }),
     onSuccess: () => {
       handleClose();
       toast.success('gespeichert');
     },
-    onError: (err) => {
+    onError: (err: Error) => {
       toast.error(err.message);
     },
   });

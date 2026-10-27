@@ -1,6 +1,5 @@
 import { serverEnv } from '@/env/server';
 import { db, saisons, spiele, teams, type Spiel } from '@/lib/db';
-import { TRPCError } from '@trpc/server';
 import { bfvApi, type Schemas } from 'bfv-api';
 import { eq } from 'drizzle-orm';
 import { getOpponentTeam, getParsedDate, parse_result } from '.';
@@ -49,10 +48,7 @@ export const updateMatches = async () => {
     .find((match) => match.bfvMatchId === data.actualMatchId);
 
   if (!currentMatch) {
-    throw new TRPCError({
-      code: 'INTERNAL_SERVER_ERROR',
-      message: "Couldn't find a game for bfvActualMatchId",
-    });
+    throw new Error("Couldn't find a game for bfvActualMatchId");
   }
 
   const [updated_saison] = await db

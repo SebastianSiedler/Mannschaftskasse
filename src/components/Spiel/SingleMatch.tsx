@@ -1,4 +1,10 @@
-// MUI
+import {
+  addByPlayerListFn,
+  addEinsatzFn,
+  availablePlayersQueryOptions,
+  einsatzListQueryOptions,
+} from '@/server/functions/einsatz';
+import { spielDetailQueryOptions } from '@/server/functions/spiele';
 import AddCircleOutline from '@mui/icons-material/AddCircleOutline';
 import CheckCircleOutline from '@mui/icons-material/CheckCircleOutline';
 import CloseIcon from '@mui/icons-material/Close';
@@ -13,42 +19,45 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-
-import { trpc } from '@/lib/trpc';
-import Link from 'next/link';
-import { useRouter } from 'next/router';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { Link, useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import EditEinsatz from './EditEinsatz';
 
 interface Props {
   spielId: string;
+  spielerId?: string;
   open: boolean;
   handleClose: () => void;
 }
 
 const SingleMatch: React.FC<Props> = (props) => {
-  const { spielId, open, handleClose } = props;
+  const { spielId, spielerId, open, handleClose } = props;
 
-  const router = useRouter();
+  const navigate = useNavigate();
 
-  const matchQuery = trpc.spiel.detail.useQuery({ spielId });
-  const spielerQuery = trpc.einsatz.list.useQuery({ spielId });
-  const availQuery = trpc.einsatz.listAvailablePlayers.useQuery({ spielId });
+  const matchQuery = useQuery(spielDetailQueryOptions(spielId));
+  const spielerQuery = useQuery(einsatzListQueryOptions(spielId));
+  const availQuery = useQuery(availablePlayersQueryOptions(spielId));
 
-  const addPlayerMutation = trpc.einsatz.add.useMutation({
+  const addPlayerMutation = useMutation({
+    mutationFn: (input: { spielId: string; spielerId: string }) =>
+      addEinsatzFn({ data: input }),
     onSuccess: () => {
       spielerQuery.refetch();
       availQuery.refetch();
       toast.success('Hinzugefügt');
     },
-    onError: (err) => {
+    onError: (err: Error) => {
       toast.error(err.message);
     },
   });
 
-  const addPlayersFromClipboard = trpc.einsatz.addByPlayerList.useMutation({
-    onError: (err) => {
+  const addPlayersFromClipboard = useMutation({
+    mutationFn: (input: { spielId: string; names: string[] }) =>
+      addByPlayerListFn({ data: input }),
+    onError: (err: Error) => {
       toast.error(err.message);
     },
     onSuccess: (data) => {
@@ -91,16 +100,11 @@ const SingleMatch: React.FC<Props> = (props) => {
             {spielerQuery.isSuccess &&
               spielerQuery.data?.map((item, i) => (
                 <Link
-                  href={`/spiele/?spielId=${spielId}&spielerId=${item.spielerId}`}
-                  as={`/spiele/${spielId}/${item.spielerId}`}
+                  to="/spiele/$spielId/$spielerId"
+                  params={{ spielId, spielerId: item.spielerId }}
                   key={i}
                 >
-                  <ListItemButton
-                    selected={
-                      spielId === router.query.spielId &&
-                      item.spielerId === router.query.spielerId
-                    }
-                  >
+                  <ListItemButton selected={item.spielerId === spielerId}>
                     <ListItemText>{item.spieler.names[0]} </ListItemText>
                     <ListItemIcon>
                       {item.bezahlt ? (
@@ -152,16 +156,9 @@ const SingleMatch: React.FC<Props> = (props) => {
               addPlayersFromClipboard.mutate({
                 spielId: spielId,
                 names: inputNames
-                  /* der neue Coach schreibt vor jeden Namen immer "02. Max Mustermann" */
                   .replaceAll(/[0-9.]+/g, '')
-
-                  /* Jeder Name ist in einer eigenen Zeile */
                   .split('\n')
-
-                  /* Leerzeichen am Anfang und Ende des Namens entfernen */
                   .map((x) => x.trim())
-
-                  /* Leere Einträge entfernen */
                   .filter((x) => !!x),
               });
             }}
@@ -171,17 +168,21 @@ const SingleMatch: React.FC<Props> = (props) => {
         </DialogContent>
       </Dialog>
 
-      {!!router.query.spielId && !!router.query.spielerId && (
+      {!!spielerId && (
         <EditEinsatz
-          open={!!router.query.spielId && !!router.query.spielerId}
-          spielId={router.query.spielId as unknown as string}
-          spielerId={router.query.spielerId as unknown as string}
+          open={!!spielerId}
+          spielId={spielId}
+          spielerId={spielerId}
           handleClose={() => {
-            router.replace(`/spiele/?spielId=${spielId}`, `/spiele/${spielId}`);
+            navigate({
+              to: '/spiele/$spielId',
+              params: { spielId },
+              replace: true,
+            });
             spielerQuery.refetch();
             availQuery.refetch();
           }}
-          key={JSON.stringify(router.query)}
+          key={`${spielId}-${spielerId}`}
         />
       )}
     </>

@@ -1,5 +1,10 @@
-import { trpc } from '@/lib/trpc';
-import { useTRPCForm } from '@/lib/trpc-forms';
+import { useZodForm } from '@/lib/trpc-forms/utils/use-zod-form';
+import {
+  einsatzDetailQueryOptions,
+  removeEinsatzFn,
+  updateEinsatzFn,
+  updateEinsatzSchema,
+} from '@/server/functions/einsatz';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -8,18 +13,12 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import IconButton from '@mui/material/IconButton';
 import TextField from '@mui/material/TextField';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { z } from 'zod';
 
-export const updateEinsatzSchema = z.object({
-  spielId: z.string(),
-  spielerId: z.string(),
-  tore: z.number().min(0).optional(),
-  gelbeKarte: z.number().min(0).optional(),
-  roteKarte: z.number().min(0).optional(),
-  bezahlt: z.boolean().optional(),
-});
+export { updateEinsatzSchema };
 
 interface Props {
   open: boolean;
@@ -31,35 +30,42 @@ interface Props {
 const EditEinsatz: React.FC<Props> = (props) => {
   const { handleClose, open, spielId, spielerId } = props;
 
-  const einsatzQuery = trpc.einsatz.detail.useQuery({ spielId, spielerId });
+  const einsatzQuery = useQuery(einsatzDetailQueryOptions(spielId, spielerId));
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useTRPCForm({
-    mutation: trpc.einsatz.update,
-    validator: updateEinsatzSchema,
-    mutationOptions: {
-      onSuccess: () => {
-        handleClose();
-        toast.success('Erfolgreich gespeichert');
-      },
-      onError: (err) => {
-        toast.error(err.message);
-      },
+  const updateMutation = useMutation({
+    mutationFn: (input: z.infer<typeof updateEinsatzSchema>) =>
+      updateEinsatzFn({ data: input }),
+    onSuccess: () => {
+      handleClose();
+      toast.success('Erfolgreich gespeichert');
     },
-    formOptions: {
-      values: einsatzQuery.data,
+    onError: (err: Error) => {
+      toast.error(err.message);
     },
   });
 
-  const removeEinsatz = trpc.einsatz.remove.useMutation({
+  const {
+    register,
+    handleSubmit: rhfHandleSubmit,
+    getValues,
+    formState: { errors },
+  } = useZodForm({
+    validator: updateEinsatzSchema,
+    values: einsatzQuery.data,
+  });
+
+  const handleSubmit = rhfHandleSubmit(() => {
+    updateMutation.mutate(getValues());
+  });
+
+  const removeEinsatz = useMutation({
+    mutationFn: (input: { spielId: string; spielerId: string }) =>
+      removeEinsatzFn({ data: input }),
     onSuccess: () => {
       handleClose();
       toast.success('Erfolgreich gelöscht');
     },
-    onError: (err) => {
+    onError: (err: Error) => {
       toast.error(err.message);
     },
   });

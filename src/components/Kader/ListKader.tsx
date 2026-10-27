@@ -1,14 +1,15 @@
 import type { Spieler } from '@/lib/db';
-import { trpc } from '@/lib/trpc';
+import { spielerListQueryOptions } from '@/server/functions/spieler';
 import AddIcon from '@mui/icons-material/Add';
 import Fab from '@mui/material/Fab';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
+import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import EditPlayer from './EditPlayer';
 
 const ListKader: React.FC = () => {
-  const kaderQuery = trpc.spieler.list.useQuery();
+  const kaderQuery = useQuery(spielerListQueryOptions());
 
   const [open, setOpen] = useState(false);
 

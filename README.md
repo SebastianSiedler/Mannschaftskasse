@@ -17,8 +17,9 @@ Der erste Admin muss manuell über die Datenbank (DB) gesetzt werden. Anschließ
 
 ## Stack 🚀
 
-- 🧙‍♂️ E2E typesafety with [tRPC v11](https://trpc.io "tRPC") & [TanStack Query v5](https://tanstack.com/query "TanStack Query")
-- ⚡ Full-stack React with Next.js
+- ⚡ Full-stack React with [TanStack Start](https://tanstack.com/start "TanStack Start") & [TanStack Router](https://tanstack.com/router "TanStack Router") (Vite 8)
+- 🧙‍♂️ E2E typesafe RPCs with `createServerFn` & [TanStack Query v5](https://tanstack.com/query "TanStack Query")
+- 🔐 Authentication with [Auth.js (`@auth/core`)](https://authjs.dev "Auth.js")
 - 🪶 Database ([Turso](https://turso.tech "Turso") SQLite / libSQL) with [Drizzle ORM](https://orm.drizzle.team "Drizzle ORM")
 
 ## Datenbank & Migration

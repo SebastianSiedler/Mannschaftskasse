@@ -122,7 +122,10 @@ export const saisons = sqliteTable('Saison', {
   bfvCompoundID: text('bfvCompoundID').notNull().unique(),
   name: text('name').notNull(),
   latest: integer('latest', { mode: 'boolean' }).notNull().default(false),
-  bfvData: text('bfvData', { mode: 'json' }).$type<unknown>(),
+  bfvData: text('bfvData', { mode: 'json' }).$type<Record<
+    string,
+    any
+  > | null>(),
   currentSpielId: text('currentSpielId').unique(),
 });
 

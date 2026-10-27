@@ -1,17 +1,22 @@
-import { trpc } from '@/lib/trpc';
+import {
+  changeUserRoleFn,
+  usersListQueryOptions,
+} from '@/server/functions/user';
 import Button from '@mui/material/Button';
-import Image from 'next/image';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 
 const UserManagement: React.FC = () => {
-  const allUsersQuery = trpc.user.list.useQuery();
+  const allUsersQuery = useQuery(usersListQueryOptions());
 
-  const changeUserPermission = trpc.user.changeRole.useMutation({
+  const changeUserPermission = useMutation({
+    mutationFn: (input: { userId: string; admin: boolean }) =>
+      changeUserRoleFn({ data: input }),
     onSuccess: () => {
       allUsersQuery.refetch();
       toast.success('Rolle geändert');
     },
-    onError: (err) => {
+    onError: (err: Error) => {
       toast.error(err.message);
     },
   });
@@ -22,18 +27,16 @@ const UserManagement: React.FC = () => {
 
       {allUsersQuery.data?.map((item) => (
         <div key={item.id}>
-          {/* Name and Mail */}
           <div className="flex gap-4">
             <div className="relative w-12 h-12">
               {item.image ? (
-                <Image
+                <img
                   src={item.image}
                   alt={item.name ?? 'User'}
-                  fill
-                  className="rounded-full object-cover"
+                  className="w-full h-full rounded-full object-cover"
                 />
               ) : (
-                <div className="w-full h-full bg-gray-200"></div>
+                <div className="w-full h-full bg-gray-200 rounded-full"></div>
               )}
             </div>
             <div className="flex-1 min-w-0">

@@ -1,22 +1,22 @@
+import { useSession } from '@/lib/auth-client';
+import PeopleIcon from '@mui/icons-material/People';
+import QueryStatsIcon from '@mui/icons-material/QueryStats';
+import SportsSoccerIcon from '@mui/icons-material/SportsSoccer';
 import BottomNavigation from '@mui/material/BottomNavigation';
 import BottomNavigationAction from '@mui/material/BottomNavigationAction';
 import Box from '@mui/material/Box';
-import Paper from '@mui/material/Paper';
-import Head from 'next/head';
-import { ReactNode, useEffect, useState } from 'react';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import CssBaseline from '@mui/material/CssBaseline';
-import SportsSoccerIcon from '@mui/icons-material/SportsSoccer';
-import QueryStatsIcon from '@mui/icons-material/QueryStats';
-import PeopleIcon from '@mui/icons-material/People';
-import { useRouter } from 'next/router';
-import { useSession } from 'next-auth/react';
+import Paper from '@mui/material/Paper';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { useLocation, useNavigate } from '@tanstack/react-router';
+import { ReactNode, useEffect, useState } from 'react';
 
 type DefaultLayoutProps = { children: ReactNode };
 
 export const DefaultLayout = ({ children }: DefaultLayoutProps) => {
   const [value, setValue] = useState(0);
-  const router = useRouter();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const { data: session } = useSession();
 
@@ -37,16 +37,11 @@ export const DefaultLayout = ({ children }: DefaultLayoutProps) => {
   ].filter((item) => !item.admin || session?.user.role === 'ADMIN');
 
   useEffect(() => {
-    setValue(items.findIndex((x) => router.pathname.includes(x.route)));
-  }, [router.pathname, items]);
+    setValue(items.findIndex((x) => location.pathname.includes(x.route)));
+  }, [location.pathname, items.length]);
 
   return (
     <>
-      <Head>
-        <title>Mannschaftskasse</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
       <Box sx={{ pb: 7 }} className="text-slate-900">
         <main>{children}</main>
         <CssBaseline />
@@ -57,7 +52,7 @@ export const DefaultLayout = ({ children }: DefaultLayoutProps) => {
         >
           <BottomNavigation
             value={value}
-            onChange={(event, newValue) => {
+            onChange={(_event, newValue) => {
               setValue(newValue);
             }}
           >
@@ -66,7 +61,7 @@ export const DefaultLayout = ({ children }: DefaultLayoutProps) => {
                 label={item.name}
                 icon={item.icon}
                 key={i}
-                onClick={() => router.push(item.route)}
+                onClick={() => navigate({ to: item.route })}
               />
             ))}
           </BottomNavigation>

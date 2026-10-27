@@ -1,19 +1,30 @@
-import { trpc } from '@/lib/trpc';
+import {
+  spieleListQueryOptions,
+  updateMatchesFn,
+} from '@/server/functions/spiele';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import MatchListItem from './MatchListItem';
 
 const ListSpiele: React.FC = () => {
-  trpc.spiel.updateMatches.useQuery(
-    {},
-    {
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-      retry: false,
-      staleTime: 24 * 60 * 1000,
-      refetchOnMount: false,
-    },
-  );
+  const queryClient = useQueryClient();
 
-  const spieleQuery = trpc.spiel.list.useQuery();
+  useQuery({
+    queryKey: ['spiele', 'updateMatches'] as const,
+    queryFn: async () => {
+      const res = await updateMatchesFn({ data: {} });
+      if (res !== 'Nothing to update') {
+        await queryClient.invalidateQueries({ queryKey: ['spiele', 'list'] });
+      }
+      return res;
+    },
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    retry: false,
+    staleTime: 24 * 60 * 1000,
+    refetchOnMount: false,
+  });
+
+  const spieleQuery = useQuery(spieleListQueryOptions());
 
   return (
     <div>

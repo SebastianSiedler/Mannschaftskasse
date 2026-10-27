@@ -1,8 +1,15 @@
 import AddCircleOutline from '@mui/icons-material/AddCircleOutlined';
 import CheckCircleOutline from '@mui/icons-material/CheckCircleOutlined';
 import CloseIcon from '@mui/icons-material/Close';
+import ContentPaste from '@mui/icons-material/ContentPaste';
+import ExpandMore from '@mui/icons-material/ExpandMore';
 import HighlightOffOutlined from '@mui/icons-material/HighlightOffOutlined';
+import PlaylistAdd from '@mui/icons-material/PlaylistAdd';
+import Accordion from '@mui/material/Accordion';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import AccordionSummary from '@mui/material/AccordionSummary';
 import AppBar from '@mui/material/AppBar';
+import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import IconButton from '@mui/material/IconButton';
@@ -174,14 +181,19 @@ const SingleMatch: React.FC<Props> = (props) => {
     onSuccess: (data) => {
       if (data.unknown_players.length > 0) {
         toast.error(`${data.unknown_players.join(', ')} nicht gefunden`);
+      } else {
+        toast.success('Spieler erfolgreich hinzugefügt');
+        setIsImportOpen(false);
       }
       setInputNames(data.unknown_players.join('\n'));
       spielerQuery.refetch();
       availQuery.refetch();
+      queryClient.invalidateQueries({ queryKey: ['spiele', 'list'] });
     },
   });
 
   const [inputNames, setInputNames] = useState('');
+  const [isImportOpen, setIsImportOpen] = useState(true);
 
   return (
     <>
@@ -307,31 +319,126 @@ const SingleMatch: React.FC<Props> = (props) => {
               ))}
           </List>
 
-          <label htmlFor="player_names_textarea" className="font-semibold">
-            Nachricht:
-          </label>
-          <textarea
-            id="player_names_textarea"
-            rows={10}
-            value={inputNames}
-            onChange={(e) => setInputNames(e.target.value)}
-            className="form-control block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-          ></textarea>
-          <button
-            className="px-4 py-2 font-bold text-white bg-blue-500 rounded hover:bg-blue-700"
-            onClick={() => {
-              addPlayersFromClipboard.mutate({
-                spielId: spielId,
-                names: inputNames
-                  .replaceAll(/[0-9.]+/g, '')
-                  .split('\n')
-                  .map((x) => x.trim())
-                  .filter((x) => !!x),
-              });
+          <Accordion
+            expanded={isImportOpen}
+            onChange={(_, expanded) => setIsImportOpen(expanded)}
+            disableGutters
+            elevation={0}
+            sx={{
+              mt: 3,
+              borderRadius: '16px !important',
+              border: '1px solid',
+              borderColor: 'divider',
+              overflow: 'hidden',
+              '&:before': { display: 'none' },
             }}
           >
-            Hinzufügen
-          </button>
+            <AccordionSummary
+              expandIcon={<ExpandMore />}
+              sx={{
+                bgcolor: 'slate.50',
+                px: 2,
+                py: 0.5,
+                '& .MuiAccordionSummary-content': { my: 1 },
+              }}
+            >
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-100 text-blue-600">
+                  <PlaylistAdd fontSize="small" />
+                </div>
+                <div className="min-w-0">
+                  <div className="text-sm font-semibold text-slate-900">
+                    Spieler aus Text / Chat einfügen
+                  </div>
+                  <div className="text-xs text-slate-500">
+                    Aufstellung z. B. aus WhatsApp kopieren und automatisch
+                    zuordnen
+                  </div>
+                </div>
+              </div>
+            </AccordionSummary>
+
+            <AccordionDetails
+              sx={{ px: 2.5, pt: 2, pb: 2.5, bgcolor: 'background.paper' }}
+            >
+              <p className="text-xs text-slate-600 mb-2 leading-relaxed">
+                Füge hier eine Spielerliste oder Nachricht ein. Nummern und
+                Aufzählungszeichen (z. B.{' '}
+                <code className="rounded bg-slate-100 px-1 py-0.5 text-slate-800">
+                  1. Name
+                </code>
+                ) werden automatisch entfernt.
+              </p>
+
+              <textarea
+                id="player_names_textarea"
+                rows={6}
+                value={inputNames}
+                onChange={(e) => setInputNames(e.target.value)}
+                placeholder={
+                  '1. Max Mustermann\n2. Lukas Schmidt\n3. Jonas Müller'
+                }
+                className="w-full rounded-xl border border-slate-300 p-3 text-sm text-slate-800 placeholder-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 focus:outline-none transition font-sans resize-y"
+              />
+
+              <div className="flex items-center justify-between gap-2 mt-3">
+                <div className="flex items-center gap-2">
+                  {!!inputNames && (
+                    <Button
+                      size="small"
+                      color="inherit"
+                      onClick={() => setInputNames('')}
+                      sx={{ textTransform: 'none', borderRadius: 2 }}
+                    >
+                      Leeren
+                    </Button>
+                  )}
+                  {typeof navigator !== 'undefined' &&
+                    'clipboard' in navigator && (
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        color="inherit"
+                        startIcon={<ContentPaste fontSize="small" />}
+                        onClick={async () => {
+                          try {
+                            const text = await navigator.clipboard.readText();
+                            if (text) setInputNames(text);
+                          } catch {
+                            // Clipboard read permission might be denied
+                          }
+                        }}
+                        sx={{ textTransform: 'none', borderRadius: 2 }}
+                      >
+                        Einfügen
+                      </Button>
+                    )}
+                </div>
+
+                <Button
+                  variant="contained"
+                  disabled={
+                    !inputNames.trim() || addPlayersFromClipboard.isPending
+                  }
+                  onClick={() => {
+                    addPlayersFromClipboard.mutate({
+                      spielId: spielId,
+                      names: inputNames
+                        .replaceAll(/[0-9.]+/g, '')
+                        .split('\n')
+                        .map((x) => x.trim())
+                        .filter((x) => !!x),
+                    });
+                  }}
+                  sx={{ textTransform: 'none', borderRadius: 2, px: 2.5 }}
+                >
+                  {addPlayersFromClipboard.isPending
+                    ? 'Wird hinzugefügt...'
+                    : 'Hinzufügen'}
+                </Button>
+              </div>
+            </AccordionDetails>
+          </Accordion>
         </DialogContent>
       </Dialog>
 

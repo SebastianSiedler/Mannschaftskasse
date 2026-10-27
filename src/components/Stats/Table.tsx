@@ -427,7 +427,7 @@ const StatsTable: React.FC<Props> = ({ data, saisonName }) => {
                 className="flex items-center justify-between text-xs text-slate-700 bg-white rounded-lg p-2 border border-slate-100 shadow-2xs"
               >
                 <span className="font-medium truncate mr-2">
-                  vs. {game.opponent}
+                  {game.opponent}
                 </span>
                 <span className="shrink-0 font-bold text-red-600">5 €</span>
               </div>

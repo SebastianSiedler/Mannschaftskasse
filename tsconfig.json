@@ -15,12 +15,11 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "types": ["vite/client", "node"],
-    "baseUrl": ".",
     "paths": {
-      "@/src/*": ["src/*"],
-      "@/lib/*": ["lib/*"],
-      "@/env/*": ["env/*"],
-      "@/server/*": ["server/*"]
+      "@/src/*": ["./src/*"],
+      "@/lib/*": ["./lib/*"],
+      "@/env/*": ["./env/*"],
+      "@/server/*": ["./server/*"]
     }
   },
   "include": [

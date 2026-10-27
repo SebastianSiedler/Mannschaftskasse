@@ -73,7 +73,7 @@ const EditEinsatz: React.FC<Props> = (props) => {
 
   useEffect(() => {
     einsatzQuery.refetch();
-  }, []);
+  }, [einsatzQuery.refetch]);
 
   return (
     <div>

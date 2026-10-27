@@ -25,6 +25,12 @@ import {
   einsatzListQueryOptions,
 } from '@/server/functions/einsatz';
 import { spielDetailQueryOptions } from '@/server/functions/spiele';
+import {
+  BfvCardRedIcon,
+  BfvCardYellowIcon,
+  BfvCardYellowRedIcon,
+  BfvGoalIcon,
+} from './BfvIcons';
 import EditEinsatz from './EditEinsatz';
 
 interface Props {
@@ -133,7 +139,22 @@ const SingleMatch: React.FC<Props> = (props) => {
                 >
                   <ListItemButton selected={item.spielerId === spielerId}>
                     <ListItemText>{item.spieler.names[0]} </ListItemText>
-                    <ListItemIcon>
+                    <div className="flex items-center gap-1 mr-3 text-slate-800">
+                      {Array.from({ length: item.tore }).map((_, goalIdx) => (
+                        <BfvGoalIcon key={goalIdx} />
+                      ))}
+                      {item.gelbeKarte > 0 && item.roteKarte > 0 ? (
+                        <BfvCardYellowRedIcon />
+                      ) : item.gelbeKarte >= 2 ? (
+                        <BfvCardYellowRedIcon />
+                      ) : (
+                        <>
+                          {item.gelbeKarte === 1 && <BfvCardYellowIcon />}
+                          {item.roteKarte > 0 && <BfvCardRedIcon />}
+                        </>
+                      )}
+                    </div>
+                    <ListItemIcon sx={{ minWidth: 'auto' }}>
                       {item.bezahlt ? (
                         <CheckCircleOutline color="success" />
                       ) : (

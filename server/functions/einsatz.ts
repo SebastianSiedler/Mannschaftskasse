@@ -3,7 +3,8 @@ import { createServerFn } from '@tanstack/react-start';
 import { and, asc, eq } from 'drizzle-orm';
 import { z } from 'zod';
 import { requireAdmin, requireAuth } from '@/lib/auth';
-import { db, type Spieler, spieler, spielereinsaetze } from '@/lib/db';
+import { db, spieler, spielereinsaetze } from '@/lib/db';
+import { matchPlayerList } from './playerImport';
 
 export const updateEinsatzSchema = z.object({
   spielId: z.string(),
@@ -86,27 +87,18 @@ export const addByPlayerListFn = createServerFn({ method: 'POST' })
   )
   .handler(async ({ data: input }) => {
     await requireAdmin();
-    const unknown_players: string[] = [];
-    const played_players: Spieler[] = [];
 
     const all_players = await db.query.spieler.findMany();
+    const { matchedPlayers, unknownNames } = matchPlayerList(
+      input.names,
+      all_players,
+    );
 
-    input.names.forEach((name) => {
-      const player = all_players.find((player) => player.names.includes(name));
-
-      if (player) {
-        played_players.push(player);
-        return;
-      }
-
-      unknown_players.push(name);
-    });
-
-    if (played_players.length > 0) {
+    if (matchedPlayers.length > 0) {
       await db
         .insert(spielereinsaetze)
         .values(
-          played_players.map((player) => ({
+          matchedPlayers.map((player) => ({
             tore: 0,
             bezahlt: false,
             gelbeKarte: 0,
@@ -121,7 +113,7 @@ export const addByPlayerListFn = createServerFn({ method: 'POST' })
     }
 
     return {
-      unknown_players,
+      unknown_players: unknownNames,
     };
   });
 

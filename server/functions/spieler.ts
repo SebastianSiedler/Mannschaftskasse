@@ -8,7 +8,10 @@ import { db, spieler } from '@/lib/db';
 export const listSpielerFn = createServerFn({ method: 'GET' }).handler(
   async () => {
     await requireAdmin();
-    return await db.query.spieler.findMany();
+    const players = await db.query.spieler.findMany();
+    return players.sort((a, b) =>
+      (a.names[0] ?? '').localeCompare(b.names[0] ?? '', 'de'),
+    );
   },
 );
 

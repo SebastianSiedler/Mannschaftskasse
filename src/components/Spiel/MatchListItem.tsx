@@ -2,7 +2,7 @@ import type { Result, Spiel } from '@/lib/db';
 import { Link, useLocation } from '@tanstack/react-router';
 
 export const getClubLogoAPI = (ClubId: string) => {
-  return `https://widget-prod.bfv.de/export.media?action=getLogo&format=0&id=${ClubId}`;
+  return `https://app.bfv.de/export.media/-/action/getLogo/format/5/id/${ClubId}/verband/00ES8GNCQK000000VV0AG08LVUPGND5I/strat_code/bfv`;
 };
 
 interface NewProps {

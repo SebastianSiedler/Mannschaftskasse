@@ -9,9 +9,9 @@ import { matchPlayerList } from './playerImport';
 export const updateEinsatzSchema = z.object({
   spielId: z.string(),
   spielerId: z.string(),
-  tore: z.number().min(0).optional(),
-  gelbeKarte: z.number().min(0).optional(),
-  roteKarte: z.number().min(0).optional(),
+  tore: z.number().int().min(0).optional(),
+  gelbeKarte: z.number().int().min(0).max(2).optional(),
+  roteKarte: z.number().int().min(0).max(1).optional(),
   bezahlt: z.boolean().optional(),
 });
 
@@ -122,9 +122,9 @@ export const addEinsatzFn = createServerFn({ method: 'POST' })
     z.object({
       spielId: z.string(),
       spielerId: z.string(),
-      tore: z.number().min(0).default(0),
-      gelbeKarte: z.number().default(0),
-      roteKarte: z.number().default(0),
+      tore: z.number().int().min(0).default(0),
+      gelbeKarte: z.number().int().min(0).max(2).default(0),
+      roteKarte: z.number().int().min(0).max(1).default(0),
       bezahlt: z.boolean().default(false),
     }),
   )

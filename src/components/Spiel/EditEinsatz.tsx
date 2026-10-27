@@ -17,13 +17,23 @@ import toast from 'react-hot-toast';
 import type { z } from 'zod';
 import { useZodForm } from '@/lib/trpc-forms/utils/use-zod-form';
 import {
+  getCardLimits,
+  getRedCardDisplay,
+  getYellowCardDisplay,
+} from '@/server/functions/cardRules';
+import {
   einsatzDetailQueryOptions,
   type getEinsatzDetailFn,
   removeEinsatzFn,
   updateEinsatzFn,
   updateEinsatzSchema,
 } from '@/server/functions/einsatz';
-import { BfvCardRedIcon, BfvCardYellowIcon, BfvGoalIcon } from './BfvIcons';
+import {
+  BfvCardRedIcon,
+  BfvCardYellowIcon,
+  BfvCardYellowRedIcon,
+  BfvGoalIcon,
+} from './BfvIcons';
 
 export { updateEinsatzSchema };
 
@@ -37,34 +47,58 @@ interface Props {
 interface StatStepperRowProps {
   icon: React.ReactNode;
   label: string;
+  subtitle?: string;
   value: number;
   onChange: (next: number) => void;
+  min?: number;
+  max?: number;
 }
 
 const StatStepperRow: React.FC<StatStepperRowProps> = ({
   icon,
   label,
+  subtitle,
   value,
   onChange,
+  min = 0,
+  max,
 }) => {
+  const canDecrement = value > min;
+  const canIncrement = max === undefined || value < max;
+
   return (
     <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50/70 px-3.5 py-2.5">
-      <div className="flex items-center gap-2.5 text-slate-800">
-        <span className="flex items-center justify-center w-6 h-6">{icon}</span>
-        <span className="font-medium text-sm">{label}</span>
+      <div className="flex items-center gap-2.5 text-slate-800 min-w-0">
+        <span className="flex items-center justify-center w-6 h-6 shrink-0">
+          {icon}
+        </span>
+        <div className="min-w-0">
+          <div className="font-medium text-sm leading-tight truncate">
+            {label}
+          </div>
+          {subtitle && (
+            <div className="text-xs text-slate-500 leading-tight mt-0.5">
+              {subtitle}
+            </div>
+          )}
+        </div>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 shrink-0">
         <IconButton
           size="small"
-          onClick={() => onChange(Math.max(0, value - 1))}
-          disabled={value <= 0}
+          onClick={() => onChange(Math.max(min, value - 1))}
+          disabled={!canDecrement}
           sx={{
             border: '1px solid',
             borderColor: 'divider',
             bgcolor: 'background.paper',
             width: 32,
             height: 32,
+            '&.Mui-disabled': {
+              opacity: 0.35,
+              bgcolor: 'transparent',
+            },
           }}
         >
           <RemoveIcon fontSize="small" />
@@ -76,13 +110,20 @@ const StatStepperRow: React.FC<StatStepperRowProps> = ({
 
         <IconButton
           size="small"
-          onClick={() => onChange(value + 1)}
+          onClick={() =>
+            onChange(max !== undefined ? Math.min(max, value + 1) : value + 1)
+          }
+          disabled={!canIncrement}
           sx={{
             border: '1px solid',
             borderColor: 'divider',
             bgcolor: 'background.paper',
             width: 32,
             height: 32,
+            '&.Mui-disabled': {
+              opacity: 0.35,
+              bgcolor: 'transparent',
+            },
           }}
         >
           <AddIcon fontSize="small" />
@@ -132,6 +173,10 @@ const EditEinsatzForm: React.FC<EditEinsatzFormProps> = ({
   const gelbeKarte = watch('gelbeKarte') ?? data.gelbeKarte ?? 0;
   const roteKarte = watch('roteKarte') ?? data.roteKarte ?? 0;
   const bezahlt = watch('bezahlt') ?? data.bezahlt ?? false;
+
+  const { maxYellow, maxRed } = getCardLimits({ gelbeKarte, roteKarte });
+  const yellowDisplay = getYellowCardDisplay(gelbeKarte);
+  const redDisplay = getRedCardDisplay(roteKarte);
 
   const handleSubmit = rhfHandleSubmit(() => {
     updateMutation.mutate(getValues());
@@ -215,9 +260,18 @@ const EditEinsatzForm: React.FC<EditEinsatzFormProps> = ({
         />
 
         <StatStepperRow
-          icon={<BfvCardYellowIcon />}
-          label="Gelbe Karten"
+          icon={
+            yellowDisplay.isYellowRed ? (
+              <BfvCardYellowRedIcon />
+            ) : (
+              <BfvCardYellowIcon />
+            )
+          }
+          label={yellowDisplay.label}
+          subtitle={yellowDisplay.subtitle}
           value={gelbeKarte}
+          min={0}
+          max={maxYellow}
           onChange={(next) =>
             setValue('gelbeKarte', next, { shouldDirty: true })
           }
@@ -225,8 +279,11 @@ const EditEinsatzForm: React.FC<EditEinsatzFormProps> = ({
 
         <StatStepperRow
           icon={<BfvCardRedIcon />}
-          label="Rote Karten"
+          label={redDisplay.label}
+          subtitle={redDisplay.subtitle}
           value={roteKarte}
+          min={0}
+          max={maxRed}
           onChange={(next) =>
             setValue('roteKarte', next, { shouldDirty: true })
           }

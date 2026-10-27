@@ -31,3 +31,6 @@ jobs:
 
       - name: Run TypeScript typecheck
         run: pnpm run typecheck
+
+      - name: Run Vitest unit tests
+        run: pnpm test

@@ -1,13 +1,17 @@
 import Skeleton from '@mui/material/Skeleton';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useEffect, useRef } from 'react';
 import {
   spieleListQueryOptions,
   updateMatchesFn,
 } from '@/server/functions/spiele';
 import MatchListItem from './MatchListItem';
 
+let hasInitialScrolledToCurrentGame = false;
+
 const ListSpiele: React.FC = () => {
   const queryClient = useQueryClient();
+  const currentGameRef = useRef<HTMLDivElement | null>(null);
 
   useQuery({
     queryKey: ['spiele', 'updateMatches'] as const,
@@ -26,6 +30,20 @@ const ListSpiele: React.FC = () => {
   });
 
   const spieleQuery = useQuery(spieleListQueryOptions());
+
+  useEffect(() => {
+    if (
+      spieleQuery.data &&
+      !hasInitialScrolledToCurrentGame &&
+      currentGameRef.current
+    ) {
+      hasInitialScrolledToCurrentGame = true;
+      currentGameRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
+    }
+  }, [spieleQuery.data]);
 
   return (
     <div>
@@ -63,17 +81,22 @@ const ListSpiele: React.FC = () => {
       {spieleQuery.isSuccess && (
         <div className="flex flex-col mx-2 mt-2 gap-y-4">
           {spieleQuery.data?.map((item) => {
+            const isCurrentGame = item.Saison.length > 0;
             return (
-              <MatchListItem
+              <div
                 key={item.id}
-                spielId={item.id}
-                kickOffDate={item.kickoffDate}
-                clubId={item.opponent.bfvClubId}
-                teamName={item.opponent.name}
-                result={item.result}
-                resultStatus={item.resultType}
-                currentGame={item.Saison.length > 0}
-              />
+                ref={isCurrentGame ? currentGameRef : undefined}
+              >
+                <MatchListItem
+                  spielId={item.id}
+                  kickOffDate={item.kickoffDate}
+                  clubId={item.opponent.bfvClubId}
+                  teamName={item.opponent.name}
+                  result={item.result}
+                  resultStatus={item.resultType}
+                  currentGame={isCurrentGame}
+                />
+              </div>
             );
           })}
         </div>

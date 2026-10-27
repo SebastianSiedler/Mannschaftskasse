@@ -13,10 +13,20 @@ import { useSession } from '@/lib/auth-client';
 
 type DefaultLayoutProps = { children: ReactNode };
 
+const tabScrollPositions = new Map<string, number>();
+
+const getTabKey = (pathname: string) => {
+  if (pathname.startsWith('/spiele')) return '/spiele';
+  if (pathname.startsWith('/kader')) return '/kader';
+  if (pathname.startsWith('/stats')) return '/stats';
+  return pathname;
+};
+
 export const DefaultLayout = ({ children }: DefaultLayoutProps) => {
   const [value, setValue] = useState(0);
   const location = useLocation();
   const navigate = useNavigate();
+  const currentTabKey = getTabKey(location.pathname);
 
   const { data: session } = useSession();
 
@@ -40,6 +50,26 @@ export const DefaultLayout = ({ children }: DefaultLayoutProps) => {
     setValue(items.findIndex((x) => location.pathname.includes(x.route)));
   }, [location.pathname, items.findIndex]);
 
+  useEffect(() => {
+    const savedY = tabScrollPositions.get(currentTabKey);
+    if (savedY !== undefined) {
+      requestAnimationFrame(() => {
+        window.scrollTo({ top: savedY, behavior: 'instant' });
+      });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
+
+    const handleScroll = () => {
+      tabScrollPositions.set(currentTabKey, window.scrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [currentTabKey]);
+
   return (
     <>
       <Box sx={{ pb: 7 }} className="text-slate-900">
@@ -61,7 +91,10 @@ export const DefaultLayout = ({ children }: DefaultLayoutProps) => {
                 label={item.name}
                 icon={item.icon}
                 key={i}
-                onClick={() => navigate({ to: item.route })}
+                onClick={() => {
+                  tabScrollPositions.set(currentTabKey, window.scrollY);
+                  navigate({ to: item.route, resetScroll: false });
+                }}
               />
             ))}
           </BottomNavigation>

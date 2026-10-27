@@ -50,6 +50,7 @@ export function getRouter() {
       queryClient,
     },
     scrollRestoration: true,
+    getScrollRestorationKey: (location) => location.pathname,
     defaultPreload: 'intent',
   });
 

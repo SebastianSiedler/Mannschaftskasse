@@ -1,8 +1,8 @@
+import { isDeepStrictEqual } from 'node:util';
 import { queryOptions } from '@tanstack/react-query';
 import { createServerFn } from '@tanstack/react-start';
 import { bfvApi } from 'bfv-api';
 import { asc, eq } from 'drizzle-orm';
-import isEqual from 'lodash.isequal';
 import { z } from 'zod';
 import { serverEnv } from '@/env/server';
 import { db, saisons, spiele } from '@/lib/db';
@@ -32,7 +32,7 @@ export const updateMatchesFn = createServerFn({ method: 'GET' })
       params: { teamPermanentId: BFV_PERMANENT_TEAM_ID },
     });
 
-    if (!isEqual(saison?.bfvData, data) || input?.force) {
+    if (!isDeepStrictEqual(saison?.bfvData, data) || input?.force) {
       await updateMatches();
       return 'data changed';
     }

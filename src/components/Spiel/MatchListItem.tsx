@@ -78,41 +78,60 @@ const NewMatchListItem: React.FC<NewProps> = (props) => {
             Uhr
           </div>
         </div>
-        <div>
-          <div className="font-semibold flex justify-end tabular-nums">
-            {result}
-          </div>
-
-          <div className="flex flex-wrap items-center justify-end gap-1.5 mt-1">
-            {currentGame && (
-              <div className="px-2.5 py-0.5 rounded-full font-bold text-xs text-white bg-amber-500 flex items-center gap-1.5 shadow-xs">
-                <span className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" />
-                <span>Aktuelles Spiel</span>
-              </div>
-            )}
-            {hasGoalMismatch && typeof bfvOwnGoals === 'number' && (
-              <div
-                className="px-2 py-0.5 rounded-full font-semibold text-xs text-amber-900 bg-amber-100 border border-amber-300 flex items-center gap-1 shrink-0"
-                title={`Tor-Differenz: ${recordedGoals ?? 0} erfasst vs. ${bfvOwnGoals} laut BFV`}
-              >
-                <span>⚠️</span>
-                <span>
-                  {recordedGoals ?? 0}/{bfvOwnGoals} Tore
-                </span>
-              </div>
-            )}
-            <div
-              className={`px-2 py-0.5 rounded-full font-semibold text-xs ${
-                resultStatus === 'GEWONNEN'
-                  ? 'text-green-600 bg-green-100'
-                  : resultStatus === 'VERLOREN'
-                    ? 'text-red-600 bg-red-100'
-                    : 'text-gray-600 bg-gray-100'
-              }`}
-            >
-              {resultStatus.toLowerCase().replaceAll('_', ' ')}
+        <div className="flex flex-col items-end shrink-0 gap-1">
+          {resultStatus === 'GEWONNEN' && (
+            <div className="inline-flex items-center px-2.5 py-0.5 rounded-lg font-bold text-xs tabular-nums tracking-wide text-emerald-800 bg-emerald-100 border border-emerald-300">
+              {result?.replace(':', ' : ') ?? 'Sieg'}
             </div>
-          </div>
+          )}
+          {resultStatus === 'VERLOREN' && (
+            <div className="inline-flex items-center px-2.5 py-0.5 rounded-lg font-bold text-xs tabular-nums tracking-wide text-rose-800 bg-rose-100 border border-rose-300">
+              {result?.replace(':', ' : ') ?? 'Niederlage'}
+            </div>
+          )}
+          {resultStatus === 'UNENTSCHIEDEN' && (
+            <div className="inline-flex items-center px-2.5 py-0.5 rounded-lg font-bold text-xs tabular-nums tracking-wide text-slate-700 bg-slate-100 border border-slate-300">
+              {result?.replace(':', ' : ') ?? 'Unentschieden'}
+            </div>
+          )}
+          {resultStatus === 'AUSSTEHEND' && (
+            <div className="inline-flex items-center px-2 py-0.5 rounded-lg font-medium text-xs tabular-nums text-slate-400 bg-slate-100/80 border border-slate-200">
+              - : -
+            </div>
+          )}
+          {resultStatus === 'NICHT_ANGETRETEN' && (
+            <div className="inline-flex items-center px-2 py-0.5 rounded-lg font-semibold text-xs text-amber-800 bg-amber-100 border border-amber-300">
+              n. an.
+            </div>
+          )}
+          {resultStatus === 'NICHT_ANGETRETEN_GEGNER' && (
+            <div className="inline-flex items-center px-2 py-0.5 rounded-lg font-semibold text-xs text-amber-800 bg-amber-100 border border-amber-300">
+              Gegner n.an.
+            </div>
+          )}
+
+          {(currentGame ||
+            (hasGoalMismatch && typeof bfvOwnGoals === 'number')) && (
+            <div className="flex flex-wrap items-center justify-end gap-1 mt-0.5">
+              {currentGame && (
+                <div className="px-2 py-0.5 rounded-full font-bold text-[11px] text-white bg-amber-500 flex items-center gap-1 shadow-xs">
+                  <span className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" />
+                  <span>Aktuelles Spiel</span>
+                </div>
+              )}
+              {hasGoalMismatch && typeof bfvOwnGoals === 'number' && (
+                <div
+                  className="px-2 py-0.5 rounded-full font-semibold text-[11px] text-amber-900 bg-amber-100 border border-amber-300 flex items-center gap-1 shrink-0"
+                  title={`Tor-Differenz: ${recordedGoals ?? 0} erfasst vs. ${bfvOwnGoals} laut BFV`}
+                >
+                  <span>⚠️</span>
+                  <span>
+                    {recordedGoals ?? 0}/{bfvOwnGoals} Tore
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </span>
     </Link>

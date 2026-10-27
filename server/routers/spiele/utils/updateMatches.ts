@@ -1,3 +1,4 @@
+import { isDeepStrictEqual } from 'node:util';
 import { bfvApi, type Schemas } from 'bfv-api';
 import { eq } from 'drizzle-orm';
 import { serverEnv } from '@/env/server';
@@ -5,13 +6,74 @@ import { db, type Spiel, saisons, spiele, teams } from '@/lib/db';
 import { getOpponentTeam, getParsedDate, parse_result } from '.';
 
 type BfvMatch = Schemas['Match'];
+type BfvMatchesData = Awaited<ReturnType<typeof bfvApi.listMatches>>['data'];
 
-export const updateMatches = async () => {
+const BFV_SYNC_COOLDOWN_MS = 15 * 60 * 1000;
+
+export async function syncMatchesWithBfv(options?: {
+  force?: boolean;
+  bypassCooldown?: boolean;
+}) {
+  const saison = await db.query.saisons.findFirst({
+    where: eq(saisons.latest, true),
+  });
+
+  if (!saison) {
+    await updateMatches();
+    return 'first RQ' as const;
+  }
+
+  const rawBfvData = (saison.bfvData ?? {}) as Record<string, any>;
+  const { _lastCheckedAt, ...previousBfvData } = rawBfvData;
+
+  if (
+    !options?.force &&
+    !options?.bypassCooldown &&
+    typeof _lastCheckedAt === 'number' &&
+    Date.now() - _lastCheckedAt < BFV_SYNC_COOLDOWN_MS
+  ) {
+    return 'Nothing to update' as const;
+  }
+
   const { BFV_PERMANENT_TEAM_ID } = serverEnv;
 
   const { data } = await bfvApi.listMatches({
     params: { teamPermanentId: BFV_PERMANENT_TEAM_ID },
   });
+
+  if (!isDeepStrictEqual(previousBfvData, data) || options?.force) {
+    await updateMatches(data);
+    return 'data changed' as const;
+  }
+
+  await db
+    .update(saisons)
+    .set({
+      bfvData: {
+        ...data,
+        _lastCheckedAt: Date.now(),
+      },
+    })
+    .where(eq(saisons.id, saison.id));
+
+  return 'Nothing to update' as const;
+}
+
+export const updateMatches = async (prefetchedData?: BfvMatchesData) => {
+  const { BFV_PERMANENT_TEAM_ID } = serverEnv;
+
+  const data =
+    prefetchedData ??
+    (
+      await bfvApi.listMatches({
+        params: { teamPermanentId: BFV_PERMANENT_TEAM_ID },
+      })
+    ).data;
+
+  const bfvDataWithTimestamp = {
+    ...data,
+    _lastCheckedAt: Date.now(),
+  };
 
   let saison = await db.query.saisons.findFirst({
     where: eq(saisons.bfvCompoundID, data.team.compoundId),
@@ -29,7 +91,7 @@ export const updateMatches = async () => {
         name: data.team.seasonId,
         bfvCompoundID: data.team.compoundId,
         latest: true,
-        bfvData: data,
+        bfvData: bfvDataWithTimestamp,
       })
       .returning();
 
@@ -55,7 +117,7 @@ export const updateMatches = async () => {
     .update(saisons)
     .set({
       currentSpielId: currentMatch.id,
-      bfvData: data,
+      bfvData: bfvDataWithTimestamp,
     })
     .where(eq(saisons.id, saison.id))
     .returning();

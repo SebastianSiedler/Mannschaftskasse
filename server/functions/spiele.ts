@@ -1,12 +1,9 @@
-import { isDeepStrictEqual } from 'node:util';
 import { queryOptions } from '@tanstack/react-query';
 import { createServerFn } from '@tanstack/react-start';
-import { bfvApi } from 'bfv-api';
 import { asc, eq } from 'drizzle-orm';
 import { z } from 'zod';
-import { serverEnv } from '@/env/server';
 import { db, saisons, spiele } from '@/lib/db';
-import { updateMatches } from '@/server/routers/spiele/utils/updateMatches';
+import { syncMatchesWithBfv } from '@/server/routers/spiele/utils/updateMatches';
 
 export const updateMatchesFn = createServerFn({ method: 'GET' })
   .validator(
@@ -17,27 +14,7 @@ export const updateMatchesFn = createServerFn({ method: 'GET' })
       .optional(),
   )
   .handler(async ({ data: input }) => {
-    const saison = await db.query.saisons.findFirst({
-      where: eq(saisons.latest, true),
-    });
-
-    if (!saison) {
-      await updateMatches();
-      return 'first RQ';
-    }
-
-    const { BFV_PERMANENT_TEAM_ID } = serverEnv;
-
-    const { data } = await bfvApi.listMatches({
-      params: { teamPermanentId: BFV_PERMANENT_TEAM_ID },
-    });
-
-    if (!isDeepStrictEqual(saison?.bfvData, data) || input?.force) {
-      await updateMatches();
-      return 'data changed';
-    }
-
-    return 'Nothing to update';
+    return await syncMatchesWithBfv({ force: input?.force });
   });
 
 export const listSpieleFn = createServerFn({ method: 'GET' }).handler(

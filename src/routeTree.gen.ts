@@ -17,6 +17,7 @@ import { Route as KaderIndexRouteImport } from './routes/kader/index'
 import { Route as KaderAccountsRouteImport } from './routes/kader/accounts'
 import { Route as SpieleIndexRouteImport } from './routes/spiele/index'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as ApiCronUpdateMatchesRouteImport } from './routes/api/cron/update-matches'
 import { Route as SpieleSpielIdIndexRouteImport } from './routes/spiele/$spielId/index'
 import { Route as SpieleSpielIdSpielerIdRouteImport } from './routes/spiele/$spielId/$spielerId'
 
@@ -60,6 +61,11 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiCronUpdateMatchesRoute = ApiCronUpdateMatchesRouteImport.update({
+  id: '/api/cron/update-matches',
+  path: '/api/cron/update-matches',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SpieleSpielIdIndexRoute = SpieleSpielIdIndexRouteImport.update({
   id: '/spiele/$spielId/',
   path: '/spiele/$spielId/',
@@ -80,6 +86,7 @@ export interface FileRoutesByFullPath {
   '/kader/': typeof KaderIndexRoute
   '/spiele/': typeof SpieleIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/cron/update-matches': typeof ApiCronUpdateMatchesRoute
   '/spiele/$spielId/$spielerId': typeof SpieleSpielIdSpielerIdRoute
   '/spiele/$spielId/': typeof SpieleSpielIdIndexRoute
 }
@@ -92,6 +99,7 @@ export interface FileRoutesByTo {
   '/kader': typeof KaderIndexRoute
   '/spiele': typeof SpieleIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/cron/update-matches': typeof ApiCronUpdateMatchesRoute
   '/spiele/$spielId/$spielerId': typeof SpieleSpielIdSpielerIdRoute
   '/spiele/$spielId': typeof SpieleSpielIdIndexRoute
 }
@@ -105,6 +113,7 @@ export interface FileRoutesById {
   '/kader/': typeof KaderIndexRoute
   '/spiele/': typeof SpieleIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/cron/update-matches': typeof ApiCronUpdateMatchesRoute
   '/spiele/$spielId/$spielerId': typeof SpieleSpielIdSpielerIdRoute
   '/spiele/$spielId/': typeof SpieleSpielIdIndexRoute
 }
@@ -119,6 +128,7 @@ export interface FileRouteTypes {
     | '/kader/'
     | '/spiele/'
     | '/api/auth/$'
+    | '/api/cron/update-matches'
     | '/spiele/$spielId/$spielerId'
     | '/spiele/$spielId/'
   fileRoutesByTo: FileRoutesByTo
@@ -131,6 +141,7 @@ export interface FileRouteTypes {
     | '/kader'
     | '/spiele'
     | '/api/auth/$'
+    | '/api/cron/update-matches'
     | '/spiele/$spielId/$spielerId'
     | '/spiele/$spielId'
   id:
@@ -143,6 +154,7 @@ export interface FileRouteTypes {
     | '/kader/'
     | '/spiele/'
     | '/api/auth/$'
+    | '/api/cron/update-matches'
     | '/spiele/$spielId/$spielerId'
     | '/spiele/$spielId/'
   fileRoutesById: FileRoutesById
@@ -156,6 +168,7 @@ export interface RootRouteChildren {
   KaderIndexRoute: typeof KaderIndexRoute
   SpieleIndexRoute: typeof SpieleIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  ApiCronUpdateMatchesRoute: typeof ApiCronUpdateMatchesRoute
   SpieleSpielIdSpielerIdRoute: typeof SpieleSpielIdSpielerIdRoute
   SpieleSpielIdIndexRoute: typeof SpieleSpielIdIndexRoute
 }
@@ -218,6 +231,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/cron/update-matches': {
+      id: '/api/cron/update-matches'
+      path: '/api/cron/update-matches'
+      fullPath: '/api/cron/update-matches'
+      preLoaderRoute: typeof ApiCronUpdateMatchesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/spiele/$spielId/': {
       id: '/spiele/$spielId/'
       path: '/spiele/$spielId'
@@ -244,6 +264,7 @@ const rootRouteChildren: RootRouteChildren = {
   KaderIndexRoute: KaderIndexRoute,
   SpieleIndexRoute: SpieleIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  ApiCronUpdateMatchesRoute: ApiCronUpdateMatchesRoute,
   SpieleSpielIdSpielerIdRoute: SpieleSpielIdSpielerIdRoute,
   SpieleSpielIdIndexRoute: SpieleSpielIdIndexRoute,
 }

@@ -51,11 +51,15 @@ const NewMatchListItem: React.FC<NewProps> = (props) => {
             <span className="font-semibold">{teamName}</span>
           </div>
           <div className="text-slate-500">
-            {parsedDate.toLocaleDateString('de', {
-              month: 'numeric',
-              day: 'numeric',
+            {parsedDate.toLocaleString('de-DE', {
+              weekday: 'short',
+              day: '2-digit',
+              month: '2-digit',
               year: 'numeric',
-            })}
+              hour: '2-digit',
+              minute: '2-digit',
+            })}{' '}
+            Uhr
           </div>
         </div>
         <div>

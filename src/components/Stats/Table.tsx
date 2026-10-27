@@ -2,11 +2,14 @@ import Button from '@mui/material/Button';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   createColumnHelper,
+  createSortedRowModel,
   flexRender,
-  getCoreRowModel,
-  getSortedRowModel,
+  rowSortingFeature,
   type SortingState,
-  useReactTable,
+  sortFn_alphanumeric,
+  sortFn_text,
+  tableFeatures,
+  useTable,
 } from '@tanstack/react-table';
 import jsPDF from 'jspdf';
 import autoTable, { type ColumnInput } from 'jspdf-autotable';
@@ -17,7 +20,13 @@ import { fontArial } from './Arial-normal';
 
 type Data = StatsListOutput[number]['saison_stats'][number];
 
-const columnHelper = createColumnHelper<Data>();
+const features = tableFeatures({
+  rowSortingFeature,
+  sortedRowModel: createSortedRowModel(),
+  sortFns: { alphanumeric: sortFn_alphanumeric, text: sortFn_text },
+});
+
+const columnHelper = createColumnHelper<typeof features, Data>();
 
 interface Props {
   data: Data[];
@@ -38,7 +47,7 @@ const StatsTable: React.FC<Props> = ({ data, saisonName }) => {
     },
   });
 
-  const columns = [
+  const columns = columnHelper.columns([
     columnHelper.accessor('name', {
       header: () => <span>Name</span>,
       cell: (info) => info.getValue(),
@@ -89,7 +98,7 @@ const StatsTable: React.FC<Props> = ({ data, saisonName }) => {
         );
       },
     }),
-  ];
+  ]);
 
   const [sorting, setSorting] = useState<SortingState>([
     { id: 'schulden', desc: true },
@@ -97,11 +106,10 @@ const StatsTable: React.FC<Props> = ({ data, saisonName }) => {
     { id: 'tore', desc: true },
   ]);
 
-  const table = useReactTable({
+  const table = useTable({
+    features,
     data,
     columns,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
     onSortingChange: setSorting,
     state: {
       sorting,
@@ -174,7 +182,7 @@ const StatsTable: React.FC<Props> = ({ data, saisonName }) => {
             key={row.id}
             className={`${i % 2 === 0 ? 'bg-gray-100' : ''} min-h-[300px]`}
           >
-            {row.getVisibleCells().map((cell) => (
+            {row.getAllCells().map((cell) => (
               <td key={cell.id} className="text-center">
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
               </td>

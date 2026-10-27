@@ -452,6 +452,7 @@ const SingleMatch: React.FC<Props> = (props) => {
             spielerQuery.refetch();
             availQuery.refetch();
             queryClient.invalidateQueries({ queryKey: ['spiele', 'list'] });
+            queryClient.invalidateQueries({ queryKey: ['stats'] });
           }}
           key={`${spielId}-${activeSpielerId}`}
         />

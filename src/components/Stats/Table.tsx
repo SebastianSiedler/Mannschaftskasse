@@ -29,6 +29,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
+import { DEBT_SETTLEMENT_INVALIDATION_KEYS } from '@/lib/queryInvalidation';
 import { clearDebtsFn, type StatsListOutput } from '@/server/functions/stats';
 import { fontArial } from './Arial-normal';
 
@@ -70,7 +71,11 @@ const StatsTable: React.FC<Props> = ({ data, saisonName }) => {
     mutationFn: (input: { spielerId: string; spielIds?: string[] }) =>
       clearDebtsFn({ data: input }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['stats', 'list'] });
+      await Promise.all(
+        DEBT_SETTLEMENT_INVALIDATION_KEYS.map((key) =>
+          queryClient.invalidateQueries({ queryKey: key }),
+        ),
+      );
       toast.success('Schulden beglichen');
       setSelectedPlayerForSettle(null);
     },

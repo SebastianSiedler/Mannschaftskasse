@@ -14,7 +14,7 @@ import ListItemText from '@mui/material/ListItemText';
 import Skeleton from '@mui/material/Skeleton';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import {
@@ -38,14 +38,119 @@ interface Props {
   handleClose: () => void;
 }
 
+interface GoalBalanceBannerProps {
+  isLoading: boolean;
+  bfvOwnGoals: number | null | undefined;
+  recordedGoals: number;
+}
+
+const GoalBalanceBanner: React.FC<GoalBalanceBannerProps> = ({
+  isLoading,
+  bfvOwnGoals,
+  recordedGoals,
+}) => {
+  if (isLoading) {
+    return (
+      <Skeleton
+        variant="rounded"
+        height={56}
+        className="mb-4 rounded-xl"
+        sx={{ borderRadius: 3 }}
+      />
+    );
+  }
+
+  if (typeof bfvOwnGoals !== 'number') {
+    return null;
+  }
+
+  if (recordedGoals === bfvOwnGoals) {
+    return (
+      <div className="flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50/80 p-3 text-emerald-900 mb-4">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700">
+          <CheckCircleOutline fontSize="small" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="font-semibold text-sm">
+              Tore vollständig zugeordnet
+            </span>
+            <span className="inline-flex items-center rounded-full bg-emerald-200/80 px-2 py-0.5 text-xs font-semibold text-emerald-800">
+              {recordedGoals} {recordedGoals === 1 ? 'Tor' : 'Tore'} (BFV)
+            </span>
+          </div>
+          <div className="text-xs text-emerald-700/90 mt-0.5">
+            Alle im BFV gemeldeten Tore sind den Spielern zugewiesen.
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (recordedGoals < bfvOwnGoals) {
+    const missingGoals = bfvOwnGoals - recordedGoals;
+    return (
+      <div className="flex items-center gap-3 rounded-xl border border-amber-200 bg-amber-50/90 p-3 text-amber-950 mb-4">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber-100 text-amber-800">
+          <BfvGoalIcon />
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="font-semibold text-sm">
+              Tor-Differenz festgestellt
+            </span>
+            <span className="inline-flex items-center rounded-full bg-amber-200 px-2 py-0.5 text-xs font-bold text-amber-900">
+              {recordedGoals} von {bfvOwnGoals} erfasst
+            </span>
+          </div>
+          <div className="text-xs text-amber-800/90 mt-0.5">
+            Laut BFV{' '}
+            {bfvOwnGoals === 1 ? 'wurde 1 Tor' : `wurden ${bfvOwnGoals} Tore`}{' '}
+            erzielt. Es{' '}
+            {missingGoals === 1
+              ? 'fehlt noch 1 Tor'
+              : `fehlen noch ${missingGoals} Tore`}{' '}
+            (oder Eigentor des Gegners).
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const excessGoals = recordedGoals - bfvOwnGoals;
+  return (
+    <div className="flex items-center gap-3 rounded-xl border border-orange-200 bg-orange-50/90 p-3 text-orange-950 mb-4">
+      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-orange-100 text-orange-800">
+        <BfvGoalIcon />
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="font-semibold text-sm">Zu viele Tore erfasst</span>
+          <span className="inline-flex items-center rounded-full bg-orange-200 px-2 py-0.5 text-xs font-bold text-orange-900">
+            +{excessGoals} {excessGoals === 1 ? 'Tor zu viel' : 'Tore zu viel'}
+          </span>
+        </div>
+        <div className="text-xs text-orange-800/90 mt-0.5">
+          Es wurden {recordedGoals} Tore bei den Spielern eingetragen, laut BFV
+          wurden aber nur {bfvOwnGoals} erzielt.
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const SingleMatch: React.FC<Props> = (props) => {
   const { spielId, open, handleClose } = props;
 
+  const queryClient = useQueryClient();
   const [activeSpielerId, setActiveSpielerId] = useState<string | null>(null);
 
   const matchQuery = useQuery(spielDetailQueryOptions(spielId));
   const spielerQuery = useQuery(einsatzListQueryOptions(spielId));
   const availQuery = useQuery(availablePlayersQueryOptions(spielId));
+
+  const recordedGoals =
+    spielerQuery.data?.reduce((sum, item) => sum + (item.tore ?? 0), 0) ?? 0;
 
   const addPlayerMutation = useMutation({
     mutationFn: (input: { spielId: string; spielerId: string }) =>
@@ -111,6 +216,12 @@ const SingleMatch: React.FC<Props> = (props) => {
         </AppBar>
 
         <DialogContent>
+          <GoalBalanceBanner
+            isLoading={matchQuery.isLoading || spielerQuery.isLoading}
+            bfvOwnGoals={matchQuery.data?.bfvOwnGoals}
+            recordedGoals={recordedGoals}
+          />
+
           <div className="font-semibold">{`Gespielte Spieler: ${
             spielerQuery.data?.length ?? 0
           }`}</div>
@@ -233,6 +344,7 @@ const SingleMatch: React.FC<Props> = (props) => {
             setActiveSpielerId(null);
             spielerQuery.refetch();
             availQuery.refetch();
+            queryClient.invalidateQueries({ queryKey: ['spiele', 'list'] });
           }}
           key={`${spielId}-${activeSpielerId}`}
         />

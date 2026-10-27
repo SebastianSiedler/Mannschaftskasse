@@ -13,6 +13,9 @@ interface NewProps {
   result: Spiel['result'];
   resultStatus: Result;
   currentGame: boolean;
+  hasGoalMismatch?: boolean;
+  recordedGoals?: number;
+  bfvOwnGoals?: number | null;
 }
 
 const NewMatchListItem: React.FC<NewProps> = (props) => {
@@ -24,6 +27,9 @@ const NewMatchListItem: React.FC<NewProps> = (props) => {
     spielId,
     resultStatus,
     currentGame,
+    hasGoalMismatch,
+    recordedGoals,
+    bfvOwnGoals,
   } = props;
 
   const location = useLocation();
@@ -65,19 +71,30 @@ const NewMatchListItem: React.FC<NewProps> = (props) => {
         <div>
           <div className="font-semibold flex justify-end">{result}</div>
 
-          <div className="flex gap-2">
+          <div className="flex flex-wrap items-center justify-end gap-1.5 mt-0.5">
             {currentGame && (
-              <div className="px-2 py-1 rounded-full font-semibold text-xs text-amber-200 bg-amber-500">
+              <div className="px-2 py-0.5 rounded-full font-semibold text-xs text-amber-200 bg-amber-500">
                 Aktuelles Spiel!
               </div>
             )}
+            {hasGoalMismatch && typeof bfvOwnGoals === 'number' && (
+              <div
+                className="px-2 py-0.5 rounded-full font-semibold text-xs text-amber-900 bg-amber-100 border border-amber-300 flex items-center gap-1 shrink-0"
+                title={`Tor-Differenz: ${recordedGoals ?? 0} erfasst vs. ${bfvOwnGoals} laut BFV`}
+              >
+                <span>⚠️</span>
+                <span>
+                  {recordedGoals ?? 0}/{bfvOwnGoals} Tore
+                </span>
+              </div>
+            )}
             <div
-              className={`px-2 py-1 rounded-full font-semibold text-xs ${
+              className={`px-2 py-0.5 rounded-full font-semibold text-xs ${
                 resultStatus === 'GEWONNEN'
-                  ? 'text-green-500 bg-green-200'
+                  ? 'text-green-600 bg-green-100'
                   : resultStatus === 'VERLOREN'
-                    ? 'text-red-500 bg-red-200'
-                    : 'text-gray-500 bg-gray-200'
+                    ? 'text-red-600 bg-red-100'
+                    : 'text-gray-600 bg-gray-100'
               }`}
             >
               {resultStatus.toLowerCase().replaceAll('_', ' ')}

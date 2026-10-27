@@ -31,6 +31,9 @@ const ListSpiele: React.FC = () => {
 
   const spieleQuery = useQuery(spieleListQueryOptions());
 
+  const mismatchCount =
+    spieleQuery.data?.filter((s) => s.hasGoalMismatch).length ?? 0;
+
   useEffect(() => {
     if (
       spieleQuery.data &&
@@ -80,6 +83,21 @@ const ListSpiele: React.FC = () => {
 
       {spieleQuery.isSuccess && (
         <div className="flex flex-col mx-2 mt-2 gap-y-4">
+          {mismatchCount > 0 && (
+            <div className="flex items-center gap-2.5 rounded-xl border border-amber-200 bg-amber-50/90 px-3.5 py-2.5 text-amber-950">
+              <span className="text-base shrink-0">⚠️</span>
+              <div className="text-xs leading-relaxed">
+                <span className="font-semibold">
+                  {mismatchCount}{' '}
+                  {mismatchCount === 1 ? 'Spiel hat' : 'Spiele haben'} eine
+                  Tor-Differenz:
+                </span>{' '}
+                Die erfassten Spieler-Tore stimmen nicht mit dem BFV-Ergebnis
+                überein.
+              </div>
+            </div>
+          )}
+
           {spieleQuery.data?.map((item) => {
             const isCurrentGame = item.Saison.length > 0;
             return (
@@ -95,6 +113,9 @@ const ListSpiele: React.FC = () => {
                   result={item.result}
                   resultStatus={item.resultType}
                   currentGame={isCurrentGame}
+                  hasGoalMismatch={item.hasGoalMismatch}
+                  recordedGoals={item.recordedGoals}
+                  bfvOwnGoals={item.bfvOwnGoals}
                 />
               </div>
             );
